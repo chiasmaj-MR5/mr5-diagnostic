@@ -910,8 +910,8 @@
           q: "Which of these are tracked today? Re-run this diagnostic in six months and compare the profiles." }
       ],
       decideLabel: "Decide →",
-      btnRestart: "Start over", btnPrint: "Print the report", btnDlReport: "Download the report", reportSaved: "Saved ✓", btnBackIntro: "Back to start",
-      foot: "Based on Chiasson, M. &amp; Kelly, R., <em>Redefining Organizational Performance in the AI Era: A New Human-Centric Framework</em>. This is a perception snapshot, not an audit — it is most useful when several leaders complete it independently and compare where their answers diverge.",
+      btnRestart: "Start over", btnPrint: "Download the report (PDF)", btnDlReport: "Download the report (PDF)", reportSaved: "Saved ✓", pdfPreparing: "Preparing the PDF…", btnBackIntro: "Back to start",
+      foot: "Based on Chiasson, M., <em>Redefining Organizational Performance in the AI Era: A New Human-Centric Framework</em>. This is a perception snapshot, not an audit — it is most useful when several leaders complete it independently and compare where their answers diverge.",
       levels: [
         { min: 81, name: "Future-Ready", read: "Strong human capital amplified by strong drive. The challenge now is protection: keep the conditions that produce this — safety, purpose, slack for exploration — as the organization scales and as AI reshapes the work." },
         { min: 49, name: "Performing", read: "A solid foundation with real momentum. The multiplication in the formula is working in the organization's favor — targeted investment in the weakest quotient will pay off exponentially, not incrementally." },
@@ -1055,6 +1055,7 @@
       btnReopen: "Reopen the session",
       closedBanner: "This session is closed — this is the final report.",
       saveErr: "Could not save to the session. Check that you have edit access, then try again.",
+      shareHosted: "<strong>No login needed.</strong> Anyone who scans the code opens the public questionnaire for this organization on their phone. At the end, each person taps <em>Email my response</em>; paste the codes you receive into the live results.",
       pastTitle: "Past sessions",
       btnNewSession: "Start a new session",
       btnPresent: "Present the QR",
@@ -1128,8 +1129,8 @@
           q: "Lesquels sont suivis aujourd'hui&nbsp;? Refaites ce diagnostic dans six mois et comparez les profils." }
       ],
       decideLabel: "À décider →",
-      btnRestart: "Recommencer", btnPrint: "Imprimer le rapport", btnDlReport: "Télécharger le rapport", reportSaved: "Enregistré ✓", btnBackIntro: "Retour au début",
-      foot: "D'après Chiasson, M. et Kelly, R., <em>Redefining Organizational Performance in the AI Era: A New Human-Centric Framework</em>. Ceci est un instantané de perceptions, pas un audit — il est le plus utile lorsque plusieurs leaders le complètent indépendamment et comparent là où leurs réponses divergent.",
+      btnRestart: "Recommencer", btnPrint: "Télécharger le rapport (PDF)", btnDlReport: "Télécharger le rapport (PDF)", reportSaved: "Enregistré ✓", pdfPreparing: "Préparation du PDF…", btnBackIntro: "Retour au début",
+      foot: "D'après Chiasson, M., <em>Redefining Organizational Performance in the AI Era: A New Human-Centric Framework</em>. Ceci est un instantané de perceptions, pas un audit — il est le plus utile lorsque plusieurs leaders le complètent indépendamment et comparent là où leurs réponses divergent.",
       levels: [
         { min: 81, name: "Prêt pour l'avenir", read: "Un capital humain solide amplifié par un élan solide. Le défi est maintenant la protection : préservez les conditions qui produisent ce résultat — sécurité, sens, marge pour l'exploration — à mesure que l'organisation croît et que l'IA transforme le travail." },
         { min: 49, name: "Performant", read: "Une base solide avec un réel élan. La multiplication de la formule joue en faveur de l'organisation — un investissement ciblé dans le quotient le plus faible rapportera de façon exponentielle, et non incrémentale." },
@@ -1272,6 +1273,7 @@
       btnReopen: "Rouvrir la session",
       closedBanner: "Cette session est close — ceci est le rapport final.",
       saveErr: "Impossible d'enregistrer dans la session. Vérifiez que vous avez un accès en modification, puis réessayez.",
+      shareHosted: "<strong>Aucune connexion requise.</strong> Toute personne qui balaie le code ouvre sur son téléphone le questionnaire public de cette organisation. À la fin, chacun touche <em>Envoyer ma réponse</em>; collez les codes reçus dans les résultats en direct.",
       pastTitle: "Sessions passées",
       btnNewSession: "Démarrer une nouvelle session",
       btnPresent: "Projeter le code QR",
@@ -1423,7 +1425,7 @@
       '<div class="link-box" id="share-link">' + esc(url) + '</div>' +
       '<button class="btn ghost small" id="btn-copy">' + esc(t.copyLink) + '</button>' +
       '</div></div>' +
-      '<p style="font-size:0.82rem;color:var(--ink-2);margin-top:0.8rem">' + t.shareAccess + '</p>' +
+      '<p style="font-size:0.82rem;color:var(--ink-2);margin-top:0.8rem">' + (HOSTED_URL && !(SESSION && SESSION.shareUrl) ? t.shareHosted : t.shareAccess) + '</p>' +
       (ART ? '<div style="margin-top:0.8rem">' +
         '<label style="display:block;font-size:0.8rem;font-weight:600;color:var(--ink-2);margin-bottom:0.3rem">' + esc(t.shareFixLink) + '</label>' +
         '<div style="display:flex;gap:0.6rem;flex-wrap:wrap">' +
@@ -1854,6 +1856,137 @@
       "</body></html>";
   }
 
+  var PDF_LIBS = [
+    "https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js",
+    "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"
+  ];
+  var pdfLibsP = null;
+  function loadScript(src) {
+    return new Promise(function (res, rej) {
+      var s = document.createElement("script");
+      s.src = src; s.onload = res; s.onerror = rej;
+      document.head.appendChild(s);
+    });
+  }
+  function loadPdfLibs() {
+    if (!pdfLibsP) {
+      pdfLibsP = loadScript(PDF_LIBS[0]).then(function () { return loadScript(PDF_LIBS[1]); });
+      pdfLibsP.catch(function () { pdfLibsP = null; });
+    }
+    return pdfLibsP;
+  }
+  function slug(s) {
+    return String(s || "").normalize("NFD").replace(/[̀-ͯ]/g, "")
+      .replace(/[^A-Za-z0-9]+/g, "-").replace(/^-+|-+$/g, "").toLowerCase() || "report";
+  }
+
+  // Charts bake their colors in at render time, so a dark view is re-rendered light for the PDF.
+  function withLightTheme(fn) {
+    var el = document.documentElement;
+    if (css("--bg").toLowerCase() !== "#191817") return fn();
+    var prev = el.getAttribute("data-theme");
+    el.setAttribute("data-theme", "light");
+    renderResults(RESULTS_MODE);
+    var restore = function () {
+      if (prev === null) el.removeAttribute("data-theme"); else el.setAttribute("data-theme", prev);
+      renderResults(RESULTS_MODE);
+    };
+    return fn().then(function (r) { restore(); return r; }, function (e) { restore(); throw e; });
+  }
+
+  function buildPdf() {
+    return loadPdfLibs().then(function () {
+      var root = $("s-results");
+      var cuts = [];
+      var scale = 2;
+      return window.html2canvas(root, {
+        scale: scale, backgroundColor: "#ffffff", windowWidth: 1000, logging: false,
+        onclone: function (doc) {
+          var st = doc.createElement("style");
+          st.textContent = "*{animation:none!important;transition:none!important}";
+          doc.head.appendChild(st);
+          var wrap = doc.querySelector(".wrap");
+          if (wrap) wrap.style.maxWidth = "900px";
+          var r = doc.getElementById("s-results");
+          ["live-admin", "submit-status", "live-empty", "r-live-note"].forEach(function (id) {
+            var el = doc.getElementById(id);
+            if (el) el.parentNode.removeChild(el);
+          });
+          Array.prototype.slice.call(r.querySelectorAll(".nav-row")).forEach(function (el) { el.parentNode.removeChild(el); });
+          Array.prototype.slice.call(r.querySelectorAll("svg")).forEach(function (svg) {
+            var bb = svg.getBoundingClientRect();
+            svg.setAttribute("width", bb.width);
+            svg.setAttribute("height", bb.height);
+            Array.prototype.slice.call(svg.querySelectorAll("text")).forEach(function (tx) {
+              tx.setAttribute("font-family", tx.getAttribute("class") === "mono"
+                ? "Menlo, 'Courier New', monospace" : "'Helvetica Neue', Helvetica, Arial, sans-serif");
+            });
+          });
+          var top = r.getBoundingClientRect().top;
+          var list = [];
+          Array.prototype.slice.call(r.children).forEach(function (el) {
+            if (el.id === "r-body") Array.prototype.slice.call(el.children).forEach(function (c) { list.push(c); });
+            else list.push(el);
+          });
+          list.forEach(function (el) {
+            var b = el.getBoundingClientRect();
+            if (b.height > 0) cuts.push((b.top - top) * scale);
+          });
+          Array.prototype.slice.call(r.querySelectorAll(".lever:not(:first-child), .rec:not(:first-child)")).forEach(function (el) {
+            cuts.push((el.getBoundingClientRect().top - top) * scale);
+          });
+        }
+      }).then(function (canvas) {
+        var jsPDF = window.jspdf.jsPDF;
+        var pdf = new jsPDF({ unit: "pt", format: "letter", orientation: "portrait" });
+        var pw = pdf.internal.pageSize.getWidth(), ph = pdf.internal.pageSize.getHeight();
+        var margin = 40, footerH = 20;
+        var cw = pw - margin * 2;
+        var k = canvas.width / cw;
+        var pageH = Math.floor((ph - margin * 2 - footerH) * k);
+
+        // Break pages at the lowest section boundary that fits, never through a section.
+        var slices = [], start = 0, total = canvas.height;
+        while (total - start > pageH) {
+          var limit = start + pageH, best = -1;
+          cuts.forEach(function (c) { if (c > start + pageH * 0.3 && c <= limit && c > best) best = c; });
+          var end = best > 0 ? Math.round(best) : limit;
+          slices.push([start, end]);
+          start = end;
+        }
+        if (total - start > 2) slices.push([start, total]);
+
+        var org = currentOrg();
+        slices.forEach(function (sl, i) {
+          var h = sl[1] - sl[0];
+          var c = document.createElement("canvas");
+          c.width = canvas.width; c.height = h;
+          var cx = c.getContext("2d");
+          cx.fillStyle = "#ffffff"; cx.fillRect(0, 0, c.width, h);
+          cx.drawImage(canvas, 0, sl[0], canvas.width, h, 0, 0, canvas.width, h);
+          if (i > 0) pdf.addPage();
+          pdf.addImage(c.toDataURL("image/jpeg", 0.92), "JPEG", margin, margin, cw, h / k);
+          pdf.setFontSize(8);
+          pdf.setTextColor(138, 130, 122);
+          pdf.text("MR5 InnovAction · Four Quotients Diagnostic · " + (org.name || ""), margin, ph - margin / 2 - 4);
+          pdf.text((i + 1) + " / " + slices.length, pw - margin, ph - margin / 2 - 4, { align: "right" });
+        });
+        pdf.setProperties({ title: (org.name || "") + " — Four Quotients Diagnostic", author: "MR5 InnovAction" });
+        return { pdf: pdf, filename: "four-quotients-" + slug(org.name) + ".pdf" };
+      });
+    });
+  }
+
+  function saveHtmlReport(done) {
+    var html = buildReport();
+    return DL.save({ filename: "four-quotients-report.html", data: html }).then(done, function (e) {
+      var code = e && e.code;
+      if (code === "extension_not_enabled" || code === "rejected_extension") {
+        return DL.save({ filename: "four-quotients-report.txt", data: html }).then(done, function () {});
+      }
+    });
+  }
+
   function renderQuadrant(s, perDots) {
     var t = T();
     var W = 520, H = 420, m = { t: 28, r: 24, b: 46, l: 52 };
@@ -2227,21 +2360,27 @@
     show("intro");
   });
   $("btn-print").addEventListener("click", function () {
-    var t = T();
-    if (!DL) { window.print(); return; }
     var btn = $("btn-print");
-    var html = buildReport();
+    if (btn.disabled) return;
+    var t = T();
+    btn.disabled = true;
+    btn.textContent = t.pdfPreparing;
+    var reset = function () { btn.disabled = false; btn.textContent = T().btnDlReport; };
     var done = function () {
-      btn.textContent = t.reportSaved;
-      setTimeout(function () { btn.textContent = t.btnDlReport; }, 2000);
+      btn.disabled = false;
+      btn.textContent = T().reportSaved;
+      setTimeout(function () { btn.textContent = T().btnDlReport; }, 2000);
     };
-    DL.save({ filename: "four-quotients-report.html", data: html }).then(done, function (e) {
-      var code = e && e.code;
-      if (code === "extension_not_enabled" || code === "rejected_extension") {
-        DL.save({ filename: "four-quotients-report.txt", data: html }).then(done, function () {});
-      } else if (code !== "declined" && code !== "rate_limited") {
-        try { window.print(); } catch (err) {}
-      }
+    withLightTheme(buildPdf).then(function (res) {
+      if (!DL) { res.pdf.save(res.filename); done(); return; }
+      return DL.save({ filename: res.filename, data: res.pdf.output("arraybuffer") }).then(done, function (e) {
+        var code = e && e.code;
+        if (code === "extension_not_enabled" || code === "rejected_extension") return saveHtmlReport(done).then(reset);
+        reset();
+      });
+    }).catch(function () {
+      reset();
+      if (DL) saveHtmlReport(done); else { try { window.print(); } catch (err) {} }
     });
   });
 
