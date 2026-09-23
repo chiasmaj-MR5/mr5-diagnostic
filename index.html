@@ -1,0 +1,2279 @@
+<!doctype html>
+<title>Four Quotients Diagnostic</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,600&amp;family=Instrument+Sans:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap">
+<style>
+  :root {
+    --bg: #F6F3EF;
+    --surface: #FDFBF8;
+    --surface-2: #EFEAE3;
+    --ink: #26221E;
+    --ink-2: #5C554D;
+    --ink-3: #8A827A;
+    --line: #DDD6CC;
+    --line-strong: #C4BBAE;
+    --accent: #B4432A;
+    --accent-ink: #FFFFFF;
+    --accent-soft: rgba(180, 67, 42, 0.10);
+    --q-iq: #2F62B8;
+    --q-eq: #188A6B;
+    --q-pasq: #B03318;
+    --q-cuq: #B67A10;
+    --track: #E7E1D8;
+    --grid: #E3DCD2;
+    --shadow: 0 1px 2px rgba(38, 34, 30, 0.05), 0 8px 28px rgba(38, 34, 30, 0.07);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #191817;
+      --surface: #211F1E;
+      --surface-2: #2A2725;
+      --ink: #ECE7E0;
+      --ink-2: #B3ACA3;
+      --ink-3: #7D766D;
+      --line: #363330;
+      --line-strong: #4A4540;
+      --accent: #E0664A;
+      --accent-ink: #1B1210;
+      --accent-soft: rgba(224, 102, 74, 0.13);
+      --q-iq: #5C8BE0;
+      --q-eq: #2EA187;
+      --q-pasq: #BC3F26;
+      --q-cuq: #C8841F;
+      --track: #2E2B29;
+      --grid: #302D2B;
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 28px rgba(0, 0, 0, 0.35);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #191817;
+    --surface: #211F1E;
+    --surface-2: #2A2725;
+    --ink: #ECE7E0;
+    --ink-2: #B3ACA3;
+    --ink-3: #7D766D;
+    --line: #363330;
+    --line-strong: #4A4540;
+    --accent: #E0664A;
+    --accent-ink: #1B1210;
+    --accent-soft: rgba(224, 102, 74, 0.13);
+    --q-iq: #5C8BE0;
+    --q-eq: #2EA187;
+    --q-pasq: #BC3F26;
+    --q-cuq: #C8841F;
+    --track: #2E2B29;
+    --grid: #302D2B;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 28px rgba(0, 0, 0, 0.35);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Instrument Sans", "Helvetica Neue", Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 2.5rem 1.25rem 5rem; position: relative; }
+
+  .lang-switch {
+    position: absolute; top: 2.3rem; right: 1.25rem;
+    display: flex; border: 1px solid var(--line-strong); border-radius: 999px;
+    overflow: hidden; background: var(--surface);
+  }
+  .lang-switch button {
+    font: inherit; font-size: 0.74rem; font-weight: 600; letter-spacing: 0.06em;
+    padding: 0.32rem 0.75rem; border: none; background: transparent;
+    color: var(--ink-3); cursor: pointer;
+  }
+  .lang-switch button.active { background: var(--ink); color: var(--bg); cursor: default; }
+  .lang-switch button:not(.active):hover { color: var(--ink); }
+  .lang-switch button:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+
+  .eyebrow {
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    font-weight: 600;
+    margin: 0 0 0.75rem;
+    padding-right: 7rem;
+  }
+  .eyebrow .mark { color: var(--accent); }
+
+  h1, h2, h3 { font-family: "Fraunces", Georgia, serif; text-wrap: balance; margin: 0; }
+  h1 { font-size: clamp(2rem, 5vw, 2.9rem); font-weight: 600; line-height: 1.12; letter-spacing: -0.01em; }
+  h2 { font-size: 1.45rem; font-weight: 600; }
+  h3 { font-size: 1.05rem; font-weight: 600; }
+  p  { margin: 0; }
+  .lede { color: var(--ink-2); font-size: 1.05rem; max-width: 58ch; }
+
+  .formula {
+    font-family: "Fraunces", Georgia, serif;
+    font-style: italic;
+    font-weight: 600;
+    font-size: clamp(1.5rem, 4.6vw, 2.3rem);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: center;
+    gap: 0.3em;
+    margin: 2.2rem 0 0.4rem;
+  }
+  .formula .op { color: var(--ink-3); font-weight: 400; }
+  .formula .t-iq   { color: var(--q-iq); }
+  .formula .t-eq   { color: var(--q-eq); }
+  .formula .t-pasq { color: var(--q-pasq); }
+  .formula .t-cuq  { color: var(--q-cuq); }
+  .formula .t-p    { color: var(--accent); }
+  .formula-legend {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 0.6rem 1.2rem;
+    margin: 1.6rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .formula-legend li { font-size: 0.86rem; color: var(--ink-2); }
+  .formula-legend .chip {
+    display: inline-block; width: 0.62em; height: 0.62em; border-radius: 2px;
+    margin-right: 0.45em;
+  }
+  .formula-legend strong { color: var(--ink); font-weight: 600; }
+
+  .btn {
+    display: inline-flex; align-items: center; gap: 0.5em;
+    font: inherit; font-weight: 600; font-size: 0.95rem;
+    padding: 0.7rem 1.5rem;
+    border-radius: 6px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    background: var(--accent); color: var(--accent-ink);
+    transition: filter 120ms ease;
+  }
+  .btn:hover { filter: brightness(1.08); }
+  .btn:focus-visible, .likert input:focus-visible + label, a:focus-visible {
+    outline: 2px solid var(--accent); outline-offset: 2px;
+  }
+  .btn[disabled] { opacity: 0.45; cursor: not-allowed; }
+  .btn.ghost { background: transparent; color: var(--ink-2); border-color: var(--line-strong); }
+  .btn.ghost:hover { color: var(--ink); filter: none; border-color: var(--ink-3); }
+  .btn.small { font-size: 0.84rem; padding: 0.5rem 1rem; }
+  .linklike {
+    background: none; border: none; font: inherit; font-size: 0.86rem;
+    color: var(--ink-3); text-decoration: underline; cursor: pointer; padding: 0;
+  }
+  .linklike:hover { color: var(--ink); }
+
+  .progress { margin: 0 0 2rem; }
+  .progress-steps { display: flex; gap: 0.4rem; margin-bottom: 0.5rem; }
+  .progress-steps .seg {
+    flex: 1; height: 4px; border-radius: 2px; background: var(--track);
+    position: relative; overflow: hidden;
+  }
+  .progress-steps .seg .fill {
+    position: absolute; inset: 0; width: 0%; background: var(--accent);
+    transition: width 200ms ease;
+  }
+  .progress-note {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.72rem; color: var(--ink-3);
+    display: flex; justify-content: space-between;
+  }
+
+  .q-head { border-left: 3px solid var(--qc, var(--accent)); padding-left: 1rem; margin-bottom: 1.8rem; }
+  .q-head .q-tag {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--qc, var(--accent)); font-weight: 600; display: block; margin-bottom: 0.35rem;
+  }
+  .q-head p { color: var(--ink-2); font-size: 0.95rem; margin-top: 0.4rem; max-width: 58ch; }
+
+  .item { padding: 1.35rem 0; border-bottom: 1px solid var(--line); }
+  .item:last-of-type { border-bottom: none; }
+  .item .stmt { font-weight: 500; margin-bottom: 0.9rem; max-width: 60ch; }
+  .item .stmt .n {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.78rem; color: var(--ink-3); margin-right: 0.6em;
+  }
+
+  .likert { display: flex; align-items: center; gap: 0.45rem; flex-wrap: wrap; }
+  .likert .cap { font-size: 0.74rem; color: var(--ink-3); min-width: 5.2em; }
+  .likert .cap.hi { text-align: left; }
+  .likert .opts { display: flex; gap: 0.45rem; }
+  .likert input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+  .likert label {
+    display: flex; align-items: center; justify-content: center;
+    width: 2.6rem; height: 2.6rem;
+    border: 1px solid var(--line-strong); border-radius: 6px;
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.9rem; color: var(--ink-2);
+    cursor: pointer; user-select: none;
+    background: var(--surface);
+    transition: border-color 100ms, background 100ms, color 100ms;
+  }
+  .likert label:hover { border-color: var(--ink-3); color: var(--ink); }
+  .likert input:checked + label {
+    background: var(--qc, var(--accent));
+    border-color: var(--qc, var(--accent));
+    color: var(--bg);
+    font-weight: 600;
+  }
+
+  .nav-row { display: flex; justify-content: space-between; align-items: center; margin-top: 2.2rem; gap: 1rem; }
+  .nav-row .hint { font-size: 0.82rem; color: var(--ink-3); }
+
+  .score-hero {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 1.5rem 2.5rem;
+    padding: 1.8rem 0 1.6rem;
+  }
+  .score-hero .num {
+    font-family: "Fraunces", Georgia, serif;
+    font-size: clamp(4rem, 12vw, 6.2rem); font-weight: 700; line-height: 0.95;
+    color: var(--accent);
+    font-variant-numeric: tabular-nums;
+  }
+  .score-hero .of { font-size: 1rem; color: var(--ink-3); font-family: "IBM Plex Mono", ui-monospace, monospace; }
+  .level-pill {
+    display: inline-block; padding: 0.32em 0.9em; border-radius: 999px;
+    background: var(--accent-soft); color: var(--accent);
+    font-weight: 600; font-size: 0.95rem; letter-spacing: 0.02em;
+    margin-bottom: 0.5rem;
+  }
+  .score-hero .read { max-width: 46ch; color: var(--ink-2); font-size: 0.98rem; }
+
+  .filled-formula {
+    font-family: "Fraunces", Georgia, serif; font-style: italic; font-weight: 600;
+    font-size: clamp(1.1rem, 3.4vw, 1.5rem);
+    padding: 1.1rem 1.3rem;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 8px;
+    display: flex; flex-wrap: wrap; gap: 0.3em; align-items: baseline;
+    justify-content: center;
+    overflow-x: auto;
+  }
+  .filled-formula .val { font-variant-numeric: tabular-nums; }
+
+  .card {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 10px;
+    padding: 1.6rem; margin-top: 1.6rem; box-shadow: var(--shadow);
+  }
+  .card > h3 { margin-bottom: 0.35rem; }
+  .card .sub { font-size: 0.86rem; color: var(--ink-3); margin-bottom: 1.2rem; }
+
+  .chart-scroll { overflow-x: auto; }
+  svg text { font-family: "Instrument Sans", Arial, sans-serif; }
+  svg .mono { font-family: "IBM Plex Mono", ui-monospace, monospace; }
+
+  .quad-note { font-size: 0.9rem; color: var(--ink-2); margin-top: 1rem; max-width: 60ch; }
+  .quad-note strong { color: var(--ink); }
+
+  .recs { display: grid; gap: 1rem; margin-top: 0.4rem; }
+  .rec { border-left: 3px solid var(--qc, var(--accent)); padding: 0.15rem 0 0.15rem 1rem; }
+  .rec h4 {
+    font-family: "Fraunces", Georgia, serif; font-size: 1rem; font-weight: 600; margin: 0 0 0.3rem;
+  }
+  .rec ul { margin: 0.3rem 0 0; padding-left: 1.1rem; color: var(--ink-2); font-size: 0.92rem; }
+  .rec li { margin-bottom: 0.25rem; }
+  .rec .ex { font-size: 0.82rem; color: var(--ink-3); font-style: italic; margin-top: 0.35rem; }
+
+  .org-form {
+    margin-top: 2rem; padding: 1.3rem 1.4rem;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 8px;
+    max-width: 34rem;
+  }
+  .org-form .o-title, .team-card .o-title, .session-card .o-title, .admin-box .o-title {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--accent); font-weight: 600; display: block; margin-bottom: 0.9rem;
+  }
+  .org-form .field { margin-bottom: 0.9rem; }
+  .org-form .field:last-child { margin-bottom: 0; }
+  .org-form label, .admin-box label {
+    display: block; font-size: 0.82rem; font-weight: 600; color: var(--ink-2);
+    margin-bottom: 0.3rem;
+  }
+  .org-form label .opt { font-weight: 400; color: var(--ink-3); }
+  .org-form input[type="text"], .org-form select, .admin-box input[type="text"] {
+    width: 100%; font: inherit; font-size: 0.95rem;
+    padding: 0.55rem 0.75rem;
+    border: 1px solid var(--line-strong); border-radius: 6px;
+    background: var(--bg); color: var(--ink);
+  }
+  .org-form input:focus-visible, .org-form select:focus-visible, .admin-box input:focus-visible {
+    outline: 2px solid var(--accent); outline-offset: 1px; border-color: var(--accent);
+  }
+  .org-form input::placeholder, .admin-box input::placeholder { color: var(--ink-3); opacity: 1; }
+  .start-hint { display: block; margin-top: 0.6rem; font-size: 0.82rem; color: var(--ink-3); }
+
+  .team-card, .session-card {
+    margin-top: 1.4rem; padding: 1.3rem 1.4rem;
+    background: var(--surface); border: 1px dashed var(--line-strong); border-radius: 8px;
+    max-width: 34rem;
+  }
+  .session-card { border-style: solid; border-color: var(--accent); }
+  .team-card p, .session-card p { font-size: 0.9rem; color: var(--ink-2); }
+  .session-card .s-org { font-family: "Fraunces", Georgia, serif; font-size: 1.2rem; font-weight: 600; color: var(--ink); margin: 0.1rem 0 0.2rem; }
+  .session-card .s-count {
+    font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 0.8rem; color: var(--accent);
+    font-weight: 600;
+  }
+  .share-panel { display: flex; gap: 1.2rem; align-items: flex-start; flex-wrap: wrap; margin-top: 1rem; }
+  .share-panel .qr { width: 148px; flex: none; border-radius: 6px; overflow: hidden; border: 1px solid var(--line); }
+  .share-panel .qr svg { display: block; width: 100%; height: auto; }
+  .share-panel .share-right { flex: 1; min-width: 220px; }
+  .share-panel .link-box {
+    font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 0.74rem;
+    padding: 0.5rem 0.6rem; border: 1px solid var(--line-strong); border-radius: 6px;
+    background: var(--bg); color: var(--ink-2); word-break: break-all;
+    margin: 0.5rem 0 0.6rem; cursor: text; user-select: all;
+  }
+  .btn-row { display: flex; gap: 0.7rem; flex-wrap: wrap; margin-top: 1.1rem; }
+
+  .archive-card {
+    margin-top: 1.4rem; padding: 1.3rem 1.4rem;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 8px;
+    max-width: 34rem;
+  }
+  .archive-card .o-title {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--ink-3); font-weight: 600; display: block; margin-bottom: 0.6rem;
+  }
+  .archive-row {
+    display: flex; align-items: center; justify-content: space-between; gap: 0.8rem;
+    padding: 0.6rem 0; border-top: 1px solid var(--line); flex-wrap: wrap;
+  }
+  .archive-row:first-of-type { border-top: none; }
+  .archive-row .a-org { font-weight: 600; color: var(--ink); font-size: 0.92rem; }
+  .archive-row .a-meta { font-size: 0.78rem; color: var(--ink-3); font-family: "IBM Plex Mono", ui-monospace, monospace; }
+
+  .present-overlay {
+    position: fixed; inset: 0; z-index: 60;
+    background: var(--bg); color: var(--ink);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 1.1rem; padding: 2rem; text-align: center; cursor: pointer;
+  }
+  .present-overlay .p-org {
+    font-family: "Fraunces", Georgia, serif; font-weight: 600;
+    font-size: clamp(1.8rem, 4.5vw, 3.2rem); line-height: 1.1;
+  }
+  .present-overlay .p-qr {
+    width: min(56vh, 82vw); background: #fff; border-radius: 12px; overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+  .present-overlay .p-qr svg { display: block; width: 100%; height: auto; }
+  .present-overlay .p-scan { font-size: clamp(1.1rem, 2.6vw, 1.7rem); font-weight: 600; color: var(--ink-2); }
+  .present-overlay .p-url {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: clamp(0.75rem, 1.6vw, 1rem); color: var(--ink-3); word-break: break-all; max-width: 90vw;
+  }
+  .present-overlay .p-exit { position: fixed; top: 1rem; right: 1.4rem; font-size: 0.8rem; color: var(--ink-3); }
+
+  .status-banner {
+    margin: 0 0 1.4rem; padding: 0.9rem 1.2rem; border-radius: 8px;
+    background: var(--accent-soft); color: var(--ink-2); font-size: 0.92rem;
+  }
+  .status-banner strong { color: var(--ink); }
+  .status-banner.err { outline: 1px solid var(--accent); }
+  .code-box {
+    font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 0.72rem;
+    padding: 0.6rem; border: 1px solid var(--line-strong); border-radius: 6px;
+    background: var(--bg); color: var(--ink-2); word-break: break-all;
+    margin-top: 0.6rem; user-select: all; max-height: 7em; overflow-y: auto;
+  }
+  .admin-box {
+    margin-top: 1.4rem; padding: 1.2rem 1.4rem;
+    background: var(--surface-2); border-radius: 8px;
+  }
+  .admin-box .a-msg { font-size: 0.82rem; margin-top: 0.5rem; color: var(--ink-3); }
+
+  .purpose-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem; margin-top: 2rem;
+  }
+  .purpose-item {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 8px;
+    padding: 1rem 1.1rem;
+  }
+  .purpose-item .p-tag {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--accent); font-weight: 600; display: block; margin-bottom: 0.4rem;
+  }
+  .purpose-item p { font-size: 0.87rem; color: var(--ink-2); }
+
+  .posture {
+    padding: 1.2rem 1.4rem; margin-bottom: 1.4rem;
+    background: var(--accent-soft); border-radius: 8px;
+    font-size: 0.94rem; color: var(--ink-2);
+  }
+  .posture strong { color: var(--ink); }
+
+  .levers { display: grid; gap: 1.1rem; }
+  .lever { border-top: 1px solid var(--line); padding-top: 1rem; }
+  .lever .l-tag {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--ink-3); font-weight: 600; display: block; margin-bottom: 0.3rem;
+  }
+  .lever h4 {
+    font-family: "Fraunces", Georgia, serif; font-size: 0.98rem; font-weight: 600; margin: 0 0 0.3rem;
+  }
+  .lever p { font-size: 0.9rem; color: var(--ink-2); }
+  .lever .decide {
+    margin-top: 0.5rem; font-size: 0.88rem; color: var(--ink);
+    padding-left: 0.9rem; border-left: 2px solid var(--accent);
+  }
+  .lever .decide .d-label { font-weight: 600; color: var(--accent); }
+
+  .org-line { margin-top: 0.6rem; font-size: 0.98rem; color: var(--ink-2); }
+  .org-line strong { color: var(--ink); font-weight: 600; }
+  .org-line .sep { color: var(--ink-3); margin: 0 0.4em; }
+
+  .foot {
+    margin-top: 3rem; padding-top: 1.2rem; border-top: 1px solid var(--line);
+    font-size: 0.8rem; color: var(--ink-3); max-width: 62ch;
+  }
+
+  .tooltip {
+    position: fixed; pointer-events: none; z-index: 10;
+    background: var(--ink); color: var(--bg);
+    font-size: 0.78rem; font-weight: 500;
+    padding: 0.35rem 0.6rem; border-radius: 5px;
+    opacity: 0; transition: opacity 100ms;
+    white-space: nowrap;
+  }
+  .tooltip.show { opacity: 1; }
+
+  .screen { display: none; }
+  .screen.active { display: block; animation: fade 240ms ease; }
+  @keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) {
+    .screen.active { animation: none; }
+    .progress-steps .seg .fill { transition: none; }
+  }
+  @media print {
+    .btn, .nav-row, .lang-switch, .admin-box, .linklike { display: none !important; }
+    body { background: #fff; color: #111; }
+  }
+</style>
+
+<div class="wrap">
+  <div class="lang-switch" role="group" aria-label="Language / Langue">
+    <button id="lang-en" class="active" aria-pressed="true">EN</button>
+    <button id="lang-fr" aria-pressed="false">FR</button>
+  </div>
+
+  <!-- ============ INTRO ============ -->
+  <section class="screen active" id="s-intro">
+    <p class="eyebrow" id="i-eyebrow"></p>
+    <h1 id="i-title"></h1>
+    <p class="lede" style="margin-top:1rem" id="i-lede"></p>
+
+    <div class="formula" id="i-formula">
+      <span class="t-p">P</span><span class="op">=</span><span class="op">(</span><span class="t-iq">IQ</span><span class="op">+</span><span class="t-eq">EQ</span><span class="op">)</span><span class="op">×</span><span class="op">(</span><span class="t-pasq">PasQ</span><span class="op">+</span><span class="t-cuq">CuQ</span><span class="op">)</span>
+    </div>
+
+    <ul class="formula-legend" id="i-legend"></ul>
+
+    <div class="purpose-grid" id="i-purpose"></div>
+
+    <p class="lede" style="margin-top:1.6rem; font-size:0.95rem" id="i-note"></p>
+
+    <div id="i-session"></div>
+
+    <div class="org-form" id="org-form">
+      <span class="o-title" id="o-title"></span>
+      <div class="field">
+        <label for="org-name" id="o-name-label"></label>
+        <input type="text" id="org-name" autocomplete="organization" maxlength="120">
+      </div>
+      <div class="field">
+        <label for="org-dept" id="o-dept-label"></label>
+        <select id="org-dept"></select>
+      </div>
+      <div class="field" id="dept-other-field" hidden="">
+        <label for="org-dept-other" id="o-dept-other-label"></label>
+        <input type="text" id="org-dept-other" maxlength="120">
+      </div>
+    </div>
+
+    <div style="margin-top:1.6rem" id="start-row">
+      <button class="btn" id="btn-start" disabled=""></button>
+      <span class="start-hint" id="start-hint"></span>
+    </div>
+
+    <div id="i-team"></div>
+    <div id="i-archive"></div>
+  </section>
+
+  <!-- ============ SURVEY ============ -->
+  <section class="screen" id="s-survey">
+    <div class="progress" aria-hidden="true">
+      <div class="progress-steps" id="prog-steps"></div>
+      <div class="progress-note"><span id="prog-label"></span><span id="prog-count"></span></div>
+    </div>
+    <div id="section-body"></div>
+    <div class="nav-row">
+      <button class="btn ghost" id="btn-back"></button>
+      <span class="hint" id="nav-hint"></span>
+      <button class="btn" id="btn-next" disabled=""></button>
+    </div>
+  </section>
+
+  <!-- ============ RESULTS ============ -->
+  <section class="screen" id="s-results">
+    <p class="eyebrow" id="r-eyebrow"></p>
+    <h1 style="font-size:clamp(1.6rem,4vw,2.2rem)" id="r-title"></h1>
+    <p class="org-line" id="r-org"></p>
+    <p class="lede" id="r-live-note" style="font-size:0.88rem;margin-top:0.5rem" hidden=""></p>
+
+    <div id="submit-status"></div>
+    <div id="live-empty"></div>
+
+    <div id="r-body">
+      <div class="score-hero">
+        <div>
+          <div class="num" id="r-score">–</div>
+          <div class="of" id="r-of"></div>
+        </div>
+        <div>
+          <span class="level-pill" id="r-level">–</span>
+          <p class="read" id="r-read"></p>
+        </div>
+      </div>
+
+      <div class="filled-formula" id="r-formula"></div>
+
+      <div class="card">
+        <h3 id="r-quad-title"></h3>
+        <p class="sub" id="r-quad-sub"></p>
+        <div class="chart-scroll"><div id="quad-chart"></div></div>
+        <p class="quad-note" id="quad-note"></p>
+      </div>
+
+      <div class="card">
+        <h3 id="r-bars-title"></h3>
+        <p class="sub" id="r-bars-sub"></p>
+        <div class="chart-scroll"><div id="bar-chart"></div></div>
+        <p class="quad-note" id="r-range-note" hidden=""></p>
+      </div>
+
+      <div class="card">
+        <h3 id="r-recs-title"></h3>
+        <p class="sub" id="r-recs-sub"></p>
+        <div class="recs" id="r-recs"></div>
+      </div>
+
+      <div class="card">
+        <h3 id="r-tr-title"></h3>
+        <p class="sub" id="r-tr-sub"></p>
+        <div class="posture" id="t-posture"></div>
+        <div class="levers" id="t-levers"></div>
+      </div>
+    </div>
+
+    <div id="live-admin"></div>
+
+    <div class="nav-row" style="justify-content:flex-start; gap:0.8rem">
+      <button class="btn ghost" id="btn-restart"></button>
+      <button class="btn ghost" id="btn-print"></button>
+    </div>
+
+    <p class="foot" id="r-foot"></p>
+  </section>
+
+</div>
+<div class="tooltip" id="tooltip"></div>
+
+<script type="application/json" id="fq-data">{"v": 1, "standalone": {"universal": true, "org": "", "deptKey": "", "deptOther": "", "email": "chiasmaj@gmail.com", "lang": "en"}}</script>
+<script>
+(function () {
+  "use strict";
+
+  var INITIAL_HTML = "<!doctype html>\n" + document.documentElement.outerHTML;
+  var ARTIFACT_URL = "https://claude.ai/code/artifact/035e83e3-40ad-49e0-aa43-388050d22bd8";
+  var HOSTED_URL = "https://chiasmaj-mr5.github.io/mr5-diagnostic/"; // public no-login respondent page; per-session links add ?org=…
+
+  // ============ QR encoder (byte mode, EC level M, v1-10) ============
+  var QR = (function () {
+    var SPEC = {
+      1: [26, 10, 1, 16, 0, 0], 2: [44, 16, 1, 28, 0, 0], 3: [70, 26, 1, 44, 0, 0],
+      4: [100, 18, 2, 32, 0, 0], 5: [134, 24, 2, 43, 0, 0], 6: [172, 16, 4, 27, 0, 0],
+      7: [196, 18, 4, 31, 0, 0], 8: [242, 22, 2, 38, 2, 39], 9: [292, 22, 3, 36, 2, 37],
+      10: [346, 26, 4, 43, 1, 44]
+    };
+    var ALIGN = { 1: [], 2: [6, 18], 3: [6, 22], 4: [6, 26], 5: [6, 30], 6: [6, 34],
+      7: [6, 22, 38], 8: [6, 24, 42], 9: [6, 26, 46], 10: [6, 28, 50] };
+    var EXP = new Array(512), LOG = new Array(256);
+    (function () {
+      var x = 1;
+      for (var i = 0; i < 255; i++) { EXP[i] = x; LOG[x] = i; x <<= 1; if (x & 0x100) x ^= 0x11D; }
+      for (i = 255; i < 512; i++) EXP[i] = EXP[i - 255];
+    })();
+    function gmul(a, b) { if (!a || !b) return 0; return EXP[LOG[a] + LOG[b]]; }
+    function rsGenPoly(n) {
+      var g = [1];
+      for (var i = 0; i < n; i++) {
+        var ng = new Array(g.length + 1).fill(0);
+        for (var j = 0; j < g.length; j++) { ng[j] ^= gmul(g[j], EXP[i]); ng[j + 1] ^= g[j]; }
+        g = ng;
+      }
+      return g;
+    }
+    function ecBytes(data, nEc) {
+      var gen = rsGenPoly(nEc).reverse();
+      var res = data.concat(new Array(nEc).fill(0));
+      for (var i = 0; i < data.length; i++) {
+        var coef = res[i];
+        if (coef !== 0) for (var j = 0; j < gen.length; j++) res[i + j] ^= gmul(gen[j], coef);
+      }
+      return res.slice(data.length);
+    }
+    function encode(text) {
+      var bytes = [];
+      var enc = unescape(encodeURIComponent(text));
+      for (var i = 0; i < enc.length; i++) bytes.push(enc.charCodeAt(i));
+      var version = null;
+      for (var v = 1; v <= 10; v++) {
+        var sv = SPEC[v];
+        var dcw = sv[0] - sv[1] * (sv[2] + sv[4]);
+        var cb = v <= 9 ? 8 : 16;
+        if (4 + cb + bytes.length * 8 <= dcw * 8) { version = v; break; }
+      }
+      if (!version) throw new Error("too long");
+      var s = SPEC[version];
+      var nBlocks = s[2] + s[4];
+      var dataCW = s[0] - s[1] * nBlocks;
+      var countBits = version <= 9 ? 8 : 16;
+      var bits = [];
+      function put(val, len) { for (var k = len - 1; k >= 0; k--) bits.push((val >> k) & 1); }
+      put(4, 4); put(bytes.length, countBits);
+      for (i = 0; i < bytes.length; i++) put(bytes[i], 8);
+      var cap = dataCW * 8;
+      put(0, Math.min(4, cap - bits.length));
+      while (bits.length % 8) bits.push(0);
+      var dataBytes = [];
+      for (i = 0; i < bits.length; i += 8) {
+        var b = 0;
+        for (var k2 = 0; k2 < 8; k2++) b = (b << 1) | bits[i + k2];
+        dataBytes.push(b);
+      }
+      var pad = [0xEC, 0x11], pi = 0;
+      while (dataBytes.length < dataCW) dataBytes.push(pad[(pi++) % 2]);
+      var blocks = [], ecs = [], off = 0;
+      for (i = 0; i < s[2]; i++) { var d = dataBytes.slice(off, off + s[3]); off += s[3]; blocks.push(d); ecs.push(ecBytes(d, s[1])); }
+      for (i = 0; i < s[4]; i++) { d = dataBytes.slice(off, off + s[5]); off += s[5]; blocks.push(d); ecs.push(ecBytes(d, s[1])); }
+      var seq = [];
+      var maxD = 0;
+      for (i = 0; i < blocks.length; i++) if (blocks[i].length > maxD) maxD = blocks[i].length;
+      for (i = 0; i < maxD; i++) for (var j2 = 0; j2 < blocks.length; j2++) if (i < blocks[j2].length) seq.push(blocks[j2][i]);
+      for (i = 0; i < s[1]; i++) for (j2 = 0; j2 < ecs.length; j2++) seq.push(ecs[j2][i]);
+      var size = 17 + version * 4;
+      var M = [], F = [];
+      for (i = 0; i < size; i++) { M.push(new Array(size).fill(0)); F.push(new Array(size).fill(false)); }
+      function setF(r, c, val) { M[r][c] = val; F[r][c] = true; }
+      function finder(r, c) {
+        for (var dr = -1; dr <= 7; dr++) for (var dc = -1; dc <= 7; dc++) {
+          var rr = r + dr, cc = c + dc;
+          if (rr < 0 || rr >= size || cc < 0 || cc >= size) continue;
+          var on = dr >= 0 && dr <= 6 && dc >= 0 && dc <= 6 &&
+            (dr === 0 || dr === 6 || dc === 0 || dc === 6 || (dr >= 2 && dr <= 4 && dc >= 2 && dc <= 4));
+          setF(rr, cc, on ? 1 : 0);
+        }
+      }
+      finder(0, 0); finder(0, size - 7); finder(size - 7, 0);
+      for (i = 8; i < size - 8; i++) {
+        if (!F[6][i]) setF(6, i, i % 2 === 0 ? 1 : 0);
+        if (!F[i][6]) setF(i, 6, i % 2 === 0 ? 1 : 0);
+      }
+      var ap = ALIGN[version];
+      for (i = 0; i < ap.length; i++) for (var j3 = 0; j3 < ap.length; j3++) {
+        var r0 = ap[i], c0 = ap[j3];
+        if (F[r0][c0]) continue;
+        for (var dr2 = -2; dr2 <= 2; dr2++) for (var dc2 = -2; dc2 <= 2; dc2++) {
+          var on2 = Math.max(Math.abs(dr2), Math.abs(dc2)) !== 1;
+          setF(r0 + dr2, c0 + dc2, on2 ? 1 : 0);
+        }
+      }
+      setF(size - 8, 8, 1);
+      for (i = 0; i <= 8; i++) {
+        if (i !== 6) { if (!F[8][i]) setF(8, i, 0); if (!F[i][8]) setF(i, 8, 0); }
+      }
+      for (i = 0; i < 8; i++) { if (!F[8][size - 1 - i]) setF(8, size - 1 - i, 0); }
+      for (i = 0; i < 7; i++) { if (!F[size - 1 - i][8]) setF(size - 1 - i, 8, 0); }
+      if (version >= 7) {
+        var rem = version << 12;
+        for (i = 17; i >= 12; i--) if ((rem >> i) & 1) rem ^= 0x1F25 << (i - 12);
+        var vinfo = (version << 12) | rem;
+        for (i = 0; i < 18; i++) {
+          var bit = (vinfo >> i) & 1;
+          setF(Math.floor(i / 3), i % 3 + size - 11, bit);
+          setF(i % 3 + size - 11, Math.floor(i / 3), bit);
+        }
+      }
+      var FMASK = [];
+      for (i = 0; i < size; i++) FMASK.push(F[i].slice());
+      var bitIdx = 0, totalBits = seq.length * 8;
+      var col = size - 1, up = true;
+      while (col > 0) {
+        if (col === 6) col--;
+        for (var rIdx = 0; rIdx < size; rIdx++) {
+          var r = up ? size - 1 - rIdx : rIdx;
+          for (var cOff = 0; cOff < 2; cOff++) {
+            var c = col - cOff;
+            if (F[r][c]) continue;
+            var val = 0;
+            if (bitIdx < totalBits) val = (seq[bitIdx >> 3] >> (7 - (bitIdx & 7))) & 1;
+            bitIdx++;
+            M[r][c] = val;
+          }
+        }
+        up = !up; col -= 2;
+      }
+      function maskFn(m, r, c) {
+        switch (m) {
+          case 0: return (r + c) % 2 === 0;
+          case 1: return r % 2 === 0;
+          case 2: return c % 3 === 0;
+          case 3: return (r + c) % 3 === 0;
+          case 4: return (Math.floor(r / 2) + Math.floor(c / 3)) % 2 === 0;
+          case 5: return (r * c) % 2 + (r * c) % 3 === 0;
+          case 6: return ((r * c) % 2 + (r * c) % 3) % 2 === 0;
+          case 7: return ((r + c) % 2 + (r * c) % 3) % 2 === 0;
+        }
+      }
+      function applyFormat(mat, maskId) {
+        var fmt = (0 << 3) | maskId;
+        var f = fmt << 10;
+        for (var i2 = 14; i2 >= 10; i2--) if ((f >> i2) & 1) f ^= 0x537 << (i2 - 10);
+        f = ((fmt << 10) | f) ^ 0x5412;
+        for (i2 = 0; i2 < 15; i2++) {
+          var bit2 = (f >> i2) & 1;
+          if (i2 < 6) mat[i2][8] = bit2;
+          else if (i2 < 8) mat[i2 + 1][8] = bit2;
+          else mat[size - 15 + i2][8] = bit2;
+          if (i2 < 8) mat[8][size - 1 - i2] = bit2;
+          else if (i2 < 9) mat[8][15 - i2] = bit2;
+          else mat[8][14 - i2] = bit2;
+        }
+      }
+      function penalty(mat) {
+        var p = 0, i2, j4;
+        for (var dir = 0; dir < 2; dir++) {
+          for (i2 = 0; i2 < size; i2++) {
+            var run = 1;
+            for (j4 = 1; j4 < size; j4++) {
+              var a = dir ? mat[j4][i2] : mat[i2][j4];
+              var b2 = dir ? mat[j4 - 1][i2] : mat[i2][j4 - 1];
+              if (a === b2) { run++; }
+              else { if (run >= 5) p += 3 + (run - 5); run = 1; }
+            }
+            if (run >= 5) p += 3 + (run - 5);
+          }
+        }
+        for (i2 = 0; i2 < size - 1; i2++) for (j4 = 0; j4 < size - 1; j4++) {
+          var v2 = mat[i2][j4];
+          if (mat[i2][j4 + 1] === v2 && mat[i2 + 1][j4] === v2 && mat[i2 + 1][j4 + 1] === v2) p += 3;
+        }
+        var dark = 0;
+        for (i2 = 0; i2 < size; i2++) for (j4 = 0; j4 < size; j4++) dark += mat[i2][j4];
+        p += Math.floor(Math.abs(dark * 100 / (size * size) - 50) / 5) * 10;
+        return p;
+      }
+      var best = null, bestP = Infinity;
+      for (var mk = 0; mk < 8; mk++) {
+        var mat = M.map(function (row) { return row.slice(); });
+        for (i = 0; i < size; i++) for (var j5 = 0; j5 < size; j5++) {
+          if (!FMASK[i][j5] && maskFn(mk, i, j5)) mat[i][j5] ^= 1;
+        }
+        applyFormat(mat, mk);
+        var pen = penalty(mat);
+        if (pen < bestP) { bestP = pen; best = mat; }
+      }
+      return best;
+    }
+    function toSVG(matrix, moduleSize, quiet) {
+      moduleSize = moduleSize || 4; quiet = quiet == null ? 4 : quiet;
+      var n = matrix.length, dim = (n + quiet * 2) * moduleSize;
+      var parts = ['<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + dim + ' ' + dim + '" shape-rendering="crispEdges">'];
+      parts.push('<rect width="' + dim + '" height="' + dim + '" fill="#ffffff"/>');
+      var path = "";
+      for (var r = 0; r < n; r++) for (var c = 0; c < n; c++) {
+        if (matrix[r][c]) path += "M" + ((c + quiet) * moduleSize) + " " + ((r + quiet) * moduleSize) + "h" + moduleSize + "v" + moduleSize + "h-" + moduleSize + "z";
+      }
+      parts.push('<path d="' + path + '" fill="#000000"/></svg>');
+      return parts.join("");
+    }
+    return { encode: encode, toSVG: toSVG };
+  })();
+
+  // ============ session data ============
+  var STORE = { v: 1, session: null };
+  try { STORE = JSON.parse(document.getElementById("fq-data").textContent) || STORE; } catch (e) {}
+  var STANDALONE = STORE.standalone || null;
+  var SESSION = STANDALONE ? null : (STORE.session || null);
+  var ARCHIVE = STANDALONE ? [] : (STORE.archive || []);
+  if (STANDALONE && STANDALONE.universal) {
+    try {
+      var _qp = new URLSearchParams(location.search);
+      if (_qp.get("org")) STANDALONE.org = _qp.get("org").slice(0, 120);
+      if (_qp.get("dept")) { STANDALONE.deptKey = "other"; STANDALONE.deptOther = _qp.get("dept").slice(0, 120); }
+      if (_qp.get("lang") === "fr") STANDALONE.lang = "fr";
+      else if (_qp.get("lang") === "en") STANDALONE.lang = "en";
+    } catch (e) {}
+  }
+
+  // ============ i18n ============
+  var DEPTS = {
+    whole: { en: "Entire organization", fr: "Organisation entière" },
+    exec: { en: "Executive leadership", fr: "Direction générale" },
+    hr: { en: "Human resources", fr: "Ressources humaines" },
+    finance: { en: "Finance", fr: "Finances" },
+    operations: { en: "Operations", fr: "Opérations" },
+    it: { en: "Information technology", fr: "Technologies de l'information" },
+    education: { en: "Education / Teaching", fr: "Éducation / Enseignement" },
+    rd: { en: "Research & development", fr: "Recherche et développement" },
+    sales: { en: "Sales", fr: "Ventes" },
+    marketing: { en: "Marketing & communications", fr: "Marketing et communications" },
+    service: { en: "Customer service", fr: "Service à la clientèle" },
+    other: { en: "Other…", fr: "Autre…" }
+  };
+  var DEPT_ORDER = ["whole", "exec", "hr", "finance", "operations", "it", "education", "rd", "sales", "marketing", "service", "other"];
+
+  var I18N = {
+    en: {
+      eyebrowIntro: '<span class="mark">MR&#8309;</span> InnovAction &middot; Diagnostic instrument',
+      eyebrowResults: '<span class="mark">MR&#8309;</span> InnovAction &middot; Diagnostic results',
+      introTitle: "How performance-ready is your organization for the AI era?",
+      introLede: "Traditional metrics measure how efficiently you run. This diagnostic measures whether you can <strong>adapt, create, and renew</strong> — the capabilities that decide performance when routine work belongs to machines.",
+      legend: [
+        '<span class="chip" style="background:var(--q-iq)"></span><strong>IQ</strong> — collective intelligence: systems thinking, foresight, digital literacy',
+        '<span class="chip" style="background:var(--q-eq)"></span><strong>EQ</strong> — emotional maturity: safety, empathy, constructive conflict',
+        '<span class="chip" style="background:var(--q-pasq)"></span><strong>PasQ</strong> — passion: purpose, autonomy, resilience',
+        '<span class="chip" style="background:var(--q-cuq)"></span><strong>CuQ</strong> — curiosity: inquiry, experimentation, external orientation'
+      ],
+      introNote: "24 statements, about 7 minutes. Rate each for the organization <em>as it is today</em> — not as you'd like it to be.",
+      purpose: [
+        { tag: "Why", text: "Financial and efficiency metrics were built for a predictable, industrial economy. In the AI era they can mask decline: an organization that is highly efficient at yesterday's work is, in reality, performing poorly." },
+        { tag: "What it measures", text: "The four human quotients that algorithms cannot replicate — collective intelligence, emotional maturity, passion, and curiosity. The framework argues these now decide an organization's long-term viability." },
+        { tag: "What you get", text: "A performance score out of 100, the organization's position on the Human Capital × Dynamic Potential map, and concrete guidance for deciding its system transformation." }
+      ],
+      orgTitle: "The organization being assessed",
+      orgNameLabel: "Organization name",
+      orgNamePh: "e.g., Riverview School District",
+      orgDeptLabel: 'Department or sector <span class="opt">(optional)</span>',
+      orgDeptOtherLabel: "Specify",
+      orgDeptOtherPh: "e.g., Continuing education",
+      deptPlaceholder: "— Select (optional) —",
+      startHint: "Enter the organization's name to begin.",
+      assessedOn: "Assessed on",
+      btnStart: "Begin the diagnostic",
+      btnIntro: "Intro", btnBack: "Back", btnNext: "Continue", btnResults: "See results",
+      hint: "Answer all six to continue",
+      capLo: "Strongly<br>disagree", capHi: "Strongly<br>agree",
+      ariaLikert: "Agreement, 1 strongly disagree to 5 strongly agree",
+      sectionTag: "Section {n} of 4 · {q}",
+      resultsTitle: "Performance profile",
+      personalTitle: "Your individual profile",
+      liveTitle: "Live results",
+      liveAuto: "This page updates automatically as responses arrive — each new response republishes it.",
+      of100: "of 100 possible",
+      quadTitle: "Where the organization sits: Human Capital &times; Dynamic Potential",
+      quadSub: "Human Capital = IQ + EQ &middot; Dynamic Potential = PasQ + CuQ &middot; each ranges 2–10",
+      quadAria: "Quadrant map of Human Capital versus Dynamic Potential",
+      axisX: "Human Capital (IQ + EQ) →",
+      axisY: "Dynamic Potential (PasQ + CuQ) →",
+      quadLabels: { ec: ["Energetic", "but Chaotic"], fr: ["Future-Ready"], do: ["Dormant"], cs: ["Capable", "but Stagnant"] },
+      barsTitle: "The four quotients",
+      barsSub: "Average agreement across each quotient's six statements (1–5)",
+      barsAria: "Bar chart of the four quotient scores",
+      rangeNote: "Bars show the average across respondents; whiskers mark the lowest and highest individual scores — wide whiskers mean perceptions diverge.",
+      recsTitle: "Where to invest first",
+      recsSub: "Cultivation moves from the framework, for the organization's two lowest quotients",
+      trTitle: "Deciding the system transformation",
+      trSub: "The framework's strategic implications — leadership, talent, design, metrics — applied to the organization's profile",
+      trLevers: [
+        { tag: "Leadership", title: "From controller to adaptive coach",
+          text: "Grounded Leadership pairs AI with empathy and ethical judgment, and operates through the Leadership Throttle: accelerate change where the organization has capacity, ease off to allow integration and recovery.",
+          q: "Where does the system have capacity for change right now — and where does it need recovery first?" },
+        { tag: "Talent", title: "Hire and develop for adaptive potential",
+          text: "Recruit for comfort with ambiguity and self-regulation alongside the four quotients, and train leaders as systemic sensors: deep listening, pattern recognition, reading the organization's energy beyond the dashboards.",
+          q: "Do the hiring and promotion criteria assess any of the four quotients today? Which one would you add first?" },
+        { tag: "Organizational design", title: "Design for resilience and flow",
+          text: "Build structures that absorb fluctuating change velocity: surge-capacity protocols for intense periods, protected deep-work and innovation time in calmer ones, and protected space for “edge” experiments alongside a stable core.",
+          q: "Which one or two edge experiments get protected time and resources in the next 90 days?" },
+        { tag: "Metrics", title: "Measure systemic health, not just output",
+          text: "Alongside the four quotients, track grounded metrics: burnout rates, psychological safety indices, and the ratio of exploitation (core business) to exploration (new ventures). They are the sensory feedback the throttle needs.",
+          q: "Which of these are tracked today? Re-run this diagnostic in six months and compare the profiles." }
+      ],
+      decideLabel: "Decide →",
+      btnRestart: "Start over", btnPrint: "Print the report", btnDlReport: "Download the report", reportSaved: "Saved ✓", btnBackIntro: "Back to start",
+      foot: "Based on Chiasson, M. &amp; Kelly, R., <em>Redefining Organizational Performance in the AI Era: A New Human-Centric Framework</em>. This is a perception snapshot, not an audit — it is most useful when several leaders complete it independently and compare where their answers diverge.",
+      levels: [
+        { min: 81, name: "Future-Ready", read: "Strong human capital amplified by strong drive. The challenge now is protection: keep the conditions that produce this — safety, purpose, slack for exploration — as the organization scales and as AI reshapes the work." },
+        { min: 49, name: "Performing", read: "A solid foundation with real momentum. The multiplication in the formula is working in the organization's favor — targeted investment in the weakest quotient will pay off exponentially, not incrementally." },
+        { min: 25, name: "Emerging", read: "Capabilities and drive are present but uneven. Because performance is multiplicative, the lowest quotient is suppressing everything else — that is where the leverage is." },
+        { min: 0, name: "Dormant", read: "The framework's hard truth: efficiency at yesterday's work does not count as performance. Foundational work on both capability and motivation is needed — start with psychological safety, it unlocks the rest." }
+      ],
+      archetypes: {
+        syn: { name: "Synergistic", text: "The organization's Human Capital and Dynamic Potential reinforce each other — capability with drive. This is the quadrant where the multiplication works in its favor.",
+          posture: "<strong>Transformation posture: protect and extend the edge.</strong> The system can absorb change. Keep the throttle open on exploration — champion edge projects with protected resources — while holding the core at a stable velocity. The risk at this stage is complacency: keep measuring, keep experimenting." },
+        cs:  { name: "Capable but Stagnant", text: "In the framework's words: “a powerful engine sitting in neutral.” The organization has the intelligence and maturity to do great things, but passion and curiosity aren't yet supplying the drive to realize that potential.",
+          posture: "<strong>Transformation posture: accelerate — ignite the drive.</strong> The capability base can absorb more change than is being asked of it. Open the throttle: articulate a purpose worth believing in, hand over real ownership, and fund visible experiments. Expect energy to lag capability for a while — protect and celebrate the early wins loudly." },
+        ec:  { name: "Energetic but Chaotic", text: "Plenty of passion and new ideas, but without matching cognitive and emotional discipline they don't convert into execution. Build the capability base under the energy.",
+          posture: "<strong>Transformation posture: ease off — consolidate before accelerating.</strong> The system is running hotter than its discipline can support. Ease off the throttle: slow the launch of new initiatives, and invest the freed energy in decision frameworks, knowledge flow, and psychological safety so execution can catch up with ambition." },
+        do:  { name: "Dormant", text: "Both the capability base and the drive need building. Start with psychological safety (EQ) — the framework treats it as the bedrock that makes everything else possible.",
+          posture: "<strong>Transformation posture: rebuild the foundations, gently.</strong> Neither capacity nor drive can absorb an aggressive transformation program yet. Start small and sequenced — psychological safety first, then a credible purpose, then protected time to learn — and only open the throttle once the system shows it can recover between pushes." }
+      },
+      quotients: [
+        { fullName: "Intelligence Quotient", short: "Intelligence",
+          title: "Collective intelligence",
+          desc: "The cognitive engine of the organization — how it thinks, learns, and decides in complexity.",
+          items: [
+            "Before major decisions, people here consider ripple effects across the whole organization, not just their own unit.",
+            "We actively scan for emerging trends and build proactive strategies, rather than reacting once change arrives.",
+            "Our people understand what AI can and cannot do well enough to use it as a genuine partner in their work.",
+            "Knowledge flows freely here — what one team learns is quickly available to others.",
+            "Decisions are grounded in data and rigorous debate rather than hierarchy or habit.",
+            "We actively seek out different perspectives and welcome challenges to our own assumptions."
+          ] },
+        { fullName: "Emotional Quotient", short: "Emotional",
+          title: "Emotional maturity",
+          desc: "The human interface of collaboration — how it feels to work, speak up, and disagree here.",
+          items: [
+            "People speak up, share half-formed ideas, and admit mistakes without fear of punishment or embarrassment.",
+            "We genuinely understand the feelings and needs of our colleagues and our customers.",
+            "Disagreements here become sources of learning rather than division.",
+            "Our culture is one of trust, respect, and open communication — people feel valued and supported.",
+            "Honest feedback is frequent, welcomed, and acted upon at every level.",
+            "Our leaders listen deeply and adjust to the emotional state and energy of their teams."
+          ] },
+        { fullName: "Passion Quotient", short: "Passion",
+          title: "Passion and purpose",
+          desc: "The motivational engine — the drive that fuels discretionary effort and persistence.",
+          items: [
+            "Our mission is compelling beyond profit, and people genuinely believe in it.",
+            "People have real control over how they do their work.",
+            "People get meaningful opportunities to deepen their skills and grow toward mastery.",
+            "Setbacks are met with perseverance here — failure is treated as learning, not blame.",
+            "People routinely go beyond what is required of them because they care about the outcome.",
+            "People here feel part of a community that is personally invested in our collective success."
+          ] },
+        { fullName: "Curiosity Quotient", short: "Curiosity",
+          title: "Curiosity and exploration",
+          desc: "The steering wheel — the exploratory drive that directs energy toward the new.",
+          items: [
+            "Asking “why?” and “what if?” is encouraged at every level, including of leadership.",
+            "Real time and resources are allocated for experiments — including ones that may fail.",
+            "We regularly mix people from different disciplines and backgrounds to solve problems together.",
+            "We constantly scan outside the organization — customers, competitors, other industries — for new ideas.",
+            "Challenging “how we’ve always done it” is welcomed here, not career-limiting.",
+            "We celebrate what we learn from failed attempts as visibly as we celebrate successes."
+          ] }
+      ],
+      recs: {
+        iq: { title: "Raise the IQ — sharpen collective intelligence",
+          moves: [
+            "Foster intellectual honesty and cognitive diversity: seek out dissenting perspectives and make rigorous debate a norm, not a threat.",
+            "Invest in knowledge-management systems and data literacy at every level, so insight travels faster than hierarchy.",
+            "Establish clear frameworks for ethical, data-driven decision-making — and train people to collaborate with AI, not just operate it."
+          ],
+          ex: "Reference point: Bridgewater's radical transparency and relentless pursuit of truth." },
+        eq: { title: "Raise the EQ — strengthen the human interface",
+          moves: [
+            "Make psychological safety a core organizational value: protect the people who speak up, admit mistakes, and ask hard questions.",
+            "Train leaders in empathy, deep listening, and social skill — the work that remains human is collaborative work.",
+            "Build robust feedback mechanisms so honest communication is routine rather than exceptional."
+          ],
+          ex: "Reference point: Google's Project Aristotle found psychological safety to be the #1 factor in high-performing teams." },
+        pasq: { title: "Raise the PasQ — reignite the motivational engine",
+          moves: [
+            "Articulate a compelling purpose beyond profit, and connect every role to it explicitly.",
+            "Give people genuine autonomy and ownership over their work — autonomy, mastery, and purpose drive intrinsic motivation.",
+            "Celebrate progress and resilience; treat setbacks as tuition, not failure."
+          ],
+          ex: "Reference points: Patagonia's environmental mission; Tesla's energy-transition purpose." },
+        cuq: { title: "Raise the CuQ — systematize exploration",
+          moves: [
+            "Allocate protected time and resources for experimentation, and celebrate learning from failures as loudly as successes.",
+            "Break silos with cross-disciplinary teams; curiosity compounds when perspectives collide.",
+            "Promote leaders who are visibly curious — leaders who ask the right questions rather than supply all the answers."
+          ],
+          ex: "Reference points: 3M's 15% time; Amazon's “Day 1” culture of continuous invention." }
+      },
+      // session strings
+      teamTitle: "Run a team session",
+      teamDesc: "Collect responses from several people across the organization and watch the aggregated results build live. You'll get a link and QR code to share.",
+      btnCreate: "Create a live session",
+      creating: "Creating the session…",
+      sessionLive: "Live assessment session",
+      respN: function (n) { return n + (n === 1 ? " response recorded" : " responses recorded"); },
+      shareTitle: "Invite respondents",
+      shareDesc: "Share this link or QR code. Each person answers the 24 statements; the results aggregate live.",
+      shareAccess: "This link requires each respondent to be signed in to claude.ai with an invited account (Share menu → grant access with editing). <strong>For respondents without any account</strong>, download the no-login respondent page below and share that instead.",
+      shareFixLink: "Using a different address (a Share-menu link, or wherever you host the respondent page)? Paste it here — the QR code and Copy button switch to it:",
+      shareFixPh: "https://…",
+      btnApplyLink: "Use this link", shareFixErr: "That doesn't look like a link (it must start with https://).",
+      copyLink: "Copy link", copied: "Copied ✓",
+      dlTitle: "No-login respondent page",
+      dlDesc: "Download a self-contained copy of this questionnaire that opens without any account — put it on your website or shared drive, or attach it to an email. Each respondent finishes with a response code; paste the codes below (several at once works) and the live results update.",
+      dlEmailLabel: 'Return email for responses <span class="opt">(optional — adds an “Email my response” button)</span>',
+      dlEmailPh: "you@example.org",
+      btnDownload: "Download respondent page",
+      dlPreparing: "Preparing…",
+      dlSaved: "Saved. Host it anywhere or attach it to an email.",
+      dlRenameNote: "Saved as .txt — rename the file so it ends in .html before sharing.",
+      dlErr: "Could not offer the download in this view.",
+      standaloneTag: "Respondent questionnaire",
+      standaloneIntro: "You have been invited to assess <strong>{org}</strong>. Answer the 24 statements below — at the end you'll receive a response code to send back to the person who invited you.",
+      codeIntro: "<strong>Done — one last step.</strong> Send this response code back to the person who invited you. Your response counts once they add it to the results.",
+      sendEmail: "Email my response", copyCodeBtn: "Copy the code",
+      emailSubject: "Four Quotients response — {org}",
+      emailBody: "Here is my response code for {org}:\n\n{code}\n",
+      btnLive: "View live results",
+      soloInstead: "Or run a separate one-off assessment without joining this session",
+      sessionClosedIntro: "The session for <strong>{org}</strong> is closed. The final report remains available.",
+      btnReport: "View the report",
+      submitPending: "Recording your response…",
+      submitOk: "<strong>Your response is recorded.</strong> It is now part of the live results.",
+      submitErr: "Your response could not be saved automatically. It will be retried — or use the response code below.",
+      submitFallback: "<strong>This view can't write to the session</strong> (view-only link). Copy your response code below and send it to the session facilitator — they can add it in the live-results view.",
+      codeLabel: "Your response code:",
+      liveEmpty: "No responses yet. Share the link or QR code from the start page to begin collecting.",
+      respondersLabel: "respondents",
+      addCodeTitle: "Add a response code",
+      addCodeDesc: "Paste a code received from a respondent whose link was view-only.",
+      addCodePh: "Paste the response code here",
+      btnAddCode: "Add response",
+      addCodeErr: "That code is not valid.",
+      addCodeDup: "This response is already recorded.",
+      addCodeOk: "Response added.",
+      btnCloseSess: "Close the session", btnCloseConfirm: "Click again to confirm",
+      btnReopen: "Reopen the session",
+      closedBanner: "This session is closed — this is the final report.",
+      saveErr: "Could not save to the session. Check that you have edit access, then try again.",
+      pastTitle: "Past sessions",
+      btnNewSession: "Start a new session",
+      btnPresent: "Present the QR",
+      genericOrg: "Organizational assessment",
+      standaloneIntroGeneric: "You have been invited to complete this organizational assessment. Answer the 24 statements below — at the end you'll receive a response code to send back to the person who invited you."
+    },
+
+    fr: {
+      eyebrowIntro: '<span class="mark">MR&#8309;</span> InnovAction &middot; Instrument diagnostique',
+      eyebrowResults: '<span class="mark">MR&#8309;</span> InnovAction &middot; R&eacute;sultats du diagnostic',
+      introTitle: "Votre organisation est-elle prête à performer à l'ère de l'IA&nbsp;?",
+      introLede: "Les indicateurs traditionnels mesurent votre efficacité. Ce diagnostic mesure votre capacité à vous <strong>adapter, créer et vous renouveler</strong> — les capacités qui déterminent la performance quand le travail routinier revient aux machines.",
+      legend: [
+        '<span class="chip" style="background:var(--q-iq)"></span><strong>IQ</strong> — intelligence collective : pensée systémique, prospective, littératie numérique',
+        '<span class="chip" style="background:var(--q-eq)"></span><strong>EQ</strong> — maturité émotionnelle : sécurité, empathie, conflits constructifs',
+        '<span class="chip" style="background:var(--q-pasq)"></span><strong>PasQ</strong> — passion : sens, autonomie, résilience',
+        '<span class="chip" style="background:var(--q-cuq)"></span><strong>CuQ</strong> — curiosité : questionnement, expérimentation, ouverture sur l’extérieur'
+      ],
+      introNote: "24 énoncés, environ 7 minutes. Évaluez chacun pour l'organisation <em>telle qu'elle est aujourd'hui</em> — pas telle que vous la souhaitez.",
+      purpose: [
+        { tag: "Pourquoi", text: "Les indicateurs financiers et d'efficacité ont été conçus pour une économie industrielle prévisible. À l'ère de l'IA, ils peuvent masquer un déclin : une organisation très efficace dans le travail d'hier est, en réalité, peu performante." },
+        { tag: "Ce qu'il mesure", text: "Les quatre quotients humains que les algorithmes ne peuvent pas répliquer — l'intelligence collective, la maturité émotionnelle, la passion et la curiosité. Selon le cadre, ce sont eux qui déterminent désormais la viabilité à long terme d'une organisation." },
+        { tag: "Ce que vous obtenez", text: "Un score de performance sur 100, la position de l'organisation sur la carte Capital humain × Potentiel dynamique, et des repères concrets pour décider de la transformation de son système." }
+      ],
+      orgTitle: "L'organisation évaluée",
+      orgNameLabel: "Nom de l'organisation",
+      orgNamePh: "p. ex., District scolaire Riverview",
+      orgDeptLabel: 'Département ou secteur <span class="opt">(facultatif)</span>',
+      orgDeptOtherLabel: "Précisez",
+      orgDeptOtherPh: "p. ex., Formation continue",
+      deptPlaceholder: "— Choisir (facultatif) —",
+      startHint: "Inscrivez le nom de l'organisation pour commencer.",
+      assessedOn: "Évalué le",
+      btnStart: "Commencer le diagnostic",
+      btnIntro: "Intro", btnBack: "Retour", btnNext: "Continuer", btnResults: "Voir les résultats",
+      hint: "Répondez aux six énoncés pour continuer",
+      capLo: "Fortement<br>en désaccord", capHi: "Fortement<br>d'accord",
+      ariaLikert: "Accord, de 1 fortement en désaccord à 5 fortement d'accord",
+      sectionTag: "Section {n} de 4 · {q}",
+      resultsTitle: "Profil de performance",
+      personalTitle: "Votre profil individuel",
+      liveTitle: "Résultats en direct",
+      liveAuto: "Cette page se met à jour automatiquement à mesure que les réponses arrivent — chaque nouvelle réponse la republie.",
+      of100: "sur 100 possible",
+      quadTitle: "Position de l'organisation : Capital humain &times; Potentiel dynamique",
+      quadSub: "Capital humain = IQ + EQ &middot; Potentiel dynamique = PasQ + CuQ &middot; chacun varie de 2 à 10",
+      quadAria: "Carte en quadrants du capital humain et du potentiel dynamique",
+      axisX: "Capital humain (IQ + EQ) →",
+      axisY: "Potentiel dynamique (PasQ + CuQ) →",
+      quadLabels: { ec: ["Énergique", "mais chaotique"], fr: ["Prêt pour l'avenir"], do: ["En dormance"], cs: ["Capable", "mais stagnant"] },
+      barsTitle: "Les quatre quotients",
+      barsSub: "Accord moyen sur les six énoncés de chaque quotient (1–5)",
+      barsAria: "Diagramme à barres des quatre quotients",
+      rangeNote: "Les barres montrent la moyenne des répondants ; les moustaches marquent les scores individuels les plus bas et les plus élevés — des moustaches larges signalent des perceptions divergentes.",
+      recsTitle: "Où investir d'abord",
+      recsSub: "Leviers de développement tirés du cadre, pour les deux quotients les plus faibles de l'organisation",
+      trTitle: "Décider la transformation du système",
+      trSub: "Les implications stratégiques du cadre — leadership, talent, design, indicateurs — appliquées au profil de l'organisation",
+      trLevers: [
+        { tag: "Leadership", title: "Du contrôleur au coach adaptatif",
+          text: "Le leadership ancré («&nbsp;Grounded Leadership&nbsp;») allie l'IA à l'empathie et au jugement éthique, et s'exerce par le «&nbsp;Leadership Throttle&nbsp;» : accélérer le changement là où l'organisation a de la capacité, relâcher pour permettre l'intégration et la récupération.",
+          q: "Où le système a-t-il de la capacité pour le changement en ce moment — et où a-t-il d'abord besoin de récupération&nbsp;?" },
+        { tag: "Talent", title: "Recruter et développer le potentiel adaptatif",
+          text: "Recrutez pour l'aisance dans l'ambiguïté et l'autorégulation, en plus des quatre quotients, et formez les leaders comme capteurs systémiques : écoute profonde, reconnaissance des motifs, lecture de l'énergie de l'organisation au-delà des tableaux de bord.",
+          q: "Les critères d'embauche et de promotion évaluent-ils aujourd'hui l'un des quatre quotients&nbsp;? Lequel ajouteriez-vous en premier&nbsp;?" },
+        { tag: "Design organisationnel", title: "Concevoir pour la résilience et le flux",
+          text: "Bâtissez des structures qui absorbent une vitesse de changement fluctuante : protocoles de capacité d'appoint pour les périodes intenses, temps protégé de travail en profondeur et d'innovation dans les plus calmes, et espace protégé pour les expérimentations «&nbsp;en périphérie&nbsp;» aux côtés d'un cœur stable.",
+          q: "Quelles une ou deux expérimentations en périphérie recevront du temps et des ressources protégés dans les 90 prochains jours&nbsp;?" },
+        { tag: "Indicateurs", title: "Mesurer la santé systémique, pas seulement l'extrant",
+          text: "Aux côtés des quatre quotients, suivez des indicateurs ancrés : taux d'épuisement professionnel, indices de sécurité psychologique, et ratio exploitation (cœur d'activité) / exploration (nouvelles avenues). C'est la rétroaction sensorielle dont le «&nbsp;throttle&nbsp;» a besoin.",
+          q: "Lesquels sont suivis aujourd'hui&nbsp;? Refaites ce diagnostic dans six mois et comparez les profils." }
+      ],
+      decideLabel: "À décider →",
+      btnRestart: "Recommencer", btnPrint: "Imprimer le rapport", btnDlReport: "Télécharger le rapport", reportSaved: "Enregistré ✓", btnBackIntro: "Retour au début",
+      foot: "D'après Chiasson, M. et Kelly, R., <em>Redefining Organizational Performance in the AI Era: A New Human-Centric Framework</em>. Ceci est un instantané de perceptions, pas un audit — il est le plus utile lorsque plusieurs leaders le complètent indépendamment et comparent là où leurs réponses divergent.",
+      levels: [
+        { min: 81, name: "Prêt pour l'avenir", read: "Un capital humain solide amplifié par un élan solide. Le défi est maintenant la protection : préservez les conditions qui produisent ce résultat — sécurité, sens, marge pour l'exploration — à mesure que l'organisation croît et que l'IA transforme le travail." },
+        { min: 49, name: "Performant", read: "Une base solide avec un réel élan. La multiplication de la formule joue en faveur de l'organisation — un investissement ciblé dans le quotient le plus faible rapportera de façon exponentielle, et non incrémentale." },
+        { min: 25, name: "Émergent", read: "Les capacités et l'élan sont présents mais inégaux. Parce que la performance est multiplicative, le quotient le plus faible freine tout le reste — c'est là que se trouve le levier." },
+        { min: 0, name: "En dormance", read: "La dure vérité du cadre : l'efficacité dans le travail d'hier ne compte pas comme performance. Un travail de fond sur la capacité et la motivation s'impose — commencez par la sécurité psychologique, elle débloque le reste." }
+      ],
+      archetypes: {
+        syn: { name: "Synergique", text: "Le capital humain et le potentiel dynamique de l'organisation se renforcent mutuellement — la capacité avec l'élan. C'est le quadrant où la multiplication joue en sa faveur.",
+          posture: "<strong>Posture de transformation : protéger et étendre la périphérie.</strong> Le système peut absorber le changement. Gardez les gaz ouverts sur l'exploration — défendez les projets en périphérie avec des ressources protégées — tout en maintenant le cœur à une vitesse stable. Le risque à ce stade est la complaisance : continuez de mesurer, continuez d'expérimenter." },
+        cs:  { name: "Capable mais stagnant", text: "Dans les mots du cadre : «&nbsp;un moteur puissant au point mort&nbsp;». L'organisation a l'intelligence et la maturité pour accomplir de grandes choses, mais la passion et la curiosité ne fournissent pas encore l'élan nécessaire pour réaliser ce potentiel.",
+          posture: "<strong>Posture de transformation : accélérer — allumer l'élan.</strong> La base de capacités peut absorber plus de changement qu'on ne lui en demande. Ouvrez les gaz : articulez une raison d'être crédible, confiez une réelle appropriation, et financez des expérimentations visibles. Attendez-vous à ce que l'énergie suive la capacité avec un délai — protégez et célébrez fort les premiers gains." },
+        ec:  { name: "Énergique mais chaotique", text: "Beaucoup de passion et d'idées nouvelles, mais sans la discipline cognitive et émotionnelle correspondante, elles ne se convertissent pas en exécution. Bâtissez la base de capacités sous l'énergie.",
+          posture: "<strong>Posture de transformation : relâcher — consolider avant d'accélérer.</strong> Le système tourne plus vite que sa discipline ne peut le soutenir. Relâchez les gaz : ralentissez le lancement de nouvelles initiatives et investissez l'énergie libérée dans les cadres de décision, la circulation du savoir et la sécurité psychologique, pour que l'exécution rattrape l'ambition." },
+        do:  { name: "En dormance", text: "La base de capacités et l'élan sont tous deux à construire. Commencez par la sécurité psychologique (EQ) — le cadre la considère comme le socle qui rend tout le reste possible.",
+          posture: "<strong>Posture de transformation : rebâtir les fondations, en douceur.</strong> Ni la capacité ni l'élan ne peuvent encore absorber un programme de transformation agressif. Commencez petit et en séquence — la sécurité psychologique d'abord, puis une raison d'être crédible, puis du temps protégé pour apprendre — et n'ouvrez les gaz que lorsque le système montre qu'il peut récupérer entre les poussées." }
+      },
+      quotients: [
+        { fullName: "Quotient d'intelligence", short: "Intelligence",
+          title: "L'intelligence collective",
+          desc: "Le moteur cognitif de l'organisation — sa façon de penser, d'apprendre et de décider dans la complexité.",
+          items: [
+            "Avant les décisions importantes, les gens considèrent ici les répercussions sur l'ensemble de l'organisation, pas seulement sur leur propre unité.",
+            "Nous surveillons activement les tendances émergentes et élaborons des stratégies proactives, plutôt que de réagir une fois le changement arrivé.",
+            "Nos gens comprennent suffisamment ce que l'IA peut et ne peut pas faire pour l'utiliser comme un véritable partenaire dans leur travail.",
+            "Le savoir circule librement ici — ce qu'une équipe apprend est rapidement accessible aux autres.",
+            "Les décisions s'appuient sur les données et un débat rigoureux plutôt que sur la hiérarchie ou l'habitude.",
+            "Nous recherchons activement des perspectives différentes et accueillons la remise en question de nos propres présupposés."
+          ] },
+        { fullName: "Quotient émotionnel", short: "Émotionnel",
+          title: "La maturité émotionnelle",
+          desc: "L'interface humaine de la collaboration — ce que l'on ressent à travailler, s'exprimer et être en désaccord ici.",
+          items: [
+            "Les gens s'expriment, partagent des idées à moitié formées et admettent leurs erreurs sans crainte de punition ou d'embarras.",
+            "Nous comprenons réellement les sentiments et les besoins de nos collègues et de nos clients.",
+            "Les désaccords deviennent ici des sources d'apprentissage plutôt que de division.",
+            "Notre culture en est une de confiance, de respect et de communication ouverte — les gens se sentent valorisés et soutenus.",
+            "La rétroaction honnête est fréquente, bien accueillie et suivie d'effets à tous les niveaux.",
+            "Nos leaders écoutent en profondeur et s'ajustent à l'état émotionnel et à l'énergie de leurs équipes."
+          ] },
+        { fullName: "Quotient de passion", short: "Passion",
+          title: "La passion et le sens",
+          desc: "Le moteur motivationnel — l'élan qui alimente l'effort discrétionnaire et la persévérance.",
+          items: [
+            "Notre mission est mobilisatrice au-delà du profit, et les gens y croient sincèrement.",
+            "Les gens ont un réel contrôle sur la façon dont ils font leur travail.",
+            "Les gens ont des occasions significatives d'approfondir leurs compétences et de progresser vers la maîtrise.",
+            "Les revers sont affrontés avec persévérance ici — l'échec est traité comme un apprentissage, pas comme un blâme.",
+            "Les gens vont régulièrement au-delà de ce qui est exigé parce que le résultat leur tient à cœur.",
+            "Les gens se sentent ici membres d'une communauté personnellement investie dans notre réussite collective."
+          ] },
+        { fullName: "Quotient de curiosité", short: "Curiosité",
+          title: "La curiosité et l'exploration",
+          desc: "Le volant de direction — l'élan exploratoire qui oriente l'énergie vers la nouveauté.",
+          items: [
+            "Demander «&nbsp;pourquoi&nbsp;?&nbsp;» et «&nbsp;et si&nbsp;?&nbsp;» est encouragé à tous les niveaux, y compris envers la direction.",
+            "Du temps et des ressources réels sont consacrés à l'expérimentation — y compris à des essais qui peuvent échouer.",
+            "Nous réunissons régulièrement des personnes de disciplines et d'horizons différents pour résoudre des problèmes ensemble.",
+            "Nous scrutons constamment l'extérieur de l'organisation — clients, concurrents, autres industries — à la recherche d'idées nouvelles.",
+            "Remettre en question «&nbsp;la façon dont on a toujours fait les choses&nbsp;» est bienvenu ici, sans risque pour la carrière.",
+            "Nous célébrons ce que nous apprenons des tentatives ratées aussi visiblement que nos succès."
+          ] }
+      ],
+      recs: {
+        iq: { title: "Élever le IQ — aiguiser l'intelligence collective",
+          moves: [
+            "Cultivez l'honnêteté intellectuelle et la diversité cognitive : recherchez les perspectives divergentes et faites du débat rigoureux une norme, pas une menace.",
+            "Investissez dans la gestion des connaissances et la littératie des données à tous les niveaux, pour que les idées circulent plus vite que la hiérarchie.",
+            "Établissez des cadres clairs de décision éthique fondée sur les données — et formez les gens à collaborer avec l'IA, pas seulement à l'opérer."
+          ],
+          ex: "Point de repère : la transparence radicale de Bridgewater et sa quête incessante de vérité." },
+        eq: { title: "Élever le EQ — renforcer l'interface humaine",
+          moves: [
+            "Faites de la sécurité psychologique une valeur organisationnelle fondamentale : protégez ceux qui s'expriment, admettent leurs erreurs et posent les questions difficiles.",
+            "Formez les leaders à l'empathie, à l'écoute profonde et aux habiletés sociales — le travail qui demeure humain est un travail collaboratif.",
+            "Mettez en place des mécanismes de rétroaction robustes pour que la communication honnête soit la routine plutôt que l'exception."
+          ],
+          ex: "Point de repère : le projet Aristote de Google a identifié la sécurité psychologique comme le facteur n° 1 des équipes performantes." },
+        pasq: { title: "Élever le PasQ — rallumer le moteur motivationnel",
+          moves: [
+            "Articulez une raison d'être mobilisatrice au-delà du profit, et reliez-y explicitement chaque rôle.",
+            "Donnez aux gens une autonomie et une appropriation réelles de leur travail — autonomie, maîtrise et sens nourrissent la motivation intrinsèque.",
+            "Célébrez le progrès et la résilience ; traitez les revers comme des frais d'apprentissage, pas comme des échecs."
+          ],
+          ex: "Points de repère : la mission environnementale de Patagonia ; la raison d'être de Tesla pour la transition énergétique." },
+        cuq: { title: "Élever le CuQ — systématiser l'exploration",
+          moves: [
+            "Réservez du temps et des ressources protégés à l'expérimentation, et célébrez les apprentissages tirés des échecs aussi fort que les succès.",
+            "Brisez les silos avec des équipes interdisciplinaires ; la curiosité se compose quand les perspectives se rencontrent.",
+            "Promouvez des leaders visiblement curieux — des leaders qui posent les bonnes questions plutôt que de fournir toutes les réponses."
+          ],
+          ex: "Points de repère : les 15 % de temps libre de 3M ; la culture «&nbsp;Day 1&nbsp;» d'invention continue d'Amazon." }
+      },
+      teamTitle: "Lancer une session d'équipe",
+      teamDesc: "Recueillez les réponses de plusieurs personnes de l'organisation et regardez les résultats agrégés se construire en direct. Vous obtiendrez un lien et un code QR à partager.",
+      btnCreate: "Créer une session en direct",
+      creating: "Création de la session…",
+      sessionLive: "Session d'évaluation en direct",
+      respN: function (n) { return n + (n === 1 ? " réponse enregistrée" : " réponses enregistrées"); },
+      shareTitle: "Inviter les répondants",
+      shareDesc: "Partagez ce lien ou ce code QR. Chaque personne répond aux 24 énoncés ; les résultats s'agrègent en direct.",
+      shareAccess: "Ce lien exige que chaque répondant soit connecté à claude.ai avec un compte invité (menu Partager → accorder l'accès avec modification). <strong>Pour des répondants sans aucun compte</strong>, téléchargez plutôt la page répondant sans connexion ci-dessous.",
+      shareFixLink: "Vous utilisez une autre adresse (lien du menu Partager, ou l'endroit où vous hébergez la page répondant) ? Collez-la ici — le code QR et le bouton Copier basculeront vers elle :",
+      shareFixPh: "https://…",
+      btnApplyLink: "Utiliser ce lien", shareFixErr: "Ceci ne ressemble pas à un lien (il doit commencer par https://).",
+      copyLink: "Copier le lien", copied: "Copié ✓",
+      dlTitle: "Page répondant sans connexion",
+      dlDesc: "Téléchargez une copie autonome de ce questionnaire qui s'ouvre sans aucun compte — placez-la sur votre site web ou un lecteur partagé, ou joignez-la à un courriel. Chaque répondant termine avec un code de réponse ; collez les codes ci-dessous (plusieurs à la fois fonctionne) et les résultats en direct se mettent à jour.",
+      dlEmailLabel: 'Courriel de retour pour les réponses <span class="opt">(facultatif — ajoute un bouton «&nbsp;Envoyer ma réponse&nbsp;»)</span>',
+      dlEmailPh: "vous@exemple.org",
+      btnDownload: "Télécharger la page répondant",
+      dlPreparing: "Préparation…",
+      dlSaved: "Enregistrée. Hébergez-la n'importe où ou joignez-la à un courriel.",
+      dlRenameNote: "Enregistrée en .txt — renommez le fichier pour qu'il se termine par .html avant de le partager.",
+      dlErr: "Impossible d'offrir le téléchargement dans cette vue.",
+      standaloneTag: "Questionnaire du répondant",
+      standaloneIntro: "Vous êtes invité·e à évaluer <strong>{org}</strong>. Répondez aux 24 énoncés ci-dessous — à la fin, vous recevrez un code de réponse à renvoyer à la personne qui vous a invité·e.",
+      codeIntro: "<strong>Terminé — une dernière étape.</strong> Renvoyez ce code de réponse à la personne qui vous a invité·e. Votre réponse compte dès qu'elle l'ajoute aux résultats.",
+      sendEmail: "Envoyer ma réponse", copyCodeBtn: "Copier le code",
+      emailSubject: "Réponse Quatre Quotients — {org}",
+      emailBody: "Voici mon code de réponse pour {org} :\n\n{code}\n",
+      btnLive: "Voir les résultats en direct",
+      soloInstead: "Ou faites une évaluation ponctuelle distincte, sans joindre cette session",
+      sessionClosedIntro: "La session pour <strong>{org}</strong> est close. Le rapport final demeure accessible.",
+      btnReport: "Voir le rapport",
+      submitPending: "Enregistrement de votre réponse…",
+      submitOk: "<strong>Votre réponse est enregistrée.</strong> Elle fait maintenant partie des résultats en direct.",
+      submitErr: "Votre réponse n'a pas pu être enregistrée automatiquement. Une nouvelle tentative aura lieu — ou utilisez le code de réponse ci-dessous.",
+      submitFallback: "<strong>Cette vue ne peut pas écrire dans la session</strong> (lien en lecture seule). Copiez votre code de réponse ci-dessous et envoyez-le à la personne qui anime la session — elle pourra l'ajouter dans la vue des résultats en direct.",
+      codeLabel: "Votre code de réponse :",
+      liveEmpty: "Aucune réponse pour l'instant. Partagez le lien ou le code QR depuis la page d'accueil pour commencer la collecte.",
+      respondersLabel: "répondants",
+      addCodeTitle: "Ajouter un code de réponse",
+      addCodeDesc: "Collez un code reçu d'un répondant dont le lien était en lecture seule.",
+      addCodePh: "Collez le code de réponse ici",
+      btnAddCode: "Ajouter la réponse",
+      addCodeErr: "Ce code n'est pas valide.",
+      addCodeDup: "Cette réponse est déjà enregistrée.",
+      addCodeOk: "Réponse ajoutée.",
+      btnCloseSess: "Clore la session", btnCloseConfirm: "Cliquez de nouveau pour confirmer",
+      btnReopen: "Rouvrir la session",
+      closedBanner: "Cette session est close — ceci est le rapport final.",
+      saveErr: "Impossible d'enregistrer dans la session. Vérifiez que vous avez un accès en modification, puis réessayez.",
+      pastTitle: "Sessions passées",
+      btnNewSession: "Démarrer une nouvelle session",
+      btnPresent: "Projeter le code QR",
+      genericOrg: "Évaluation organisationnelle",
+      standaloneIntroGeneric: "Vous êtes invité·e à compléter cette évaluation organisationnelle. Répondez aux 24 énoncés ci-dessous — à la fin, vous recevrez un code de réponse à renvoyer à la personne qui vous a invité·e."
+    }
+  };
+
+  var QMETA = [
+    { key: "iq",   name: "IQ",   cssVar: "--q-iq" },
+    { key: "eq",   name: "EQ",   cssVar: "--q-eq" },
+    { key: "pasq", name: "PasQ", cssVar: "--q-pasq" },
+    { key: "cuq",  name: "CuQ",  cssVar: "--q-cuq" }
+  ];
+
+  // ---------- state ----------
+  var lang = (STANDALONE && STANDALONE.lang === "fr") ? "fr" : "en";
+  var answers = {};
+  QMETA.forEach(function (q) { answers[q.key] = [null, null, null, null, null, null]; });
+  var step = 0;
+  var MODE = "solo";           // 'solo' | 'respond' (session respondent)
+  var RESULTS_MODE = "solo";   // 'solo' | 'personal' | 'live'
+  var forceSolo = false;
+  var ART = undefined;         // artifact namespace: undefined = resolving, null = unavailable
+  var DL = undefined;          // downloads namespace
+  var closeArmed = false;
+  var LIVE_SRC = null;         // null = current session; otherwise an archived session being viewed
+  function liveSession() { return LIVE_SRC || SESSION; }
+
+  var $ = function (id) { return document.getElementById(id); };
+  var T = function () { return I18N[lang]; };
+  var screens = { intro: $("s-intro"), survey: $("s-survey"), results: $("s-results") };
+
+  function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+  function fmt(n) { return (Math.round(n * 10) / 10).toFixed(1); }
+  function css(varName) { return getComputedStyle(document.documentElement).getPropertyValue(varName).trim(); }
+  function mean(arr) { return arr.reduce(function (a, b) { return a + b; }, 0) / arr.length; }
+  function lsGet(k) { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } }
+  function lsSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+  function lsDel(k) { try { localStorage.removeItem(k); } catch (e) {} }
+
+  function sessionActive() { return SESSION && SESSION.active && !SESSION.closed; }
+  function deptLabel(key, other) {
+    if (!key) return "";
+    if (key === "other") return other || "";
+    return DEPTS[key] ? DEPTS[key][lang] : "";
+  }
+  function currentOrg() {
+    if (STANDALONE) {
+      return { name: STANDALONE.org || T().genericOrg, dept: deptLabel(STANDALONE.deptKey, STANDALONE.deptOther) };
+    }
+    var ls = (RESULTS_MODE === "live") ? liveSession() : SESSION;
+    if ((MODE === "respond" || RESULTS_MODE === "live" || RESULTS_MODE === "personal") && ls) {
+      return { name: ls.org, dept: deptLabel(ls.deptKey, ls.deptOther) };
+    }
+    return { name: $("org-name").value.trim(), dept: deptLabel($("org-dept").value, $("org-dept-other").value.trim()) };
+  }
+
+  function show(name) {
+    Object.keys(screens).forEach(function (k) { screens[k].classList.toggle("active", k === name); });
+    window.scrollTo({ top: 0 });
+  }
+  function activeScreen() {
+    var keys = Object.keys(screens);
+    for (var i = 0; i < keys.length; i++) if (screens[keys[i]].classList.contains("active")) return keys[i];
+    return "intro";
+  }
+
+  // ---------- static text ----------
+  function fillDeptSelect() {
+    var t = T();
+    var cur = $("org-dept").value;
+    var html = '<option value="">' + esc(t.deptPlaceholder) + "</option>";
+    DEPT_ORDER.forEach(function (k) {
+      html += '<option value="' + k + '"' + (cur === k ? " selected" : "") + ">" + esc(DEPTS[k][lang]) + "</option>";
+    });
+    $("org-dept").innerHTML = html;
+  }
+
+  function applyStatic() {
+    var t = T();
+    document.documentElement.lang = lang;
+    $("i-eyebrow").innerHTML = t.eyebrowIntro;
+    $("i-title").innerHTML = t.introTitle;
+    $("i-lede").innerHTML = t.introLede;
+    $("i-legend").innerHTML = t.legend.map(function (l) { return "<li>" + l + "</li>"; }).join("");
+    $("i-purpose").innerHTML = t.purpose.map(function (p) {
+      return '<div class="purpose-item"><span class="p-tag">' + p.tag + '</span><p>' + p.text + '</p></div>';
+    }).join("");
+    $("i-note").innerHTML = t.introNote;
+    $("o-title").textContent = t.orgTitle;
+    $("o-name-label").textContent = t.orgNameLabel;
+    $("o-dept-label").innerHTML = t.orgDeptLabel;
+    $("o-dept-other-label").textContent = t.orgDeptOtherLabel;
+    $("org-name").placeholder = t.orgNamePh;
+    $("org-dept-other").placeholder = t.orgDeptOtherPh;
+    fillDeptSelect();
+    $("btn-start").textContent = t.btnStart;
+    $("r-eyebrow").innerHTML = t.eyebrowResults;
+    $("r-of").textContent = t.of100;
+    $("r-quad-title").innerHTML = t.quadTitle;
+    $("r-quad-sub").innerHTML = t.quadSub;
+    $("r-bars-title").innerHTML = t.barsTitle;
+    $("r-bars-sub").innerHTML = t.barsSub;
+    $("r-recs-title").innerHTML = t.recsTitle;
+    $("r-recs-sub").innerHTML = t.recsSub;
+    $("r-tr-title").innerHTML = t.trTitle;
+    $("r-tr-sub").innerHTML = t.trSub;
+    $("btn-print").textContent = DL ? t.btnDlReport : t.btnPrint;
+    $("r-foot").innerHTML = t.foot;
+    renderIntroMode();
+    syncStart();
+  }
+
+  function setLang(l) {
+    if (lang === l) return;
+    lang = l;
+    $("lang-en").classList.toggle("active", l === "en");
+    $("lang-fr").classList.toggle("active", l === "fr");
+    $("lang-en").setAttribute("aria-pressed", l === "en");
+    $("lang-fr").setAttribute("aria-pressed", l === "fr");
+    applyStatic();
+    var sc = activeScreen();
+    if (sc === "survey") renderSection();
+    else if (sc === "results") renderResults(RESULTS_MODE);
+  }
+
+  // ---------- intro modes / session UI ----------
+  function shareUrl() {
+    if (SESSION && SESSION.shareUrl) return SESSION.shareUrl;
+    if (HOSTED_URL && SESSION) {
+      var p = "?org=" + encodeURIComponent(SESSION.org);
+      var d = deptLabel(SESSION.deptKey, SESSION.deptOther);
+      if (d) p += "&dept=" + encodeURIComponent(d);
+      if (lang === "fr") p += "&lang=fr";
+      return HOSTED_URL + p;
+    }
+    return ARTIFACT_URL;
+  }
+  function shareHTML() {
+    var t = T();
+    var url = shareUrl();
+    var qrSvg = "";
+    try { qrSvg = QR.toSVG(QR.encode(url), 4, 4); } catch (e) {}
+    return '<div class="share-panel">' +
+      '<div class="qr" aria-hidden="true">' + qrSvg + '</div>' +
+      '<div class="share-right">' +
+      '<p>' + t.shareDesc + '</p>' +
+      '<div class="link-box" id="share-link">' + esc(url) + '</div>' +
+      '<button class="btn ghost small" id="btn-copy">' + esc(t.copyLink) + '</button>' +
+      '</div></div>' +
+      '<p style="font-size:0.82rem;color:var(--ink-2);margin-top:0.8rem">' + t.shareAccess + '</p>' +
+      (ART ? '<div style="margin-top:0.8rem">' +
+        '<label style="display:block;font-size:0.8rem;font-weight:600;color:var(--ink-2);margin-bottom:0.3rem">' + esc(t.shareFixLink) + '</label>' +
+        '<div style="display:flex;gap:0.6rem;flex-wrap:wrap">' +
+        '<input type="text" id="share-fix" placeholder="' + esc(t.shareFixPh) + '" style="flex:1;min-width:200px;font:inherit;font-size:0.85rem;padding:0.45rem 0.6rem;border:1px solid var(--line-strong);border-radius:6px;background:var(--bg);color:var(--ink)"' + (SESSION && SESSION.shareUrl ? ' value="' + esc(SESSION.shareUrl) + '"' : "") + '>' +
+        '<button class="btn ghost small" id="btn-apply-link">' + esc(t.btnApplyLink) + '</button></div>' +
+        '<p class="a-msg" id="share-fix-msg" style="font-size:0.78rem;color:var(--ink-3);margin-top:0.3rem"></p>' +
+        '</div>' : "");
+  }
+
+  function downloadHTML() {
+    var t = T();
+    if (!DL || !SESSION) return "";
+    return '<div style="margin-top:1.2rem;border-top:1px solid var(--line);padding-top:1rem">' +
+      '<strong style="font-size:0.86rem">' + esc(t.dlTitle) + '</strong>' +
+      '<p style="margin-top:0.3rem">' + esc(t.dlDesc) + '</p>' +
+      '<label style="display:block;font-size:0.8rem;font-weight:600;color:var(--ink-2);margin:0.7rem 0 0.3rem" for="dl-email">' + t.dlEmailLabel + '</label>' +
+      '<div style="display:flex;gap:0.6rem;flex-wrap:wrap">' +
+      '<input type="text" id="dl-email" inputmode="email" placeholder="' + esc(t.dlEmailPh) + '" style="flex:1;min-width:180px;font:inherit;font-size:0.85rem;padding:0.45rem 0.6rem;border:1px solid var(--line-strong);border-radius:6px;background:var(--bg);color:var(--ink)"' + (SESSION.email ? ' value="' + esc(SESSION.email) + '"' : "") + '>' +
+      '<button class="btn ghost small" id="btn-download">' + esc(t.btnDownload) + '</button></div>' +
+      '<p class="a-msg" id="dl-msg" style="font-size:0.78rem;color:var(--ink-3);margin-top:0.3rem"></p>' +
+      '</div>';
+  }
+
+  function renderIntroMode() {
+    var t = T();
+    var sess = $("i-session");
+    var team = $("i-team");
+
+    if (STANDALONE) {
+      var dept = deptLabel(STANDALONE.deptKey, STANDALONE.deptOther);
+      sess.innerHTML = '<div class="session-card">' +
+        '<span class="o-title">' + esc(t.standaloneTag) + '</span>' +
+        '<p class="s-org">' + esc(STANDALONE.org || t.genericOrg) + (dept ? ' <span style="font-weight:400;color:var(--ink-3)">· ' + esc(dept) + "</span>" : "") + '</p>' +
+        '<p style="margin-top:0.5rem">' + (STANDALONE.org ? t.standaloneIntro.replace("{org}", esc(STANDALONE.org)) : t.standaloneIntroGeneric) + '</p>' +
+        '</div>';
+      $("org-form").hidden = true;
+      $("start-row").hidden = false;
+      $("btn-start").disabled = false;
+      $("start-hint").textContent = "";
+      team.innerHTML = "";
+      $("i-archive").innerHTML = "";
+      return;
+    }
+
+    var showForm = !sessionActive() || forceSolo;
+    $("org-form").hidden = !showForm;
+    $("start-row").hidden = false;
+
+    if (SESSION && SESSION.closed && !forceSolo) {
+      sess.innerHTML = '<div class="session-card">' +
+        '<span class="o-title">' + esc(t.sessionLive) + '</span>' +
+        '<p>' + t.sessionClosedIntro.replace("{org}", esc(SESSION.org)) + '</p>' +
+        '<div class="btn-row"><button class="btn" id="btn-view-live">' + esc(t.btnReport) + '</button>' +
+        (ART ? '<button class="btn ghost" id="btn-new-sess">' + esc(t.btnNewSession) + '</button>' : '') + '</div>' +
+        '<p style="margin-top:0.9rem"><button class="linklike" id="btn-solo">' + esc(t.soloInstead) + '</button></p>' +
+        '</div>';
+      $("org-form").hidden = true;
+      $("start-row").hidden = true;
+      wireSessionCard();
+      return;
+    }
+
+    if (sessionActive() && !forceSolo) {
+      var n = SESSION.responses.length;
+      sess.innerHTML = '<div class="session-card">' +
+        '<span class="o-title">' + esc(t.sessionLive) + '</span>' +
+        '<p class="s-org">' + esc(SESSION.org) + (deptLabel(SESSION.deptKey, SESSION.deptOther) ? ' <span style="font-weight:400;color:var(--ink-3)">· ' + esc(deptLabel(SESSION.deptKey, SESSION.deptOther)) + "</span>" : "") + '</p>' +
+        '<p class="s-count">' + esc(t.respN(n)) + '</p>' +
+        '<div style="margin-top:0.9rem"><strong style="font-size:0.86rem">' + esc(t.shareTitle) + '</strong></div>' +
+        shareHTML() +
+        downloadHTML() +
+        '<div class="btn-row">' +
+        '<button class="btn" id="btn-join">' + esc(t.btnStart) + '</button>' +
+        '<button class="btn ghost" id="btn-view-live">' + esc(t.btnLive) + '</button>' +
+        '<button class="btn ghost" id="btn-present">' + esc(t.btnPresent) + '</button>' +
+        '</div>' +
+        '<p style="margin-top:0.9rem"><button class="linklike" id="btn-solo">' + esc(t.soloInstead) + '</button></p>' +
+        '</div>';
+      $("start-row").hidden = true;
+      wireSessionCard();
+    } else {
+      sess.innerHTML = "";
+    }
+
+    // team offer (solo view, capability present, no active session)
+    if (showForm && !sessionActive() && ART) {
+      team.innerHTML = '<div class="team-card">' +
+        '<span class="o-title">' + esc(t.teamTitle) + '</span>' +
+        '<p>' + esc(t.teamDesc) + '</p>' +
+        '<div class="btn-row"><button class="btn ghost" id="btn-create" ' + ($("org-name").value.trim() ? "" : "disabled") + '>' + esc(t.btnCreate) + '</button></div>' +
+        '<p class="a-msg" id="create-msg" style="font-size:0.82rem;color:var(--ink-3);margin-top:0.5rem"></p>' +
+        '</div>';
+      var bc = $("btn-create");
+      if (bc) bc.addEventListener("click", createSession);
+    } else {
+      team.innerHTML = "";
+    }
+    renderArchive();
+  }
+
+  function renderArchive() {
+    var t = T();
+    var box = $("i-archive");
+    if (!ARCHIVE.length) { box.innerHTML = ""; return; }
+    var html = '<div class="archive-card"><span class="o-title">' + esc(t.pastTitle) + '</span>';
+    ARCHIVE.forEach(function (a, i) {
+      var d = new Date(a.createdAt).toLocaleDateString(lang === "fr" ? "fr-CA" : "en-CA", { year: "numeric", month: "short", day: "numeric" });
+      html += '<div class="archive-row"><div><div class="a-org">' + esc(a.org) +
+        (deptLabel(a.deptKey, a.deptOther) ? ' <span style="font-weight:400;color:var(--ink-3)">· ' + esc(deptLabel(a.deptKey, a.deptOther)) + '</span>' : '') +
+        '</div><div class="a-meta">' + d + ' · ' + esc(t.respN(a.responses.length)) + '</div></div>' +
+        '<button class="btn ghost small arch-view" data-i="' + i + '">' + esc(t.btnReport) + '</button></div>';
+    });
+    html += "</div>";
+    box.innerHTML = html;
+    Array.prototype.slice.call(box.querySelectorAll(".arch-view")).forEach(function (b) {
+      b.addEventListener("click", function () {
+        LIVE_SRC = ARCHIVE[+b.getAttribute("data-i")];
+        renderResults("live"); show("results");
+      });
+    });
+  }
+
+  function openPresent() {
+    var old = $("present-overlay");
+    if (old) old.parentNode.removeChild(old);
+    var url = shareUrl();
+    var qrSvg = "";
+    try { qrSvg = QR.toSVG(QR.encode(url), 4, 4); } catch (e) {}
+    var ov = document.createElement("div");
+    ov.className = "present-overlay"; ov.id = "present-overlay";
+    ov.innerHTML = '<div class="p-exit">Esc ✕</div>' +
+      '<div class="p-org">' + esc(SESSION ? SESSION.org : "") + '</div>' +
+      '<div class="p-qr">' + qrSvg + '</div>' +
+      '<div class="p-scan">Scan to begin · Balayez pour commencer</div>' +
+      '<div class="p-url">' + esc(url) + '</div>';
+    document.body.appendChild(ov);
+    try { sessionStorage.setItem("fq-present", "1"); } catch (e) {}
+    function close() {
+      if (ov.parentNode) ov.parentNode.removeChild(ov);
+      try { sessionStorage.removeItem("fq-present"); } catch (e) {}
+      document.removeEventListener("keydown", onKey);
+    }
+    function onKey(e) { if (e.key === "Escape") close(); }
+    ov.addEventListener("click", close);
+    document.addEventListener("keydown", onKey);
+  }
+
+  function wireSessionCard() {
+    var j = $("btn-join"), v = $("btn-view-live"), s = $("btn-solo"), c = $("btn-copy");
+    var pr = $("btn-present");
+    if (pr) pr.addEventListener("click", openPresent);
+    var nsb = $("btn-new-sess");
+    if (nsb) nsb.addEventListener("click", function () {
+      nsb.disabled = true;
+      publishStore({ v: 1, session: null, archive: ARCHIVE.concat([SESSION]) })
+        .catch(function () { nsb.disabled = false; });
+    });
+    var dl = $("btn-download");
+    if (dl) dl.addEventListener("click", function () {
+      var t = T();
+      var msg = $("dl-msg");
+      msg.textContent = t.dlPreparing;
+      var payload = { v: 1, standalone: {
+        org: SESSION.org, deptKey: SESSION.deptKey, deptOther: SESSION.deptOther,
+        email: $("dl-email").value.trim(), lang: lang
+      } };
+      var html = buildDocument(payload);
+      DL.save({ filename: "four-quotients-respondent.html", data: html }).then(function () {
+        msg.textContent = t.dlSaved;
+        var em = $("dl-email").value.trim();
+        if (ART && em && em !== SESSION.email) {
+          var ns2 = JSON.parse(JSON.stringify(SESSION)); ns2.email = em;
+          publishSession(ns2).catch(function () {});
+        }
+      }, function (e) {
+        var code = e && e.code;
+        if (code === "extension_not_enabled" || code === "rejected_extension") {
+          DL.save({ filename: "four-quotients-respondent.txt", data: html }).then(function () {
+            msg.textContent = t.dlSaved + " " + t.dlRenameNote;
+          }, function () { msg.textContent = t.dlErr; });
+        } else if (code === "declined" || code === "rate_limited") {
+          msg.textContent = "";
+        } else {
+          msg.textContent = t.dlErr;
+        }
+      });
+    });
+    var af = $("btn-apply-link");
+    if (af) af.addEventListener("click", function () {
+      var t = T();
+      var msg = $("share-fix-msg");
+      var url = $("share-fix").value.trim();
+      if (url && !/^https:\/\//.test(url)) { msg.textContent = t.shareFixErr; return; }
+      var ns = JSON.parse(JSON.stringify(SESSION));
+      ns.shareUrl = url || "";
+      msg.textContent = "…";
+      publishSession(ns).catch(function () { msg.textContent = t.saveErr; });
+    });
+    if (j) j.addEventListener("click", function () {
+      MODE = "respond";
+      QMETA.forEach(function (q) { answers[q.key] = [null, null, null, null, null, null]; });
+      step = 0; renderSection(); show("survey");
+    });
+    if (v) v.addEventListener("click", function () { LIVE_SRC = null; renderResults("live"); show("results"); });
+    if (s) s.addEventListener("click", function () { forceSolo = true; renderIntroMode(); syncStart(); });
+    if (c) c.addEventListener("click", function () {
+      var done = function () { c.textContent = T().copied; setTimeout(function () { c.textContent = T().copyLink; }, 1600); };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(shareUrl()).then(done, function () { selectLink(); });
+      } else { selectLink(); done(); }
+    });
+    function selectLink() {
+      var range = document.createRange();
+      range.selectNodeContents($("share-link"));
+      var sel = window.getSelection();
+      sel.removeAllRanges(); sel.addRange(range);
+      try { document.execCommand("copy"); } catch (e) {}
+    }
+  }
+
+  // ---------- progress ----------
+  var progSteps = $("prog-steps");
+  QMETA.forEach(function () {
+    var seg = document.createElement("div"); seg.className = "seg";
+    seg.innerHTML = '<div class="fill"></div>';
+    progSteps.appendChild(seg);
+  });
+
+  function updateProgress() {
+    var segs = progSteps.children;
+    for (var i = 0; i < segs.length; i++) {
+      var fill = segs[i].firstChild;
+      if (i < step) fill.style.width = "100%";
+      else if (i === step) {
+        var done = answers[QMETA[i].key].filter(function (v) { return v !== null; }).length;
+        fill.style.width = (done / 6 * 100) + "%";
+      } else fill.style.width = "0%";
+    }
+    var total = 0;
+    QMETA.forEach(function (q) { total += answers[q.key].filter(function (v) { return v !== null; }).length; });
+    $("prog-label").textContent = T().sectionTag.replace("{n}", step + 1).replace("{q}", QMETA[step].name);
+    $("prog-count").textContent = total + " / 24";
+  }
+
+  // ---------- survey ----------
+  function renderSection() {
+    var t = T();
+    var meta = QMETA[step];
+    var q = t.quotients[step];
+    var body = $("section-body");
+    var html = '<div class="q-head" style="--qc:var(' + meta.cssVar + ')">' +
+      '<span class="q-tag">' + meta.name + ' &middot; ' + q.fullName + '</span>' +
+      '<h2>' + q.title + '</h2><p>' + q.desc + '</p></div>';
+
+    q.items.forEach(function (stmt, i) {
+      var name = meta.key + "-" + i;
+      html += '<div class="item" style="--qc:var(' + meta.cssVar + ')">' +
+        '<p class="stmt"><span class="n">' + (step * 6 + i + 1) + '</span>' + stmt + '</p>' +
+        '<div class="likert" role="radiogroup" aria-label="' + t.ariaLikert + '">' +
+        '<span class="cap">' + t.capLo + '</span><span class="opts">';
+      for (var v = 1; v <= 5; v++) {
+        var id = name + "-" + v;
+        var checked = answers[meta.key][i] === v ? " checked" : "";
+        html += '<input type="radio" id="' + id + '" name="' + name + '" value="' + v + '"' + checked + '>' +
+          '<label for="' + id + '">' + v + '</label>';
+      }
+      html += '</span><span class="cap hi">' + t.capHi + '</span></div></div>';
+    });
+    body.innerHTML = html;
+
+    body.querySelectorAll("input[type=radio]").forEach(function (input) {
+      input.addEventListener("change", function () {
+        var parts = input.name.split("-");
+        answers[parts[0]][+parts[1]] = +input.value;
+        updateProgress();
+        syncNav();
+      });
+    });
+
+    $("btn-back").textContent = step === 0 ? t.btnIntro : t.btnBack;
+    $("btn-next").textContent = step === 3 ? t.btnResults : t.btnNext;
+    updateProgress();
+    syncNav();
+  }
+
+  function sectionComplete() {
+    return answers[QMETA[step].key].every(function (v) { return v !== null; });
+  }
+  function syncNav() {
+    var done = sectionComplete();
+    $("btn-next").disabled = !done;
+    $("nav-hint").textContent = done ? "" : T().hint;
+  }
+
+  // ---------- scoring ----------
+  function scoresFromAnswers(a) {
+    var s = {};
+    QMETA.forEach(function (q) { s[q.key] = mean(a[q.key]); });
+    s.hc = s.iq + s.eq; s.dp = s.pasq + s.cuq; s.p = s.hc * s.dp;
+    return s;
+  }
+  function aggregate(responses) {
+    var per = responses.map(function (r) { return scoresFromAnswers(r.answers); });
+    var agg = { n: per.length, per: per, min: {}, max: {} };
+    QMETA.forEach(function (q) {
+      var vals = per.map(function (s) { return s[q.key]; });
+      agg[q.key] = mean(vals);
+      agg.min[q.key] = Math.min.apply(null, vals);
+      agg.max[q.key] = Math.max.apply(null, vals);
+    });
+    agg.hc = agg.iq + agg.eq; agg.dp = agg.pasq + agg.cuq; agg.p = agg.hc * agg.dp;
+    return agg;
+  }
+  function levelFor(p) {
+    var levels = T().levels;
+    for (var i = 0; i < levels.length; i++) if (p >= levels[i].min) return levels[i];
+    return levels[levels.length - 1];
+  }
+  function archetype(s) {
+    var a = T().archetypes;
+    var hcHigh = s.hc >= 6, dpHigh = s.dp >= 6;
+    if (hcHigh && dpHigh) return a.syn;
+    if (hcHigh && !dpHigh) return a.cs;
+    if (!hcHigh && dpHigh) return a.ec;
+    return a.do;
+  }
+
+  // ---------- results ----------
+  function renderOrgLine(org, ts) {
+    var d = new Date(ts || Date.now()).toLocaleDateString(lang === "fr" ? "fr-CA" : "en-CA",
+      { year: "numeric", month: "long", day: "numeric" });
+    var html = "<strong>" + esc(org.name || "") + "</strong>";
+    if (org.dept) html += '<span class="sep">·</span>' + esc(org.dept);
+    html += '<span class="sep">·</span>' + T().assessedOn + " " + d;
+    $("r-org").innerHTML = html;
+  }
+
+  function renderResults(mode) {
+    RESULTS_MODE = mode;
+    var t = T();
+    var live = mode === "live";
+    var s, perDots = null;
+
+    $("r-title").textContent = mode === "solo" ? t.resultsTitle : mode === "personal" ? t.personalTitle : t.liveTitle;
+    $("r-live-note").hidden = !live;
+    if (live) {
+      var lsn = liveSession();
+      $("r-live-note").textContent = LIVE_SRC ? t.closedBanner : (t.liveAuto + (lsn && lsn.closed ? " " + t.closedBanner : ""));
+    }
+    $("r-range-note").hidden = !live;
+    if (live) $("r-range-note").textContent = t.rangeNote;
+    renderOrgLine(currentOrg(), live && liveSession() ? liveSession().createdAt : null);
+    if (mode !== "personal") $("submit-status").innerHTML = "";
+
+    if (live) {
+      var lsrc = liveSession();
+      var n = lsrc ? lsrc.responses.length : 0;
+      if (!n) {
+        $("live-empty").innerHTML = '<div class="status-banner">' + esc(t.liveEmpty) + "</div>";
+        $("r-body").style.display = "none";
+        renderAdmin();
+        syncNavButtons();
+        return;
+      }
+      $("live-empty").innerHTML = "";
+      $("r-body").style.display = "";
+      var agg = aggregate(lsrc.responses);
+      s = agg; perDots = agg.per;
+      $("r-of").textContent = t.of100 + " · " + n + " " + t.respondersLabel;
+    } else {
+      $("live-empty").innerHTML = "";
+      $("r-body").style.display = "";
+      s = scoresFromAnswers(answers);
+      $("r-of").textContent = t.of100;
+    }
+
+    var p = Math.round(s.p);
+    var lvl = levelFor(p);
+    var arch = archetype(s);
+
+    $("r-score").textContent = p;
+    $("r-level").textContent = lvl.name;
+    $("r-read").textContent = lvl.read;
+
+    $("r-formula").innerHTML =
+      '<span style="color:var(--accent)">P</span><span style="color:var(--ink-3)">=</span>' +
+      '<span style="color:var(--ink-3)">(</span><span class="val" style="color:var(--q-iq)">' + fmt(s.iq) + '</span>' +
+      '<span style="color:var(--ink-3)">+</span><span class="val" style="color:var(--q-eq)">' + fmt(s.eq) + '</span><span style="color:var(--ink-3)">)</span>' +
+      '<span style="color:var(--ink-3)">&times;</span>' +
+      '<span style="color:var(--ink-3)">(</span><span class="val" style="color:var(--q-pasq)">' + fmt(s.pasq) + '</span>' +
+      '<span style="color:var(--ink-3)">+</span><span class="val" style="color:var(--q-cuq)">' + fmt(s.cuq) + '</span><span style="color:var(--ink-3)">)</span>' +
+      '<span style="color:var(--ink-3)">=</span><span class="val" style="color:var(--accent)">' + fmt(s.hc) + '&times;' + fmt(s.dp) + '=' + p + '</span>';
+
+    renderQuadrant(s, perDots);
+    var colon = lang === "fr" ? "&nbsp;:" : ":";
+    $("quad-note").innerHTML = '<strong>' + arch.name + colon + '</strong> ' + arch.text;
+    renderBars(s, live ? s : null);
+    renderRecs(s);
+    renderTransform(arch);
+    renderAdmin();
+    syncNavButtons();
+  }
+
+  function syncNavButtons() {
+    var t = T();
+    $("btn-restart").textContent = RESULTS_MODE === "solo" ? t.btnRestart : t.btnBackIntro;
+    $("btn-print").textContent = DL ? t.btnDlReport : t.btnPrint;
+  }
+
+  function buildReport() {
+    var t = T();
+    var clone = document.getElementById("s-results").cloneNode(true);
+    ["live-admin", "submit-status", "live-empty", "r-live-note"].forEach(function (id) {
+      var el = clone.querySelector("#" + id);
+      if (el) el.parentNode.removeChild(el);
+    });
+    Array.prototype.slice.call(clone.querySelectorAll(".nav-row")).forEach(function (el) {
+      el.parentNode.removeChild(el);
+    });
+    var styles = Array.prototype.map.call(document.querySelectorAll("style"), function (s) { return s.textContent; }).join("\n");
+    var org = currentOrg();
+    return '<!doctype html>\n<html lang="' + lang + '"><head><meta charset="utf-8">' +
+      '<meta name="viewport" content="width=device-width,initial-scale=1">' +
+      "<title>" + esc(org.name || "Four Quotients") + " — Four Quotients</title>" +
+      '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,600&family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">' +
+      "<style>" + styles + "</style></head><body>" +
+      '<div class="wrap"><section class="screen active">' + clone.innerHTML + "</section></div>" +
+      "</body></html>";
+  }
+
+  function renderQuadrant(s, perDots) {
+    var t = T();
+    var W = 520, H = 420, m = { t: 28, r: 24, b: 46, l: 52 };
+    var pw = W - m.l - m.r, ph = H - m.t - m.b;
+    var x = function (v) { return m.l + (v - 2) / 8 * pw; };
+    var y = function (v) { return m.t + ph - (v - 2) / 8 * ph; };
+    var ink2 = css("--ink-2"), ink3 = css("--ink-3"), grid = css("--grid"), accent = css("--accent"), soft = css("--accent-soft"), bg = css("--bg");
+
+    var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" width="100%" style="max-width:560px;display:block;margin:0 auto" role="img" aria-label="' + t.quadAria + '">';
+    svg += '<rect x="' + x(6) + '" y="' + y(10) + '" width="' + (x(10) - x(6)) + '" height="' + (y(6) - y(10)) + '" fill="' + soft + '"/>';
+    for (var g = 2; g <= 10; g += 2) {
+      svg += '<line x1="' + x(g) + '" y1="' + y(2) + '" x2="' + x(g) + '" y2="' + y(10) + '" stroke="' + grid + '" stroke-width="1"/>';
+      svg += '<line x1="' + x(2) + '" y1="' + y(g) + '" x2="' + x(10) + '" y2="' + y(g) + '" stroke="' + grid + '" stroke-width="1"/>';
+      svg += '<text x="' + x(g) + '" y="' + (y(2) + 18) + '" text-anchor="middle" font-size="11" class="mono" fill="' + ink3 + '">' + g + '</text>';
+      svg += '<text x="' + (x(2) - 10) + '" y="' + (y(g) + 4) + '" text-anchor="end" font-size="11" class="mono" fill="' + ink3 + '">' + g + '</text>';
+    }
+    svg += '<line x1="' + x(6) + '" y1="' + y(2) + '" x2="' + x(6) + '" y2="' + y(10) + '" stroke="' + ink3 + '" stroke-width="1" stroke-dasharray="4 4"/>';
+    svg += '<line x1="' + x(2) + '" y1="' + y(6) + '" x2="' + x(10) + '" y2="' + y(6) + '" stroke="' + ink3 + '" stroke-width="1" stroke-dasharray="4 4"/>';
+    var ql = function (tx, ty, lines, anchor) {
+      var out = "";
+      lines.forEach(function (ln, i) {
+        out += '<text x="' + tx + '" y="' + (ty + i * 14) + '" text-anchor="' + anchor + '" font-size="11.5" font-weight="600" fill="' + ink2 + '" opacity="0.85">' + ln + '</text>';
+      });
+      return out;
+    };
+    svg += ql(x(2.2), y(9.7), t.quadLabels.ec, "start");
+    svg += ql(x(9.8), y(9.7), t.quadLabels.fr, "end");
+    svg += ql(x(2.2), y(2.9), t.quadLabels.do, "start");
+    svg += ql(x(9.8), y(2.9), t.quadLabels.cs, "end");
+    svg += '<text x="' + (m.l + pw / 2) + '" y="' + (H - 8) + '" text-anchor="middle" font-size="12" font-weight="600" fill="' + ink2 + '">' + t.axisX + '</text>';
+    svg += '<text x="14" y="' + (m.t + ph / 2) + '" text-anchor="middle" font-size="12" font-weight="600" fill="' + ink2 + '" transform="rotate(-90 14 ' + (m.t + ph / 2) + ')">' + t.axisY + '</text>';
+    if (perDots && perDots.length > 1) {
+      perDots.forEach(function (ps) {
+        svg += '<circle cx="' + x(ps.hc) + '" cy="' + y(ps.dp) + '" r="4" fill="' + accent + '" opacity="0.3"/>';
+      });
+    }
+    var dx = x(s.hc), dy = y(s.dp);
+    svg += '<circle cx="' + dx + '" cy="' + dy + '" r="14" fill="' + accent + '" opacity="0.18"/>';
+    svg += '<circle cx="' + dx + '" cy="' + dy + '" r="7" fill="' + accent + '" stroke="' + bg + '" stroke-width="2"/>';
+    var lblAnchor = s.hc > 7.6 ? "end" : "start";
+    var lblX = s.hc > 7.6 ? dx - 14 : dx + 14;
+    svg += '<text x="' + lblX + '" y="' + (dy + 4) + '" text-anchor="' + lblAnchor + '" font-size="12" font-weight="600" class="mono" fill="' + accent + '">' + fmt(s.hc) + ' × ' + fmt(s.dp) + '</text>';
+    svg += "</svg>";
+    $("quad-chart").innerHTML = svg;
+  }
+
+  function renderBars(s, range) {
+    var t = T();
+    var W = 560, rowH = 46, m = { t: 8, r: 46, b: 26, l: 108 };
+    var H = m.t + QMETA.length * rowH + m.b;
+    var pw = W - m.l - m.r;
+    var x = function (v) { return m.l + (v - 1) / 4 * pw; };
+    var ink = css("--ink"), ink2 = css("--ink-2"), ink3 = css("--ink-3"), grid = css("--grid"), track = css("--track"), bg = css("--bg");
+
+    var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" width="100%" style="max-width:600px;display:block;margin:0 auto" role="img" aria-label="' + t.barsAria + '">';
+    for (var g = 1; g <= 5; g++) {
+      svg += '<line x1="' + x(g) + '" y1="' + m.t + '" x2="' + x(g) + '" y2="' + (H - m.b) + '" stroke="' + grid + '" stroke-width="1"/>';
+      svg += '<text x="' + x(g) + '" y="' + (H - 8) + '" text-anchor="middle" font-size="11" class="mono" fill="' + ink3 + '">' + g + '</text>';
+    }
+    QMETA.forEach(function (meta, i) {
+      var v = s[meta.key];
+      var cy = m.t + i * rowH + rowH / 2;
+      var col = css(meta.cssVar);
+      var barH = 16;
+      svg += '<text x="' + (m.l - 14) + '" y="' + (cy - 2) + '" text-anchor="end" font-size="13" font-weight="600" fill="' + ink + '">' + meta.name + '</text>';
+      svg += '<text x="' + (m.l - 14) + '" y="' + (cy + 12) + '" text-anchor="end" font-size="10.5" fill="' + ink3 + '">' + t.quotients[i].short + '</text>';
+      svg += '<rect x="' + x(1) + '" y="' + (cy - barH / 2) + '" width="' + pw + '" height="' + barH + '" rx="4" fill="' + track + '"/>';
+      var w = Math.max(x(v) - x(1), 2);
+      svg += '<rect class="qbar" data-label="' + meta.name + ': ' + fmt(v) + ' / 5" x="' + x(1) + '" y="' + (cy - barH / 2) + '" width="' + w + '" height="' + barH + '" rx="4" fill="' + col + '" stroke="' + bg + '" stroke-width="1"/>';
+      if (range && range.min && range.n > 1) {
+        var xmin = x(range.min[meta.key]), xmax = x(range.max[meta.key]);
+        svg += '<line x1="' + xmin + '" y1="' + cy + '" x2="' + xmax + '" y2="' + cy + '" stroke="' + ink + '" stroke-width="1.5" opacity="0.55"/>';
+        svg += '<line x1="' + xmin + '" y1="' + (cy - 5) + '" x2="' + xmin + '" y2="' + (cy + 5) + '" stroke="' + ink + '" stroke-width="1.5" opacity="0.55"/>';
+        svg += '<line x1="' + xmax + '" y1="' + (cy - 5) + '" x2="' + xmax + '" y2="' + (cy + 5) + '" stroke="' + ink + '" stroke-width="1.5" opacity="0.55"/>';
+      }
+      svg += '<text x="' + (x(v) + 8) + '" y="' + (cy + 4.5) + '" font-size="12.5" font-weight="600" class="mono" fill="' + ink2 + '">' + fmt(v) + '</text>';
+    });
+    svg += "</svg>";
+    $("bar-chart").innerHTML = svg;
+
+    var tip = $("tooltip");
+    document.querySelectorAll(".qbar").forEach(function (bar) {
+      bar.addEventListener("mousemove", function (e) {
+        tip.textContent = bar.getAttribute("data-label");
+        tip.style.left = (e.clientX + 12) + "px";
+        tip.style.top = (e.clientY - 30) + "px";
+        tip.classList.add("show");
+      });
+      bar.addEventListener("mouseleave", function () { tip.classList.remove("show"); });
+    });
+  }
+
+  function renderRecs(s) {
+    var t = T();
+    var order = ["iq", "eq", "pasq", "cuq"].sort(function (a, b) { return s[a] - s[b]; });
+    var lowest = order.slice(0, 2);
+    var html = "";
+    lowest.forEach(function (key) {
+      var rec = t.recs[key];
+      var meta = QMETA.filter(function (x) { return x.key === key; })[0];
+      html += '<div class="rec" style="--qc:var(' + meta.cssVar + ')"><h4>' + rec.title +
+        ' <span class="mono" style="font-size:0.8rem;color:var(--ink-3)">(' + fmt(s[key]) + ' / 5)</span></h4><ul>';
+      rec.moves.forEach(function (mv) { html += "<li>" + mv + "</li>"; });
+      html += '</ul><p class="ex">' + rec.ex + "</p></div>";
+    });
+    $("r-recs").innerHTML = html;
+  }
+
+  function renderTransform(arch) {
+    var t = T();
+    $("t-posture").innerHTML = arch.posture;
+    $("t-levers").innerHTML = t.trLevers.map(function (lv) {
+      return '<div class="lever"><span class="l-tag">' + lv.tag + '</span><h4>' + lv.title + '</h4>' +
+        '<p>' + lv.text + '</p>' +
+        '<p class="decide"><span class="d-label">' + t.decideLabel + '</span> ' + lv.q + '</p></div>';
+    }).join("");
+  }
+
+  // ---------- session admin (live view) ----------
+  function renderAdmin() {
+    var t = T();
+    var box = $("live-admin");
+    if (RESULTS_MODE !== "live" || !SESSION || LIVE_SRC || !ART) { box.innerHTML = ""; closeArmed = false; return; }
+    var html = '<div class="admin-box">';
+    if (!SESSION.closed) {
+      html += '<span class="o-title">' + esc(t.addCodeTitle) + '</span>' +
+        '<p style="font-size:0.86rem;color:var(--ink-2)">' + esc(t.addCodeDesc) + '</p>' +
+        '<div style="display:flex;gap:0.6rem;margin-top:0.6rem;flex-wrap:wrap;align-items:flex-start">' +
+        '<textarea id="code-input" rows="3" placeholder="' + esc(t.addCodePh) + '" style="flex:1;min-width:200px;font-family:\'IBM Plex Mono\',ui-monospace,monospace;font-size:0.78rem;padding:0.5rem 0.6rem;border:1px solid var(--line-strong);border-radius:6px;background:var(--bg);color:var(--ink);resize:vertical"></textarea>' +
+        '<button class="btn ghost small" id="btn-add-code">' + esc(t.btnAddCode) + '</button></div>' +
+        '<p class="a-msg" id="code-msg"></p>' +
+        '<div class="btn-row"><button class="btn ghost small" id="btn-close-sess">' + esc(t.btnCloseSess) + '</button></div>';
+    } else {
+      html += '<div class="btn-row"><button class="btn ghost small" id="btn-reopen">' + esc(t.btnReopen) + '</button></div>';
+    }
+    html += '<p class="a-msg" id="admin-msg"></p></div>';
+    box.innerHTML = html;
+
+    var add = $("btn-add-code");
+    if (add) add.addEventListener("click", function () {
+      var raw = $("code-input").value.trim();
+      var msg = $("code-msg");
+      var codes = raw.split(/\s+/).filter(Boolean);
+      if (!codes.length) return;
+      var valid = [], invalid = 0, dup = 0;
+      var seen = {};
+      SESSION.responses.forEach(function (r) { seen[r.id] = true; });
+      codes.forEach(function (c) {
+        var r = decodeResponse(c);
+        if (!r) { invalid++; return; }
+        if (seen[r.id]) { dup++; return; }
+        seen[r.id] = true;
+        valid.push(r);
+      });
+      if (!valid.length) { msg.textContent = invalid ? t.addCodeErr : t.addCodeDup; return; }
+      var ns = JSON.parse(JSON.stringify(SESSION));
+      valid.forEach(function (r) { ns.responses.push(r); });
+      msg.textContent = "…";
+      publishSession(ns).then(function () {
+        msg.textContent = valid.length + " ✓" + (invalid ? " · " + invalid + " ✗" : "");
+      }, function () { msg.textContent = t.saveErr; });
+    });
+    var cl = $("btn-close-sess");
+    if (cl) cl.addEventListener("click", function () {
+      if (!closeArmed) { closeArmed = true; cl.textContent = t.btnCloseConfirm; return; }
+      var ns = JSON.parse(JSON.stringify(SESSION)); ns.closed = true;
+      publishSession(ns).catch(function () { $("admin-msg").textContent = t.saveErr; });
+    });
+    var ro = $("btn-reopen");
+    if (ro) ro.addEventListener("click", function () {
+      var ns = JSON.parse(JSON.stringify(SESSION)); ns.closed = false;
+      publishSession(ns).catch(function () { $("admin-msg").textContent = t.saveErr; });
+    });
+  }
+
+  // ---------- session persistence ----------
+  function buildDocument(store) {
+    var json = JSON.stringify(store).replace(/</g, "\\u003c");
+    return INITIAL_HTML.replace(/<html[^>]*>/, "<html>").replace(
+      /(<script type="application\/json" id="fq-data">)[\s\S]*?(<\/script>)/,
+      function (mm, p1, p2) { return p1 + json + p2; }
+    );
+  }
+  function storeWith(sess) { return { v: 1, session: sess, archive: ARCHIVE }; }
+  function publishStore(store) {
+    if (!ART) return Promise.reject({ code: "unavailable" });
+    return ART.publish(buildDocument(store));
+  }
+  function publishSession(newSession) { return publishStore(storeWith(newSession)); }
+  function withResponse(sess, resp) {
+    var ns = JSON.parse(JSON.stringify(sess));
+    ns.responses.push(resp);
+    return ns;
+  }
+  function decodeResponse(code) {
+    try {
+      var obj = JSON.parse(decodeURIComponent(escape(atob(code))));
+      if (!obj || !obj.id || !obj.answers) return null;
+      var ok = QMETA.every(function (q) {
+        var a = obj.answers[q.key];
+        return Array.isArray(a) && a.length === 6 && a.every(function (v) { return v >= 1 && v <= 5; });
+      });
+      return ok ? obj : null;
+    } catch (e) { return null; }
+  }
+  function encodeResponse(resp) {
+    return btoa(unescape(encodeURIComponent(JSON.stringify(resp))));
+  }
+  function makeResponse() {
+    var id = "r" + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+    return { id: id, ts: Date.now(), lang: lang,
+      org: STANDALONE ? (STANDALONE.org || "") : (SESSION ? SESSION.org : ""),
+      answers: JSON.parse(JSON.stringify(answers)) };
+  }
+
+  function createSession() {
+    var t = T();
+    var name = $("org-name").value.trim();
+    if (!name || !ART) return;
+    var msg = $("create-msg");
+    if (msg) msg.textContent = t.creating;
+    var sess = {
+      active: true, closed: false,
+      org: name,
+      deptKey: $("org-dept").value || "",
+      deptOther: $("org-dept-other").value.trim(),
+      createdAt: Date.now(),
+      responses: []
+    };
+    publishSession(sess).then(function () {
+      // all views (this one included) reload into session mode
+    }, function (e) {
+      if (msg) msg.textContent = t.saveErr;
+    });
+  }
+
+  function submitResponse() {
+    var t = T();
+    var status = $("submit-status");
+    var resp = makeResponse();
+    status.innerHTML = '<div class="status-banner">' + esc(t.submitPending) + "</div>";
+    lsSet("fq-pending-" + ARTIFACT_URL, resp);
+    if (!ART) { showFallback(resp); return; }
+    publishSession(withResponse(SESSION, resp)).then(function () {
+      lsDel("fq-pending-" + ARTIFACT_URL);
+      status.innerHTML = '<div class="status-banner">' + t.submitOk + "</div>";
+    }, function (e) {
+      var code = e && e.code;
+      if (code === "not_granted" || code === "not_writer") { showFallback(resp); }
+      else if (code === "conflict") {
+        // the view reloads to the winning version; the pending response is retried on load
+        status.innerHTML = '<div class="status-banner">' + esc(t.submitPending) + "</div>";
+      } else {
+        status.innerHTML = '<div class="status-banner err">' + esc(t.submitErr) +
+          '<div class="code-box">' + esc(encodeResponse(resp)) + "</div></div>";
+      }
+    });
+    function showFallback(r) {
+      lsDel("fq-pending-" + ARTIFACT_URL);
+      var code = encodeResponse(r);
+      var mailBtn = "";
+      if (SESSION && SESSION.email) {
+        var href = "mailto:" + SESSION.email +
+          "?subject=" + encodeURIComponent(t.emailSubject.replace("{org}", SESSION.org)) +
+          "&body=" + encodeURIComponent(t.emailBody.replace(/\{org\}/g, SESSION.org).replace("{code}", code));
+        mailBtn = '<div class="btn-row"><a class="btn small" style="text-decoration:none" href="' + esc(href) + '">' + esc(t.sendEmail) + "</a></div>";
+      }
+      status.innerHTML = '<div class="status-banner err">' + t.submitFallback +
+        '<div style="margin-top:0.6rem;font-size:0.82rem;font-weight:600">' + esc(t.codeLabel) + "</div>" +
+        '<div class="code-box">' + esc(code) + "</div>" + mailBtn + "</div>";
+    }
+  }
+
+  function renderStandaloneDone() {
+    var t = T();
+    var resp = makeResponse();
+    var code = encodeResponse(resp);
+    var email = STANDALONE.email || "";
+    var orgName = STANDALONE.org || t.genericOrg;
+    var mailtoHref = "";
+    if (email) {
+      mailtoHref = "mailto:" + email +
+        "?subject=" + encodeURIComponent(t.emailSubject.replace("{org}", orgName)) +
+        "&body=" + encodeURIComponent(t.emailBody.replace(/\{org\}/g, orgName).replace("{code}", code));
+    }
+    $("submit-status").innerHTML = '<div class="status-banner">' + t.codeIntro +
+      '<div class="code-box" id="sa-code">' + esc(code) + "</div>" +
+      '<div class="btn-row">' +
+      (mailtoHref ? '<a class="btn small" style="text-decoration:none" href="' + esc(mailtoHref) + '">' + esc(t.sendEmail) + "</a>" : "") +
+      '<button class="btn ghost small" id="btn-copy-code">' + esc(t.copyCodeBtn) + '</button>' +
+      "</div></div>";
+    var cc = $("btn-copy-code");
+    if (cc) cc.addEventListener("click", function () {
+      var done = function () { cc.textContent = t.copied; setTimeout(function () { cc.textContent = t.copyCodeBtn; }, 1600); };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(code).then(done, fallback);
+      } else { fallback(); }
+      function fallback() {
+        var range = document.createRange();
+        range.selectNodeContents($("sa-code"));
+        var sel = window.getSelection();
+        sel.removeAllRanges(); sel.addRange(range);
+        try { document.execCommand("copy"); done(); } catch (e) {}
+      }
+    });
+  }
+
+  function retryPending() {
+    if (!ART || !sessionActive()) return;
+    var pending = lsGet("fq-pending-" + ARTIFACT_URL);
+    if (!pending || !pending.id) return;
+    if (SESSION.responses.some(function (r) { return r.id === pending.id; })) {
+      lsDel("fq-pending-" + ARTIFACT_URL);
+      return;
+    }
+    publishSession(withResponse(SESSION, pending)).then(function () {
+      lsDel("fq-pending-" + ARTIFACT_URL);
+    }, function () { /* conflict → reload retries again; not_writer → leave for manual code */ });
+  }
+
+  // ---------- start gating ----------
+  function syncStart() {
+    var t = T();
+    if (STANDALONE) { $("btn-start").disabled = false; $("start-hint").textContent = ""; return; }
+    if (sessionActive() && !forceSolo) return;
+    var ok = $("org-name").value.trim().length > 0;
+    $("btn-start").disabled = !ok;
+    $("start-hint").textContent = ok ? "" : t.startHint;
+    var bc = $("btn-create");
+    if (bc) bc.disabled = !ok;
+  }
+
+  // ---------- wiring ----------
+  $("lang-en").addEventListener("click", function () { setLang("en"); });
+  $("lang-fr").addEventListener("click", function () { setLang("fr"); });
+  $("org-name").addEventListener("input", syncStart);
+  $("org-dept").addEventListener("change", function () {
+    $("dept-other-field").hidden = $("org-dept").value !== "other";
+  });
+  $("btn-start").addEventListener("click", function () {
+    if (STANDALONE) {
+      MODE = "standalone";
+      step = 0; renderSection(); show("survey");
+      return;
+    }
+    if (!$("org-name").value.trim()) return;
+    MODE = "solo";
+    step = 0; renderSection(); show("survey");
+  });
+  $("btn-back").addEventListener("click", function () {
+    if (step === 0) { show("intro"); } else { step--; renderSection(); }
+  });
+  $("btn-next").addEventListener("click", function () {
+    if (!sectionComplete()) return;
+    if (step === 3) {
+      if (MODE === "respond") {
+        renderResults("personal"); show("results");
+        submitResponse();
+      } else if (MODE === "standalone") {
+        renderResults("personal"); show("results");
+        renderStandaloneDone();
+      } else {
+        renderResults("solo"); show("results");
+      }
+    } else { step++; renderSection(); }
+  });
+  $("btn-restart").addEventListener("click", function () {
+    QMETA.forEach(function (q) { answers[q.key] = [null, null, null, null, null, null]; });
+    step = 0; MODE = "solo";
+    renderIntroMode(); syncStart();
+    show("intro");
+  });
+  $("btn-print").addEventListener("click", function () {
+    var t = T();
+    if (!DL) { window.print(); return; }
+    var btn = $("btn-print");
+    var html = buildReport();
+    var done = function () {
+      btn.textContent = t.reportSaved;
+      setTimeout(function () { btn.textContent = t.btnDlReport; }, 2000);
+    };
+    DL.save({ filename: "four-quotients-report.html", data: html }).then(done, function (e) {
+      var code = e && e.code;
+      if (code === "extension_not_enabled" || code === "rejected_extension") {
+        DL.save({ filename: "four-quotients-report.txt", data: html }).then(done, function () {});
+      } else if (code !== "declined" && code !== "rate_limited") {
+        try { window.print(); } catch (err) {}
+      }
+    });
+  });
+
+  var mq = window.matchMedia("(prefers-color-scheme: dark)");
+  if (mq.addEventListener) mq.addEventListener("change", function () {
+    if (screens.results.classList.contains("active")) renderResults(RESULTS_MODE);
+  });
+
+  $("lang-en").classList.toggle("active", lang === "en");
+  $("lang-fr").classList.toggle("active", lang === "fr");
+  $("lang-en").setAttribute("aria-pressed", lang === "en");
+  $("lang-fr").setAttribute("aria-pressed", lang === "fr");
+  applyStatic();
+  try { if (sessionStorage.getItem("fq-present") === "1" && sessionActive()) openPresent(); } catch (e) {}
+
+  // resolve the artifact capability (arrives after first run; null when absent)
+  if (!STANDALONE && window.claude && typeof window.claude.use === "function") {
+    window.claude.use("artifact").then(function (ns) {
+      ART = ns || null;
+      renderIntroMode(); syncStart();
+      if (activeScreen() === "results" && RESULTS_MODE === "live") renderAdmin();
+      retryPending();
+    }, function () { ART = null; });
+    window.claude.use("downloads").then(function (ns) {
+      DL = ns || null;
+      if (DL) {
+        if (activeScreen() === "intro") renderIntroMode();
+        $("btn-print").textContent = T().btnDlReport;
+      }
+    }, function () { DL = null; });
+  } else {
+    ART = null; DL = null;
+  }
+})();
+</script>
