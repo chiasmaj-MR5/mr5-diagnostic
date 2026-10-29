@@ -14,6 +14,9 @@
     --accent: #B4432A; --accent-ink: #FFFFFF; --accent-soft: rgba(180, 67, 42, 0.10);
     --track: #E7E1D8;
     --shadow: 0 1px 2px rgba(38, 34, 30, 0.05), 0 8px 28px rgba(38, 34, 30, 0.07);
+    /* chart series: categories (automatable, augmented, human) and audiences (teams, leadership) */
+    --c-auto: #2a78d6; --c-aug: #eb6834; --c-hum: #1baf7a;
+    --c-teams: #6250d6; --c-lead: #eda100;
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
@@ -23,6 +26,8 @@
       --accent: #E0664A; --accent-ink: #1B1210; --accent-soft: rgba(224, 102, 74, 0.13);
       --track: #2E2B29;
       --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 28px rgba(0, 0, 0, 0.35);
+      --c-auto: #3987e5; --c-aug: #d95926; --c-hum: #199e70;
+      --c-teams: #9085e9; --c-lead: #c98500;
     }
   }
   :root[data-theme="dark"] {
@@ -32,6 +37,8 @@
     --accent: #E0664A; --accent-ink: #1B1210; --accent-soft: rgba(224, 102, 74, 0.13);
     --track: #2E2B29;
     --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 28px rgba(0, 0, 0, 0.35);
+    --c-auto: #3987e5; --c-aug: #d95926; --c-hum: #199e70;
+    --c-teams: #9085e9; --c-lead: #c98500;
   }
 
   * { box-sizing: border-box; }
@@ -40,7 +47,7 @@
     font-family: "Instrument Sans", "Helvetica Neue", Arial, sans-serif;
     font-size: 16px; line-height: 1.55; -webkit-font-smoothing: antialiased;
   }
-  .wrap { max-width: 760px; margin: 0 auto; padding: 2.5rem 1rem 5rem; position: relative; }
+  .wrap { max-width: 800px; margin: 0 auto; padding: 2.5rem 1rem 5rem; position: relative; }
 
   .lang-switch {
     position: absolute; top: 2.3rem; right: 1rem;
@@ -62,14 +69,18 @@
   h1, h2, h3 { font-family: "Fraunces", Georgia, serif; text-wrap: balance; margin: 0; }
   h1 { font-size: clamp(1.9rem, 5vw, 2.7rem); font-weight: 600; line-height: 1.12; letter-spacing: -0.01em; }
   h2 { font-size: 1.4rem; font-weight: 600; }
-  h3 { font-size: 1.05rem; font-weight: 600; }
+  h3 { font-size: 1.08rem; font-weight: 600; }
+  h4 { font-size: 0.95rem; font-weight: 600; margin: 0 0 0.4rem; }
   p { margin: 0; }
-  .lede { color: var(--ink-2); font-size: 1.04rem; max-width: 60ch; margin-top: 1rem; }
+  .lede { color: var(--ink-2); font-size: 1.04rem; max-width: 62ch; margin-top: 1rem; }
   ul.points { margin: 1.4rem 0 0; padding-left: 1.2rem; color: var(--ink-2); max-width: 60ch; }
   ul.points li { margin-bottom: 0.35rem; }
+  .org-line { margin-top: 0.6rem; font-size: 0.98rem; color: var(--ink-2); }
+  .org-line strong { color: var(--ink); font-weight: 600; }
+  .org-line .sep { color: var(--ink-3); margin: 0 0.4em; }
 
   .btn {
-    display: inline-flex; align-items: center; gap: 0.5em;
+    display: inline-flex; align-items: center; gap: 0.5em; text-decoration: none;
     font: inherit; font-weight: 600; font-size: 0.95rem; padding: 0.7rem 1.5rem;
     border-radius: 6px; border: 1px solid transparent; cursor: pointer;
     background: var(--accent); color: var(--accent-ink); transition: filter 120ms ease;
@@ -124,15 +135,17 @@
   input:focus-visible, textarea:focus-visible, select:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; border-color: var(--accent); }
   input::placeholder, textarea::placeholder { color: var(--ink-3); opacity: 1; }
   .other-input { margin-top: 0.5rem; }
+  .field { margin-bottom: 0.9rem; }
+  .field label { display: block; font-size: 0.82rem; font-weight: 600; color: var(--ink-2); margin-bottom: 0.3rem; }
 
   .act {
     background: var(--surface); border: 1px solid var(--line); border-radius: 10px;
     padding: 1.1rem 1.2rem 0.4rem; margin-top: 1.2rem; box-shadow: var(--shadow);
   }
   .act-head { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; }
-  .act-tag {
-    font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 0.72rem; letter-spacing: 0.1em;
-    text-transform: uppercase; color: var(--accent); font-weight: 600;
+  .tag {
+    font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 0.7rem; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--accent); font-weight: 600; display: block;
   }
   .act .q { padding: 0.9rem 0; }
   .act .q .stmt { font-size: 0.95rem; margin-bottom: 0.55rem; }
@@ -149,33 +162,94 @@
   .nav-row .hint { font-size: 0.82rem; color: var(--ink-3); flex: 1; text-align: center; min-width: 10rem; }
 
   .card { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 1.4rem; margin-top: 1.4rem; box-shadow: var(--shadow); }
-  .card > h3 { margin-bottom: 0.35rem; }
-  .card .sub { font-size: 0.86rem; color: var(--ink-3); margin-bottom: 1rem; }
-  .notice { margin-top: 1.4rem; padding: 0.9rem 1.2rem; border-radius: 8px; background: var(--accent-soft); color: var(--ink-2); font-size: 0.92rem; max-width: 62ch; }
-  .notice strong { color: var(--ink); }
+  .card > h3 { margin-bottom: 0.3rem; }
+  .card .sub { font-size: 0.86rem; color: var(--ink-3); margin-bottom: 1.1rem; max-width: 64ch; }
+  .card.dashed { border-style: dashed; box-shadow: none; }
+  .card.live { border-color: var(--accent); }
+  .status-banner { margin-top: 1.4rem; padding: 0.9rem 1.2rem; border-radius: 8px; background: var(--accent-soft); color: var(--ink-2); font-size: 0.92rem; }
+  .status-banner strong { color: var(--ink); }
+  .status-banner.err { outline: 1px solid var(--accent); }
   .code-box {
     font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 0.72rem; padding: 0.6rem;
     border: 1px solid var(--line-strong); border-radius: 6px; background: var(--bg); color: var(--ink-2);
     word-break: break-all; margin-top: 0.6rem; user-select: all; max-height: 8em; overflow-y: auto;
   }
-  .btn-row { display: flex; gap: 0.7rem; flex-wrap: wrap; margin-top: 1rem; }
+  .btn-row { display: flex; gap: 0.7rem; flex-wrap: wrap; margin-top: 1rem; align-items: center; }
   .msg { font-size: 0.84rem; color: var(--ink-3); margin-top: 0.5rem; min-height: 1.2em; }
+  .s-org { font-family: "Fraunces", Georgia, serif; font-size: 1.25rem; font-weight: 600; color: var(--ink); margin: 0.1rem 0 0.2rem; }
+  .s-count { font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 0.8rem; color: var(--accent); font-weight: 600; }
 
-  .tbl-scroll { overflow-x: auto; }
-  table { border-collapse: collapse; width: 100%; font-size: 0.86rem; }
-  th, td { text-align: left; padding: 0.45rem 0.6rem; border-bottom: 1px solid var(--line); vertical-align: top; }
-  th { font-weight: 600; color: var(--ink-2); font-size: 0.78rem; }
-  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; font-family: "IBM Plex Mono", ui-monospace, monospace; }
-  .muted { color: var(--ink-3); }
-  .field { margin-bottom: 0.9rem; }
-  .field label { display: block; font-size: 0.82rem; font-weight: 600; color: var(--ink-2); margin-bottom: 0.3rem; }
-
-  .share { display: flex; gap: 1.2rem; align-items: flex-start; flex-wrap: wrap; margin-top: 0.5rem; }
+  .share { display: flex; gap: 1.2rem; align-items: flex-start; flex-wrap: wrap; margin-top: 0.6rem; }
   .share .qr { width: 148px; flex: none; border-radius: 6px; overflow: hidden; border: 1px solid var(--line); background: #fff; }
+  .share .qr.sm { width: 104px; }
   .share .qr svg { display: block; width: 100%; height: auto; }
   .share .share-right { flex: 1; min-width: 220px; }
   .share .code-box { margin-top: 0; }
-  .share h4 { font-size: 0.95rem; font-weight: 600; margin: 0 0 0.4rem; }
+  .share-block { padding: 1rem 0; border-top: 1px solid var(--line); }
+  .share-block:first-of-type { border-top: none; }
+
+  .archive-row { display: flex; align-items: center; justify-content: space-between; gap: 0.8rem; padding: 0.6rem 0; border-top: 1px solid var(--line); flex-wrap: wrap; }
+  .archive-row:first-of-type { border-top: none; }
+  .archive-row .a-org { font-weight: 600; font-size: 0.92rem; }
+  .archive-row .a-meta { font-size: 0.78rem; color: var(--ink-3); font-family: "IBM Plex Mono", ui-monospace, monospace; }
+
+  /* results */
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.8rem; margin-top: 1.6rem; }
+  .tile { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 1rem 1.1rem; }
+  .tile .v { font-family: "Fraunces", Georgia, serif; font-size: 2rem; font-weight: 700; line-height: 1.05; font-variant-numeric: tabular-nums; }
+  .tile .v.accent { color: var(--accent); }
+  .tile .l { font-size: 0.8rem; color: var(--ink-3); margin-top: 0.3rem; }
+
+  .legend { display: flex; flex-wrap: wrap; gap: 0.4rem 1.1rem; font-size: 0.8rem; color: var(--ink-2); margin-bottom: 0.9rem; }
+  .legend .key { display: inline-flex; align-items: center; gap: 0.4em; }
+  .sw { display: inline-block; width: 0.7em; height: 0.7em; border-radius: 2px; flex: none; }
+  .bars { display: grid; gap: 0.75rem; }
+  .bar-row { display: grid; grid-template-columns: minmax(6rem, 13rem) 1fr; gap: 0.3rem 0.9rem; align-items: center; }
+  .bar-row .name { font-size: 0.88rem; color: var(--ink); line-height: 1.3; }
+  .bar-row .name small { display: block; color: var(--ink-3); font-size: 0.76rem; }
+  .bar-line { display: flex; align-items: center; gap: 0.5rem; min-width: 0; }
+  .bar-line + .bar-line { margin-top: 3px; }
+  .track { flex: 1; display: flex; gap: 2px; height: 14px; min-width: 0; }
+  .track.thin { height: 10px; }
+  .fill { height: 100%; min-width: 2px; }
+  .track .fill:last-of-type { border-radius: 0 4px 4px 0; }
+  .val { font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 0.76rem; color: var(--ink-2); white-space: nowrap; min-width: 3.2em; text-align: right; }
+  .breakdown { grid-column: 2; font-size: 0.76rem; color: var(--ink-3); }
+  .bar-row.solo { grid-template-columns: 1fr; }
+  .bar-row.solo .breakdown { grid-column: 1; }
+  .breakdown span + span::before { content: " · "; }
+  .muted { color: var(--ink-3); }
+
+  .chip { display: inline-flex; align-items: center; gap: 0.35em; font-size: 0.74rem; font-weight: 600; color: var(--ink-2); white-space: nowrap; }
+  .alist { list-style: none; margin: 0; padding: 0; }
+  .alist li { display: grid; grid-template-columns: 1fr auto; gap: 0.2rem 1rem; padding: 0.6rem 0; border-top: 1px solid var(--line); align-items: baseline; }
+  .alist li:first-child { border-top: none; }
+  .alist .a-n { font-weight: 500; }
+  .alist .a-m { font-size: 0.78rem; color: var(--ink-3); grid-column: 1 / -1; display: flex; gap: 0.9rem; flex-wrap: wrap; }
+  .alist .a-h { font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 0.8rem; color: var(--ink-2); }
+
+  table.rt { border-collapse: collapse; width: 100%; font-size: 0.88rem; }
+  .rt th, .rt td { text-align: left; padding: 0.5rem 0.6rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+  .rt th { font-weight: 600; color: var(--ink-2); font-size: 0.78rem; }
+  .rt td.num, .rt th.num { text-align: right; font-variant-numeric: tabular-nums; font-family: "IBM Plex Mono", ui-monospace, monospace; }
+
+  .levers { display: grid; gap: 1.1rem; }
+  .lever { border-top: 1px solid var(--line); padding-top: 1rem; }
+  .lever:first-child { border-top: none; padding-top: 0; }
+  .lever .l-tag { font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3); font-weight: 600; display: block; margin-bottom: 0.3rem; }
+  .lever p { font-size: 0.93rem; color: var(--ink-2); }
+  .lever .decide { margin-top: 0.5rem; font-size: 0.9rem; color: var(--ink); padding-left: 0.9rem; border-left: 2px solid var(--accent); }
+  .lever .decide b { color: var(--accent); }
+
+  .admin-box { margin-top: 1.4rem; padding: 1.2rem 1.4rem; background: var(--surface-2); border-radius: 8px; }
+
+  .tooltip {
+    position: fixed; pointer-events: none; z-index: 70; background: var(--ink); color: var(--bg);
+    font-size: 0.78rem; font-weight: 500; padding: 0.35rem 0.6rem; border-radius: 5px;
+    opacity: 0; transition: opacity 100ms; max-width: 18rem;
+  }
+  .tooltip.show { opacity: 1; }
+
   .present-overlay {
     position: fixed; inset: 0; z-index: 60; background: var(--bg); color: var(--ink);
     display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -192,8 +266,13 @@
   .screen { animation: fade 240ms ease; }
   @keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
   @media (prefers-reduced-motion: reduce) { .screen { animation: none; } }
-  @media (max-width: 520px) { .eyebrow { padding-right: 6rem; } .nav-row .hint { order: 3; flex-basis: 100%; } }
-  @media print { .btn, .nav-row, .lang-switch, .linklike { display: none !important; } body { background: #fff; color: #111; } }
+  @media (max-width: 560px) {
+    .eyebrow { padding-right: 6rem; }
+    .nav-row .hint { order: 3; flex-basis: 100%; }
+    .bar-row { grid-template-columns: 1fr; }
+    .breakdown { grid-column: 1; }
+  }
+  @media print { .btn, .nav-row, .lang-switch, .linklike, .no-pdf { display: none !important; } body { background: #fff; color: #111; } }
 </style>
 </head>
 <body>
@@ -205,10 +284,16 @@
   <main id="app"></main>
   <p class="foot" id="foot"></p>
 </div>
+<div class="tooltip" id="tooltip" role="status"></div>
 
+<script type="application/json" id="aia-data">{"v": 1, "standalone": {"universal": true}}</script>
 <script>
 (function () {
   "use strict";
+
+  var INITIAL_HTML = "<!doctype html>\n" + document.documentElement.outerHTML;
+  // Public no-login respondent page; per-session links add ?org=…&roles=…
+  var HOSTED_URL = "https://chiasmaj-mr5.github.io/mr5-diagnostic/ai-activities/";
 
   // ============ QR encoder (byte mode, EC level M, v1-15) ============
   var QR = (function () {
@@ -428,23 +513,34 @@
     return { encode: encode, toSVG: toSVG };
   })();
 
-  // Per-engagement settings come from the link, so this page names no client:
+  // ============ store ============
+  // The GitHub copy embeds {standalone}; the facilitator's Claude artifact embeds
+  // {session, archive} and republishes itself as answers and codes arrive.
+  var STORE = { v: 1 };
+  try { STORE = JSON.parse(document.getElementById("aia-data").textContent) || STORE; } catch (e) {}
+  var STANDALONE = STORE.standalone || null;
+  var SESSION = STANDALONE ? null : (STORE.session || null);
+  var ARCHIVE = STANDALONE ? [] : (STORE.archive || []);
+  var ART = undefined;   // artifact namespace: undefined = resolving, null = unavailable
+  var DL = undefined;    // downloads namespace
+
+  // Standalone settings come from the link, so the page names no client:
   //   ?org=Name&form=team|direction&lang=en|fr&roles=Role A|Role B&min=5&to=facilitator@example.com
-  //   ?view=facilitator — link builder and response compiler
+  //   ?view=facilitator — links and code compiler without the Claude artifact
   var qp = new URLSearchParams(location.search);
-  var ORG = (qp.get("org") || "").trim();
-  var FORM = qp.get("form") === "direction" ? "d" : "t";
-  var VIEW = qp.get("view") === "facilitator" ? "facilitator" : "survey";
-  var MIN_GROUP = Math.max(2, parseInt(qp.get("min"), 10) || 5);
   var DEFAULT_TO = "chiasmaj@gmail.com";
-  var TO = (qp.get("to") || DEFAULT_TO).trim();
-  var ROLES_PARAM = (qp.get("roles") || "").split("|").map(function (s) { return s.trim(); }).filter(Boolean);
+  var P = {
+    org: (qp.get("org") || "").trim(),
+    form: qp.get("form") === "direction" ? "d" : "t",
+    roles: (qp.get("roles") || "").split("|").map(function (s) { return s.trim(); }).filter(Boolean),
+    min: Math.max(2, parseInt(qp.get("min"), 10) || 5),
+    to: (qp.get("to") || DEFAULT_TO).trim(),
+    view: qp.get("view") === "facilitator" ? "facilitator" : ""
+  };
   var CODE_PREFIX = "AIA1.";
-  var STORE_KEY = "aia-draft:" + FORM + ":" + ORG;
+  var lang = STANDALONE ? (qp.get("lang") === "fr" ? "fr" : "en") : ((SESSION && SESSION.lang) || "en");
 
-  var lang = qp.get("lang") === "fr" ? "fr" : "en";
-
-  // Weekly-hours brackets → midpoint used for estimates (flagged as estimates in exports).
+  // Weekly-hours brackets → midpoint used for estimates (flagged as estimates everywhere).
   var HOURS_MID = [0.5, 2, 4, 7.5, 12];
 
   var I18N = {
@@ -468,7 +564,7 @@
         "Do not attach documents; we will collect them during the diagnostic if needed."
       ],
       start: "Start", resume: "Resume where I left off", restart: "Start over",
-      back: "Back", next: "Next", finish: "Finish",
+      back: "Back", next: "Next", finish: "See my results",
       stepOf: "Step {n} of {t}",
       required: "Answer the questions marked * to continue.",
       optional: "(optional)",
@@ -550,42 +646,110 @@
       qWho: "Who currently decides on adopting a new tool or changing a role?",
       qChamp: "Who at {org} could act as an AI champion or point person?",
 
-      doneEyebrow: "Done — one last step",
-      doneTitle: "Thank you!",
-      doneLede: "Send the response code below to MR5 InnovAction. It contains your answers and no name. Your answers count once MR5 adds the code to the results.",
-      doneAnon: "If you send it by email, only MR5 sees who sent it. {org} receives grouped results only, never for fewer than {min} people.",
-      codeLabel: "Your response code",
+      catAuto: "Automatable by AI", catAug: "Augmented by AI", catAugData: "Augmented — check data rules", catHum: "Human to keep",
+      catAutoS: "Automatable", catAugS: "Augmented", catHumS: "Human to keep",
+
+      yEyebrow: "Your results",
+      yTitle: "Your activity profile",
+      yLede: "Here is how your week breaks down, using the same rules MR5 applies to the whole group. These are proposals — they will be validated with you and your team.",
+      yTiles: ["Hours per week described", "Where AI could help", "Activities described"],
+      yHelp: "About {h} h of your week ({p} %) goes to activities where AI could help — by automating them or by assisting you.",
+      yHelpNone: "None of the activities you described is a clear candidate for AI: they rely on judgement or carry serious consequences.",
+      yWeek: "Your week, by proposed category",
+      yActs: "Your activities",
+      yPrio: "Your priorities for freed time",
+      yNext: "What happens next",
+      yNextText: "MR5 combines everyone’s answers by group (never fewer than {min} people), checks the proposals with you during the on-site day, and presents the group results to leadership.",
+      yNextTextD: "MR5 combines leadership and team answers, and will go over these proposals with you in the interview.",
+      hpw: "h/wk",
+
+      codeIntro: "<strong>One last step:</strong> send this response code to MR5 InnovAction. It contains your answers and no name; your answers count in the group results once MR5 adds it.",
+      codeAnon: "If you send it by email, only MR5 sees who sent it. {org} receives grouped results only, never for fewer than {min} people.",
       email: "Send by email", copy: "Copy code", copied: "Copied.", copyFail: "Select the code above and copy it.",
       emailSubject: "AI activity diagnostic – response code",
       emailBody: "Here is my response code{org}:\n\n{code}\n",
+      submitPending: "Adding your answers to the group results…",
+      submitOk: "<strong>Your answers were added to the group results.</strong>",
+      submitFallback: "<strong>This view can’t add your answers automatically.</strong> Send this response code to the facilitator — they will add it to the live results.",
+      submitErr: "Your answers could not be saved automatically. Send this response code to the facilitator instead.",
       editAgain: "Change my answers",
+      btnReport: "Download report (PDF)", pdfPreparing: "Preparing the report…", reportSaved: "Report saved ✓",
+      btnBackConsole: "Back to the session",
 
-      footer: "MR5 InnovAction Solutions · AI activity diagnostic. Answers are used only for this engagement.",
+      gEyebrow: "Group results",
+      gTitle: "What the group told us",
+      gLive: "Live — updates as answers arrive.",
+      gClosed: "This session is closed.",
+      gEmpty: "No answers yet. Share the QR code — results appear here as people finish.",
+      gTiles: ["Respondents", "Activities described", "Hours per week described", "Share of time where AI could help"],
+      gRespSplit: "{t} team · {d} leadership",
+      cTime: "Where the time goes",
+      cTimeSub: "Hours per week, by proposed category. Hours are bracket midpoints (estimates). Team groups under {min} people are pooled.",
+      cAll: "All respondents", cPooled: "Pooled (groups under {min})", cLead: "Leadership", cHidden: "Hidden — fewer than {min} people",
+      cCand: "Best candidates for AI",
+      cCandSub: "Activities where AI could automate or assist and that people would like to lighten — most hours first.",
+      cKeep: "Keep human",
+      cKeepSub: "Activities with serious consequences if an error slips in.",
+      cNone: "Nothing yet.",
+      cReinv: "Where to reinvest freed time",
+      cConc: "Concerns about AI",
+      cShareSub: "Share of respondents choosing each option.",
+      cTrain: "Training priorities",
+      cTrainSub: "Share of team respondents choosing each topic.",
+      cReady: "Readiness signals",
+      rUsedWork: "Already use AI at work",
+      rFeel: "Feeling about AI (1 worrying – 5 exciting)",
+      rRekey: "Often re-enter the same information",
+      rFind: "Easily find the information they need",
+      rChange: "Changes are well explained and supported (1–5)",
+      cTeams: "Teams", cDir: "Leadership",
+      cDirs: "Directions to discuss",
+      cDirsSub: "Generated from the answers — a starting point for the group’s decisions, to be validated together.",
+      decide: "Decide:",
+      dQuick: "Quick wins", dQuickP: "{h} h/week go to activities that look automatable, led by {list}.", dQuickD: "which one or two to pilot during the first four weeks, and who checks the results?",
+      dAug: "Assist, don’t replace", dAugP: "{h} h/week go to activities where AI could assist a person who stays in charge.", dAugD: "which tools, and which human check before anything leaves the team?",
+      dData: "Data first", dDataP: "{n} activities involve confidential information (or people are not sure).", dDataD: "who confirms what data AI tools may use, before any pilot?",
+      dReinvSame: "Freed time", dReinvSameP: "Teams and leadership agree: freed time should go first to “{a}”.", dReinvSameD: "which indicator will show that the time really went there?",
+      dReinvDiff: "Freed time", dReinvDiffP: "Teams would put freed time into “{a}”; leadership into “{b}”.", dReinvDiffD: "how to split the freed time between the two?",
+      dConc: "Concerns", dConcP: "The top concern is “{c}” ({p} % of respondents).", dConcD: "what message and what safeguard will address it?",
+      dGap: "Change support", dGapP: "Leadership rates how well change is explained and supported at {d}/5; teams at {t}/5.", dGapD: "what will be done differently this time?",
+      dTrain: "First workshop", dTrainP: "The most requested training topic is “{x}”.", dTrainD: "should the first of the three AI workshops focus on it?",
 
-      fEyebrow: "Facilitator",
-      fTitle: "Links and results",
-      fLinks: "Create the survey links",
-      fLinksSub: "Settings travel in the link, so nothing about the client is stored on this page.",
-      fOrg: "Organization name", fRoles: "Role groups (one per line — each should have at least the minimum group size)",
-      fMin: "Minimum group size", fTo: "Email address that receives response codes", fLang: "Default language",
-      fTeamLink: "Team questionnaire (anonymous)", fDirLink: "Leadership questionnaire",
-      fCopyLink: "Copy link", fPresent: "Present QR", fSaveQr: "Download QR",
-      fQrLong: "This link is too long for a QR code — shorten the organization or role-group names. The link itself still works.",
-      fScan: "Scan to begin · Balayez pour commencer",
-      fCompile: "Compile response codes",
-      fCompileSub: "Paste the codes you received (several at once works). Nothing leaves this browser.",
-      fPaste: "Paste codes here",
-      fRead: "Read codes", fCsvR: "Download respondents (CSV)", fCsvA: "Download activities (CSV)",
-      fFound: "{n} valid responses ({t} team, {d} leadership). {bad} code(s) could not be read. {dup} duplicate(s) ignored.",
-      fByRole: "Weekly hours by proposed category",
-      fByRoleSub: "Hours are bracket midpoints (estimates). Categories follow the decision tree and must be validated by MR5 and leadership. Groups under the minimum size are pooled.",
-      fRole: "Role group", fResp: "Resp.", fActs: "Activities", fAuto: "Automatable", fAug: "Augmented", fHum: "Human to keep", fTot: "Total h/wk",
-      fPooled: "Pooled (groups under {min})", fLeaders: "Leadership",
-      fCompare: "Leadership vs teams",
-      fCompareSub: "Share of respondents choosing each option.",
-      fItem: "Item", fTeams: "Teams", fDir: "Leadership",
-      fChangeAvg: "“Changes are well explained and supported” — average agreement (1–5)",
-      catAuto: "Automatable by AI", catAug: "Augmented by AI", catAugData: "Augmented — check data rules", catHum: "Human to keep"
+      addCodeTitle: "Add response codes",
+      addCodeDesc: "Paste codes from people who answered on the public link (several at once works).",
+      addCodePh: "Paste response codes here",
+      btnAddCode: "Add to results",
+      addCodeRes: "{n} added · {bad} unreadable · {dup} already in",
+      btnCsvR: "Download respondents (CSV)", btnCsvA: "Download activities (CSV)",
+      btnClose: "Close session", btnCloseConfirm: "Click again to close", btnReopen: "Reopen session",
+      saveErr: "Could not save — try again.",
+
+      cEyebrow: "Facilitator console",
+      cTitle: "AI Activity Diagnostic",
+      cLede: "Create a group session, show the QR code, and watch the group results build as people finish — then discuss the directions together.",
+      newSession: "New group session",
+      fOrg: "Organization name", fRoles: "Role groups (one per line — each should reach the minimum group size)",
+      fMin: "Minimum group size", fTo: "Email address that receives response codes", fLang: "Questionnaire language",
+      btnCreate: "Create group session", creating: "Creating…",
+      needArt: "Group sessions work when this page is opened as your Claude artifact. On the public link, use the facilitator view to build links and compile codes.",
+      tryIt: "Try the questionnaire yourself",
+      sessLive: "Live session", sessClosed: "Session closed",
+      respCount: "{t} team · {d} leadership answers",
+      shareTeam: "Team questionnaire — anonymous", shareLead: "Leadership questionnaire",
+      shareDesc: "Participants scan the code or open the link — no account needed. When they finish they see their own results and send their code to you.",
+      copyLink: "Copy link", present: "Present QR", saveQr: "Download QR",
+      qrLong: "This link is too long for a QR code — shorten the organization or role-group names. The link itself still works.",
+      scan: "Scan to begin · Balayez pour commencer",
+      btnLive: "View live results", btnAnswerT: "Answer (team)", btnAnswerD: "Answer (leadership)",
+      btnView: "View results", btnNew: "Start a new session",
+      pastTitle: "Past sessions",
+
+      fEyebrow: "Facilitator", fTitle: "Links and results",
+      fLinks: "Survey links", fLinksSub: "Settings travel in the link, so nothing about the client is stored on this page.",
+      fCompile: "Compile response codes", fCompileSub: "Paste the codes you received (several at once works). Nothing leaves this browser.",
+      fRead: "Show group results", fFound: "{n} valid responses ({t} team, {d} leadership). {bad} unreadable. {dup} duplicate(s) ignored.",
+
+      footer: "MR5 InnovAction Solutions · AI activity diagnostic. Answers are used only for this engagement."
     },
     fr: {
       eyebrowT: "Diagnostic IA des activités · Questionnaire Équipes",
@@ -607,7 +771,7 @@
         "Ne joignez aucun document : nous les recueillerons au besoin lors du diagnostic."
       ],
       start: "Commencer", resume: "Reprendre où j’en étais", restart: "Recommencer",
-      back: "Retour", next: "Suivant", finish: "Terminer",
+      back: "Retour", next: "Suivant", finish: "Voir mes résultats",
       stepOf: "Étape {n} sur {t}",
       required: "Répondez aux questions marquées d’un * pour continuer.",
       optional: "(facultatif)",
@@ -689,42 +853,110 @@
       qWho: "Qui décide aujourd’hui de l’adoption d’un nouvel outil ou d’un changement de rôle?",
       qChamp: "Qui, à {org}, pourrait agir comme personne-relais ou champion de l’IA?",
 
-      doneEyebrow: "Terminé — une dernière étape",
-      doneTitle: "Merci!",
-      doneLede: "Envoyez le code de réponse ci-dessous à MR5 InnovAction. Il contient vos réponses et aucun nom. Vos réponses comptent dès que MR5 ajoute le code aux résultats.",
-      doneAnon: "Si vous l’envoyez par courriel, seule MR5 voit qui l’a envoyé. {org} reçoit uniquement des résultats regroupés, jamais pour moins de {min} personnes.",
-      codeLabel: "Votre code de réponse",
+      catAuto: "Automatisable par l’IA", catAug: "Augmentée par l’IA", catAugData: "Augmentée — vérifier les règles de données", catHum: "Humaine à garder",
+      catAutoS: "Automatisable", catAugS: "Augmentée", catHumS: "Humaine à garder",
+
+      yEyebrow: "Vos résultats",
+      yTitle: "Votre profil d’activités",
+      yLede: "Voici comment se répartit votre semaine, selon les mêmes règles que MR5 applique à l’ensemble du groupe. Ce sont des propositions : elles seront validées avec vous et votre équipe.",
+      yTiles: ["Heures par semaine décrites", "Là où l’IA pourrait aider", "Activités décrites"],
+      yHelp: "Environ {h} h de votre semaine ({p} %) vont à des activités où l’IA pourrait aider — en les automatisant ou en vous assistant.",
+      yHelpNone: "Aucune des activités décrites n’est un candidat évident pour l’IA : elles demandent du jugement ou comportent des conséquences importantes.",
+      yWeek: "Votre semaine, par catégorie proposée",
+      yActs: "Vos activités",
+      yPrio: "Vos priorités pour le temps libéré",
+      yNext: "La suite",
+      yNextText: "MR5 regroupe les réponses de tous par groupe (jamais moins de {min} personnes), valide les propositions avec vous lors du diagnostic sur place, puis présente les résultats de groupe à la direction.",
+      yNextTextD: "MR5 regroupe les réponses de la direction et des équipes, et reviendra sur ces propositions avec vous en entrevue.",
+      hpw: "h/sem.",
+
+      codeIntro: "<strong>Une dernière étape :</strong> envoyez ce code de réponse à MR5 InnovAction. Il contient vos réponses et aucun nom; vos réponses comptent dans les résultats de groupe dès que MR5 l’ajoute.",
+      codeAnon: "Si vous l’envoyez par courriel, seule MR5 voit qui l’a envoyé. {org} reçoit uniquement des résultats regroupés, jamais pour moins de {min} personnes.",
       email: "Envoyer par courriel", copy: "Copier le code", copied: "Copié.", copyFail: "Sélectionnez le code ci-dessus et copiez-le.",
       emailSubject: "Diagnostic IA des activités – code de réponse",
       emailBody: "Voici mon code de réponse{org} :\n\n{code}\n",
+      submitPending: "Ajout de vos réponses aux résultats de groupe…",
+      submitOk: "<strong>Vos réponses ont été ajoutées aux résultats de groupe.</strong>",
+      submitFallback: "<strong>Cette vue ne peut pas ajouter vos réponses automatiquement.</strong> Envoyez ce code de réponse à la personne qui anime — elle l’ajoutera aux résultats en direct.",
+      submitErr: "Vos réponses n’ont pas pu être enregistrées automatiquement. Envoyez plutôt ce code de réponse à la personne qui anime.",
       editAgain: "Modifier mes réponses",
+      btnReport: "Télécharger le rapport (PDF)", pdfPreparing: "Préparation du rapport…", reportSaved: "Rapport enregistré ✓",
+      btnBackConsole: "Retour à la session",
 
-      footer: "MR5 InnovAction Solutions · Diagnostic IA des activités. Les réponses servent uniquement à ce mandat.",
+      gEyebrow: "Résultats de groupe",
+      gTitle: "Ce que le groupe nous a dit",
+      gLive: "En direct — se met à jour à l’arrivée des réponses.",
+      gClosed: "Cette session est fermée.",
+      gEmpty: "Aucune réponse pour l’instant. Montrez le code QR — les résultats s’affichent ici à mesure que les gens terminent.",
+      gTiles: ["Répondants", "Activités décrites", "Heures par semaine décrites", "Part du temps où l’IA pourrait aider"],
+      gRespSplit: "{t} équipes · {d} direction",
+      cTime: "Où va le temps",
+      cTimeSub: "Heures par semaine, par catégorie proposée. Les heures sont le milieu de chaque tranche (estimations). Les groupes de moins de {min} personnes sont regroupés.",
+      cAll: "Tous les répondants", cPooled: "Regroupés (groupes de moins de {min})", cLead: "Direction", cHidden: "Masqué — moins de {min} personnes",
+      cCand: "Meilleurs candidats pour l’IA",
+      cCandSub: "Activités que l’IA pourrait automatiser ou assister et que les gens aimeraient alléger — les plus longues d’abord.",
+      cKeep: "Humain à garder",
+      cKeepSub: "Activités où une erreur aurait des conséquences importantes.",
+      cNone: "Rien pour l’instant.",
+      cReinv: "Où réinvestir le temps libéré",
+      cConc: "Préoccupations à l’égard de l’IA",
+      cShareSub: "Part des répondants ayant choisi chaque option.",
+      cTrain: "Priorités de formation",
+      cTrainSub: "Part des répondants des équipes ayant choisi chaque sujet.",
+      cReady: "Signaux de préparation",
+      rUsedWork: "Utilisent déjà l’IA au travail",
+      rFeel: "Perception de l’IA (1 préoccupante – 5 stimulante)",
+      rRekey: "Ressaisissent souvent la même information",
+      rFind: "Trouvent facilement l’information",
+      rChange: "Changements bien expliqués et accompagnés (1 à 5)",
+      cTeams: "Équipes", cDir: "Direction",
+      cDirs: "Pistes à discuter",
+      cDirsSub: "Générées à partir des réponses — un point de départ pour les décisions du groupe, à valider ensemble.",
+      decide: "À décider :",
+      dQuick: "Gains rapides", dQuickP: "{h} h/sem. vont à des activités qui semblent automatisables, en tête : {list}.", dQuickD: "lesquelles mettre à l’essai pendant les quatre premières semaines, et qui vérifie les résultats?",
+      dAug: "Assister, pas remplacer", dAugP: "{h} h/sem. vont à des activités où l’IA pourrait assister une personne qui reste responsable.", dAugD: "quels outils, et quelle vérification humaine avant que quoi que ce soit ne sorte de l’équipe?",
+      dData: "Les données d’abord", dDataP: "{n} activités touchent des renseignements confidentiels (ou les gens ne sont pas certains).", dDataD: "qui confirme quelles données les outils d’IA peuvent utiliser, avant tout essai?",
+      dReinvSame: "Temps libéré", dReinvSameP: "Les équipes et la direction s’entendent : le temps libéré devrait aller d’abord à « {a} ».", dReinvSameD: "quel indicateur montrera que le temps y est vraiment allé?",
+      dReinvDiff: "Temps libéré", dReinvDiffP: "Les équipes consacreraient le temps libéré à « {a} »; la direction, à « {b} ».", dReinvDiffD: "comment répartir le temps libéré entre les deux?",
+      dConc: "Préoccupations", dConcP: "La principale préoccupation est « {c} » ({p} % des répondants).", dConcD: "quel message et quelle mesure de protection y répondront?",
+      dGap: "Accompagnement du changement", dGapP: "La direction évalue l’accompagnement du changement à {d}/5; les équipes, à {t}/5.", dGapD: "que fera-t-on différemment cette fois-ci?",
+      dTrain: "Premier atelier", dTrainP: "Le sujet de formation le plus demandé est « {x} ».", dTrainD: "le premier des trois ateliers sur l’IA devrait-il porter là-dessus?",
 
-      fEyebrow: "Animation",
-      fTitle: "Liens et résultats",
-      fLinks: "Créer les liens du questionnaire",
-      fLinksSub: "Les paramètres voyagent dans le lien : aucune information sur le client n’est enregistrée dans cette page.",
+      addCodeTitle: "Ajouter des codes de réponse",
+      addCodeDesc: "Collez les codes des personnes qui ont répondu par le lien public (plusieurs à la fois fonctionne).",
+      addCodePh: "Collez les codes de réponse ici",
+      btnAddCode: "Ajouter aux résultats",
+      addCodeRes: "{n} ajouté(s) · {bad} illisible(s) · {dup} déjà présent(s)",
+      btnCsvR: "Télécharger les répondants (CSV)", btnCsvA: "Télécharger les activités (CSV)",
+      btnClose: "Fermer la session", btnCloseConfirm: "Cliquez de nouveau pour fermer", btnReopen: "Rouvrir la session",
+      saveErr: "Enregistrement impossible — réessayez.",
+
+      cEyebrow: "Console d’animation",
+      cTitle: "Diagnostic IA des activités",
+      cLede: "Créez une session de groupe, affichez le code QR et suivez les résultats de groupe à mesure que les gens terminent — puis discutez ensemble des pistes.",
+      newSession: "Nouvelle session de groupe",
       fOrg: "Nom de l’organisation", fRoles: "Groupes de fonctions (un par ligne — chacun devrait atteindre la taille minimale)",
-      fMin: "Taille minimale d’un groupe", fTo: "Adresse courriel qui reçoit les codes", fLang: "Langue par défaut",
-      fTeamLink: "Questionnaire Équipes (anonyme)", fDirLink: "Questionnaire Direction",
-      fCopyLink: "Copier le lien", fPresent: "Présenter le code QR", fSaveQr: "Télécharger le code QR",
-      fQrLong: "Ce lien est trop long pour un code QR — raccourcissez le nom de l’organisation ou des groupes. Le lien lui-même fonctionne.",
-      fScan: "Balayez pour commencer · Scan to begin",
-      fCompile: "Compiler les codes de réponse",
-      fCompileSub: "Collez les codes reçus (plusieurs à la fois fonctionne). Rien ne quitte ce navigateur.",
-      fPaste: "Collez les codes ici",
-      fRead: "Lire les codes", fCsvR: "Télécharger les répondants (CSV)", fCsvA: "Télécharger les activités (CSV)",
-      fFound: "{n} réponses valides ({t} équipes, {d} direction). {bad} code(s) illisible(s). {dup} doublon(s) ignoré(s).",
-      fByRole: "Heures par semaine selon la catégorie proposée",
-      fByRoleSub: "Les heures sont le milieu de chaque tranche (estimations). Les catégories suivent l’arbre de décision et doivent être validées par MR5 et la direction. Les groupes sous la taille minimale sont regroupés.",
-      fRole: "Groupe", fResp: "Rép.", fActs: "Activités", fAuto: "Automatisable", fAug: "Augmentée", fHum: "Humaine à garder", fTot: "Total h/sem.",
-      fPooled: "Regroupés (groupes de moins de {min})", fLeaders: "Direction",
-      fCompare: "Direction et équipes",
-      fCompareSub: "Part des répondants ayant choisi chaque option.",
-      fItem: "Élément", fTeams: "Équipes", fDir: "Direction",
-      fChangeAvg: "« Les changements sont bien expliqués et accompagnés » — accord moyen (1 à 5)",
-      catAuto: "Automatisable par l’IA", catAug: "Augmentée par l’IA", catAugData: "Augmentée — vérifier les règles de données", catHum: "Humaine à garder"
+      fMin: "Taille minimale d’un groupe", fTo: "Adresse courriel qui reçoit les codes", fLang: "Langue du questionnaire",
+      btnCreate: "Créer la session de groupe", creating: "Création…",
+      needArt: "Les sessions de groupe fonctionnent lorsque cette page est ouverte comme votre artefact Claude. Sur le lien public, utilisez la vue d’animation pour créer les liens et compiler les codes.",
+      tryIt: "Essayer le questionnaire moi-même",
+      sessLive: "Session en cours", sessClosed: "Session fermée",
+      respCount: "{t} réponses équipes · {d} direction",
+      shareTeam: "Questionnaire Équipes — anonyme", shareLead: "Questionnaire Direction",
+      shareDesc: "Les participants balaient le code ou ouvrent le lien — aucun compte requis. À la fin, ils voient leurs propres résultats et vous envoient leur code.",
+      copyLink: "Copier le lien", present: "Présenter le code QR", saveQr: "Télécharger le code QR",
+      qrLong: "Ce lien est trop long pour un code QR — raccourcissez le nom de l’organisation ou des groupes. Le lien lui-même fonctionne.",
+      scan: "Balayez pour commencer · Scan to begin",
+      btnLive: "Voir les résultats en direct", btnAnswerT: "Répondre (équipes)", btnAnswerD: "Répondre (direction)",
+      btnView: "Voir les résultats", btnNew: "Nouvelle session",
+      pastTitle: "Sessions précédentes",
+
+      fEyebrow: "Animation", fTitle: "Liens et résultats",
+      fLinks: "Liens du questionnaire", fLinksSub: "Les paramètres voyagent dans le lien : aucune information sur le client n’est enregistrée dans cette page.",
+      fCompile: "Compiler les codes de réponse", fCompileSub: "Collez les codes reçus (plusieurs à la fois fonctionne). Rien ne quitte ce navigateur.",
+      fRead: "Afficher les résultats de groupe", fFound: "{n} réponses valides ({t} équipes, {d} direction). {bad} illisible(s). {dup} doublon(s) ignoré(s).",
+
+      footer: "MR5 InnovAction Solutions · Diagnostic IA des activités. Les réponses servent uniquement à ce mandat."
     }
   };
 
@@ -733,39 +965,51 @@
     fr: ["Service à la clientèle", "Opérations", "Administration et finances", "Ventes et développement des affaires", "Gestion"]
   };
 
-  // ---------- helpers ----------
+  // ============ helpers ============
+  function $(id) { return document.getElementById(id); }
   function T(k) { return I18N[lang][k]; }
-  function fmt(s, o) {
-    return String(s).replace(/\{(\w+)\}/g, function (m, k) { return o && o[k] != null ? o[k] : m; });
-  }
-  function orgName() { return ORG || T("ourOrg"); }
-  function tx(k, o) { return fmt(T(k), Object.assign({ org: esc(orgName()), min: MIN_GROUP }, o || {})); }
+  function fmt(s, o) { return String(s).replace(/\{(\w+)\}/g, function (m, k) { return o && o[k] != null ? o[k] : m; }); }
   function esc(s) {
     return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
       return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
     });
   }
-  function $(id) { return document.getElementById(id); }
   function lsGet(k) { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } }
   function lsSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
   function lsDel(k) { try { localStorage.removeItem(k); } catch (e) {} }
-  function roles() { return ROLES_PARAM.length ? ROLES_PARAM : DEFAULT_ROLES[lang]; }
+  function ssGet(k) { try { return JSON.parse(sessionStorage.getItem(k)); } catch (e) { return null; } }
+  function ssSet(k, v) { try { sessionStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+  function ssDel(k) { try { sessionStorage.removeItem(k); } catch (e) {} }
   function filled(v) { return v != null && v !== "" && !(Array.isArray(v) && !v.length); }
+  function h1(n) { return (Math.round(n * 10) / 10).toLocaleString(lang === "fr" ? "fr-CA" : "en-CA"); }
+  function pct(n) { return Math.round(n) + " %"; }
   function rid() {
     var a = new Uint8Array(6);
-    (window.crypto || {}).getRandomValues ? crypto.getRandomValues(a) : a.forEach(function (_, i) { a[i] = Math.random() * 256; });
-    return Array.prototype.map.call(a, function (b) { return b.toString(16).padStart(2, "0"); }).join("");
+    if (window.crypto && crypto.getRandomValues) crypto.getRandomValues(a);
+    else for (var i = 0; i < a.length; i++) a[i] = Math.floor(Math.random() * 256);
+    return Array.prototype.map.call(a, function (b) { return (b < 16 ? "0" : "") + b.toString(16); }).join("");
   }
-  function b64urlEncode(str) {
-    return btoa(unescape(encodeURIComponent(str))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
-  }
+  function b64urlEncode(str) { return btoa(unescape(encodeURIComponent(str))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, ""); }
   function b64urlDecode(s) {
     s = s.replace(/-/g, "+").replace(/_/g, "/");
     while (s.length % 4) s += "=";
     return decodeURIComponent(escape(atob(s)));
   }
+  function dateStr(ts) {
+    return new Date(ts || Date.now()).toLocaleDateString(lang === "fr" ? "fr-CA" : "en-CA", { year: "numeric", month: "long", day: "numeric" });
+  }
 
-  // ---------- form definition ----------
+  // Survey settings: from the session in the artifact, from the link on the public page.
+  function cfg() {
+    if (STANDALONE) return { org: P.org, roles: P.roles, min: P.min, to: P.to };
+    if (SESSION) return { org: SESSION.org, roles: SESSION.roles || [], min: SESSION.min || 5, to: SESSION.email || DEFAULT_TO };
+    return { org: "", roles: [], min: 5, to: DEFAULT_TO };
+  }
+  function orgName() { return cfg().org || T("ourOrg"); }
+  function roles() { var r = cfg().roles; return r.length ? r : DEFAULT_ROLES[lang]; }
+  function tx(k, o) { return fmt(T(k), Object.assign({ org: esc(orgName()), min: cfg().min }, o || {})); }
+
+  // ============ form definition ============
   // Field keys stay short: they end up in the response code.
   var ACT_FIELDS = [
     { k: "h", q: "aHours", o: "hours", help: "aHoursHelp" },
@@ -820,34 +1064,51 @@
     ]
   };
 
-  // ---------- state ----------
-  var state = null;      // { a: answers, step, done }
+  // ============ app state ============
+  // view: intro | survey | personal | group | facilitator
+  // mode: standalone (public link) | respond (in a live session) | solo (trying it, nothing saved)
+  var view = "intro", mode = STANDALONE ? "standalone" : "solo";
+  var FORM = STANDALONE ? P.form : "t";
+  var state = null;            // { id, step, a }
+  var lastPayload = null;      // the answers shown on the personal results screen
+  var submitHTML = "";         // status banner under personal results
+  var LIVE_SRC = null;         // null = current session; otherwise an archived session
+  var compiled = [];           // responses compiled from codes on the public facilitator view
+  var closeArmed = false;
+  var codeMsg = "";            // result of the last "add codes", shown again after the reload
+
+  function draftKey() { return "aia-draft:" + FORM + ":" + (cfg().org || ""); }
   function freshState() {
     var lo = STEPS[FORM].filter(function (s) { return s.acts; })[0].acts.lo;
     var acts = [];
     for (var i = 0; i < lo; i++) acts.push({});
-    return { step: -1, done: false, a: { acts: acts } };
+    return { id: rid(), step: 0, a: { acts: acts } };
   }
-  function save() { lsSet(STORE_KEY, state); }
+  function saveDraft() { if (mode === "standalone") lsSet(draftKey(), state); }
 
-  // ---------- rendering: survey ----------
-  function renderIntro() {
-    var draft = lsGet(STORE_KEY);
-    var hasDraft = draft && draft.step >= 0;
-    var pts = T(FORM === "t" ? "pointsT" : "pointsD").map(function (p) { return "<li>" + fmt(p, { min: MIN_GROUP }) + "</li>"; }).join("");
-    $("app").innerHTML =
-      '<section class="screen">' +
-      '<p class="eyebrow"><span class="mark">MR5</span> · ' + esc(T(FORM === "t" ? "eyebrowT" : "eyebrowD")) + (ORG ? " · " + esc(ORG) : "") + "</p>" +
-      "<h1>" + esc(T(FORM === "t" ? "titleT" : "titleD")) + "</h1>" +
-      '<p class="lede">' + tx(FORM === "t" ? "ledeT" : "ledeD") + "</p>" +
-      '<ul class="points">' + pts + "</ul>" +
-      '<div class="btn-row" style="margin-top:1.8rem">' +
-      (hasDraft
-        ? '<button class="btn" data-act="resume">' + esc(T("resume")) + '</button><button class="btn ghost" data-act="restart">' + esc(T("restart")) + "</button>"
-        : '<button class="btn" data-act="start">' + esc(T("start")) + "</button>") +
-      "</div></section>";
+  // ============ classification (decision tree, section 6.3 — proposals only) ============
+  // 1. serious consequence of an error → human to keep
+  // 2. confidential data (or unsure) → augmented at most, pending data rules
+  // 3. always the same way + minor consequence → automatable
+  // 4. otherwise → augmented
+  function classify(x) {
+    if (x.e === 2) return "hum";
+    if (x.c === 0 || x.c === 2) return "augData";
+    if (x.s === 2 && x.e === 0) return "auto";
+    return "aug";
+  }
+  function bucket(c) { return c === "augData" ? "aug" : c; }
+  var CAT_LABEL = { auto: "catAuto", aug: "catAug", augData: "catAugData", hum: "catHum" };
+  var CAT_SHORT = { auto: "catAutoS", aug: "catAugS", hum: "catHumS" };
+  var CAT_VAR = { auto: "--c-auto", aug: "--c-aug", hum: "--c-hum" };
+  function hoursOf(acts) {
+    var h = { auto: 0, aug: 0, hum: 0 };
+    acts.forEach(function (x) { h[bucket(classify(x))] += HOURS_MID[x.h] || 0; });
+    h.total = h.auto + h.aug + h.hum;
+    return h;
   }
 
+  // ============ survey rendering ============
   function choiceGroup(name, opts, val, multi, extra) {
     extra = extra || {};
     var cls = "choices" + (extra.stack ? " stack" : "") + (extra.scale ? " scale" : "");
@@ -900,9 +1161,8 @@
   }
 
   function actCard(act, i, canRemove) {
-    var n = i + 1;
     return '<div class="act" data-i="' + i + '">' +
-      '<div class="act-head"><span class="act-tag">' + esc(fmt(T("act"), { n: n })) + "</span>" +
+      '<div class="act-head"><span class="tag">' + esc(fmt(T("act"), { n: i + 1 })) + "</span>" +
       (canRemove ? '<button class="linklike" data-act="rm" data-i="' + i + '">' + esc(T("remove")) + "</button>" : "") + "</div>" +
       '<div class="q"><p class="stmt" id="lbl-a' + i + '">' + esc(T("aName")) + ' *</p><input type="text" data-act-i="' + i + '" data-k="n" maxlength="160" aria-labelledby="lbl-a' + i + '" placeholder="' + esc(T("aNamePh")) + '" value="' + esc(act.n || "") + '"></div>' +
       ACT_FIELDS.map(function (f) {
@@ -926,6 +1186,22 @@
     });
   }
 
+  function renderSurveyIntro() {
+    var draft = lsGet(draftKey());
+    var hasDraft = draft && draft.step >= 0 && draft.a;
+    var pts = T(FORM === "t" ? "pointsT" : "pointsD").map(function (p) { return "<li>" + fmt(p, { min: cfg().min }) + "</li>"; }).join("");
+    return '<section class="screen">' +
+      '<p class="eyebrow"><span class="mark">MR5</span> · ' + esc(T(FORM === "t" ? "eyebrowT" : "eyebrowD")) + (cfg().org ? " · " + esc(cfg().org) : "") + "</p>" +
+      "<h1>" + esc(T(FORM === "t" ? "titleT" : "titleD")) + "</h1>" +
+      '<p class="lede">' + tx(FORM === "t" ? "ledeT" : "ledeD") + "</p>" +
+      '<ul class="points">' + pts + "</ul>" +
+      '<div class="btn-row" style="margin-top:1.8rem">' +
+      (hasDraft
+        ? '<button class="btn" data-act="resume">' + esc(T("resume")) + '</button><button class="btn ghost" data-act="start">' + esc(T("restart")) + "</button>"
+        : '<button class="btn" data-act="start">' + esc(T("start")) + "</button>") +
+      "</div></section>";
+  }
+
   function renderStep() {
     var steps = STEPS[FORM], step = steps[state.step], a = state.a;
     var segs = steps.map(function (_, i) { return '<div class="seg' + (i <= state.step ? " done" : "") + '"></div>'; }).join("");
@@ -940,18 +1216,17 @@
       body = '<div class="s-head"><h2>' + tx(step.title) + "</h2></div>" + step.qs.map(function (q) { return qBlock(q, a); }).join("");
     }
     var last = state.step === steps.length - 1;
-    $("app").innerHTML =
-      '<section class="screen">' +
+    return '<section class="screen">' +
       '<div class="progress" aria-hidden="true"><div class="progress-steps">' + segs + '</div>' +
-      '<div class="progress-note"><span>' + esc(fmt(T("stepOf"), { n: state.step + 1, t: steps.length })) + "</span><span>" + esc(ORG) + "</span></div></div>" +
+      '<div class="progress-note"><span>' + esc(fmt(T("stepOf"), { n: state.step + 1, t: steps.length })) + "</span><span>" + esc(cfg().org) + "</span></div></div>" +
       body +
       '<div class="nav-row"><button class="btn ghost" data-act="back">' + esc(T("back")) + "</button>" +
       '<span class="hint" id="nav-hint"></span>' +
       '<button class="btn" data-act="next" id="btn-next">' + esc(T(last ? "finish" : "next")) + "</button></div></section>";
-    updateNext();
   }
 
   function updateNext() {
+    if (view !== "survey") return;
     var ok = stepValid(STEPS[FORM][state.step]);
     var b = $("btn-next");
     if (b) b.disabled = !ok;
@@ -959,10 +1234,10 @@
     if (h) h.textContent = ok ? "" : T("required");
   }
 
-  // ---------- response code ----------
+  // ============ response payload / code ============
   function buildPayload() {
     var a = state.a, out = { v: 1, f: FORM, id: state.id, d: new Date().toISOString().slice(0, 10), l: lang };
-    if (ORG) out.org = ORG;
+    if (cfg().org) out.org = cfg().org;
     if (FORM === "t" && a.role != null) {
       var rl = roles();
       out.role = a.role < rl.length ? rl[a.role] : "";
@@ -980,84 +1255,570 @@
     });
     return out;
   }
-
-  function renderDone() {
-    var code = CODE_PREFIX + b64urlEncode(JSON.stringify(buildPayload()));
-    var body = fmt(T("emailBody"), { org: ORG ? " (" + ORG + ")" : "", code: code });
-    var mail = "mailto:" + encodeURIComponent(TO) + "?subject=" + encodeURIComponent(T("emailSubject") + (ORG ? " – " + ORG : "")) + "&body=" + encodeURIComponent(body);
-    $("app").innerHTML =
-      '<section class="screen">' +
-      '<p class="eyebrow"><span class="mark">MR5</span> · ' + esc(T("doneEyebrow")) + "</p>" +
-      "<h1>" + esc(T("doneTitle")) + "</h1>" +
-      '<p class="lede">' + esc(T("doneLede")) + "</p>" +
-      '<div class="card"><h3>' + esc(T("codeLabel")) + '</h3><div class="code-box" id="code">' + esc(code) + "</div>" +
-      '<div class="btn-row"><a class="btn" href="' + esc(mail) + '">' + esc(T("email")) + '</a><button class="btn ghost" data-act="copy">' + esc(T("copy")) + "</button></div>" +
-      '<p class="msg" id="copy-msg" role="status"></p></div>' +
-      (FORM === "t" ? '<p class="notice">' + tx("doneAnon") + "</p>" : "") +
-      '<div class="btn-row" style="margin-top:1.6rem"><button class="linklike" data-act="edit">' + esc(T("editAgain")) + "</button></div></section>";
+  function encodeCode(p) { return CODE_PREFIX + b64urlEncode(JSON.stringify(p)); }
+  function decodeCode(c) {
+    try {
+      var r = JSON.parse(b64urlDecode(c.slice(CODE_PREFIX.length)));
+      if (!r || r.v !== 1 || !r.id || (r.f !== "t" && r.f !== "d") || !Array.isArray(r.acts)) return null;
+      var okActs = r.acts.every(function (x) {
+        return x && typeof x.n === "string" && ACT_FIELDS.every(function (f) { return typeof x[f.k] === "number" && x[f.k] >= 0 && x[f.k] < T(f.o).length; });
+      });
+      return okActs ? r : null;
+    } catch (e) { return null; }
+  }
+  function parseCodes(text, existing) {
+    var raw = String(text || "").match(/AIA1\.[A-Za-z0-9_-]+/g) || [];
+    var seen = {}, out = [], bad = 0, dup = 0;
+    (existing || []).forEach(function (r) { seen[r.id] = true; });
+    raw.forEach(function (c) {
+      var r = decodeCode(c);
+      if (!r) { bad++; return; }
+      if (seen[r.id]) { dup++; return; }
+      seen[r.id] = true; out.push(r);
+    });
+    return { valid: out, bad: bad, dup: dup };
   }
 
+  // ============ charts (HTML bars; values always printed beside the marks) ============
+  function sw(varName) { return '<span class="sw" style="background:var(' + varName + ')"></span>'; }
+  function catLegend() {
+    return '<div class="legend">' + ["auto", "aug", "hum"].map(function (c) {
+      return '<span class="key">' + sw(CAT_VAR[c]) + esc(T(CAT_SHORT[c])) + "</span>";
+    }).join("") + "</div>";
+  }
+  function stackRow(name, sub, h, max) {
+    var segs = ["auto", "aug", "hum"].filter(function (c) { return h[c] > 0; }).map(function (c) {
+      var w = max ? (100 * h[c] / max) : 0;
+      return '<div class="fill" style="width:' + w.toFixed(2) + '%;background:var(' + CAT_VAR[c] + ')" data-tip="' +
+        esc(T(CAT_SHORT[c]) + " · " + h1(h[c]) + " " + T("hpw")) + '"></div>';
+    }).join("");
+    var rest = max ? 100 * (max - h.total) / max : 0;
+    return '<div class="bar-row' + (name ? "" : " solo") + '">' + (name ? '<div class="name">' + esc(name) + (sub ? "<small>" + esc(sub) + "</small>" : "") + "</div>" : "") +
+      '<div class="bar-line"><div class="track">' + segs + '<span style="width:' + rest.toFixed(2) + '%"></span></div>' +
+      '<span class="val">' + h1(h.total) + " h</span></div>" +
+      '<div class="breakdown">' + ["auto", "aug", "hum"].map(function (c) {
+        return "<span>" + esc(T(CAT_SHORT[c])) + " " + h1(h[c]) + " h</span>";
+      }).join("") + "</div></div>";
+  }
+  function pairRows(labels, a, b, showB) {
+    return '<div class="bars">' + labels.map(function (l, i) {
+      function line(v, varName, who) {
+        if (v == null) return "";
+        return '<div class="bar-line"><div class="track thin"><div class="fill" style="width:' + Math.max(0, v).toFixed(1) + '%;background:var(' + varName + ')" data-tip="' +
+          esc(who + " · " + pct(v)) + '"></div></div><span class="val">' + pct(v) + "</span></div>";
+      }
+      return '<div class="bar-row"><div class="name">' + esc(l) + "</div><div>" +
+        line(a[i], "--c-teams", T("cTeams")) + (showB ? line(b[i], "--c-lead", T("cDir")) : "") + "</div></div>";
+    }).join("") + "</div>";
+  }
+  function audienceLegend(nt, nd) {
+    return '<div class="legend"><span class="key">' + sw("--c-teams") + esc(T("cTeams")) + " (" + nt + ")</span>" +
+      (nd ? '<span class="key">' + sw("--c-lead") + esc(T("cDir")) + " (" + nd + ")</span>" : "") + "</div>";
+  }
+  function shareOf(list, k, i) {
+    if (!list.length) return null;
+    return 100 * list.filter(function (r) { return Array.isArray(r[k]) && r[k].indexOf(i) >= 0; }).length / list.length;
+  }
+  function chip(c) { return '<span class="chip">' + sw(CAT_VAR[bucket(c)]) + esc(T(CAT_LABEL[c])) + "</span>"; }
+
+  // ============ personal results ============
+  function renderPersonal() {
+    var p = lastPayload, h = hoursOf(p.acts);
+    var help = h.auto + h.aug, hp = h.total ? 100 * help / h.total : 0;
+    var acts = p.acts.map(function (x) { return { x: x, c: classify(x) }; })
+      .sort(function (m, n) { return (HOURS_MID[n.x.h] || 0) - (HOURS_MID[m.x.h] || 0); });
+    var prio = (p.re || []).map(function (i) { return i < T("reinvest").length ? T("reinvest")[i] : (p.reo || T("other")); });
+    var back = mode === "respond" || mode === "solo";
+    return '<section class="screen" id="report-root">' +
+      '<p class="eyebrow"><span class="mark">MR5</span> · ' + esc(T("yEyebrow")) + "</p>" +
+      "<h1>" + esc(T("yTitle")) + "</h1>" +
+      '<p class="org-line">' + (cfg().org ? "<strong>" + esc(cfg().org) + '</strong><span class="sep">·</span>' : "") +
+      (p.role ? esc(p.role) + '<span class="sep">·</span>' : "") + esc(dateStr()) + "</p>" +
+      '<p class="lede">' + esc(T("yLede")) + "</p>" +
+      '<div class="tiles">' +
+      '<div class="tile"><div class="v">' + h1(h.total) + '</div><div class="l">' + esc(T("yTiles")[0]) + "</div></div>" +
+      '<div class="tile"><div class="v accent">' + pct(hp) + '</div><div class="l">' + esc(T("yTiles")[1]) + "</div></div>" +
+      '<div class="tile"><div class="v">' + p.acts.length + '</div><div class="l">' + esc(T("yTiles")[2]) + "</div></div></div>" +
+      '<div class="card"><h3>' + esc(T("yWeek")) + '</h3><p class="sub">' + esc(help ? fmt(T("yHelp"), { h: h1(help), p: Math.round(hp) }) : T("yHelpNone")) + "</p>" +
+      catLegend() + '<div class="bars">' + stackRow("", "", h, h.total) + "</div></div>" +
+      '<div class="card"><h3>' + esc(T("yActs")) + '</h3><ul class="alist">' + acts.map(function (m) {
+        return '<li><span class="a-n">' + esc(m.x.n) + '</span><span class="a-h">' + esc(T("hours")[m.x.h]) + "</span>" +
+          '<span class="a-m">' + chip(m.c) + "</span></li>";
+      }).join("") + "</ul></div>" +
+      (prio.length ? '<div class="card"><h3>' + esc(T("yPrio")) + '</h3><ul class="points" style="margin-top:0.4rem">' +
+        prio.map(function (x) { return "<li>" + esc(x) + "</li>"; }).join("") + "</ul></div>" : "") +
+      '<div class="card dashed"><h3>' + esc(T("yNext")) + '</h3><p class="sub" style="margin:0.3rem 0 0">' +
+        esc(fmt(T(p.f === "d" ? "yNextTextD" : "yNextText"), { min: cfg().min })) + "</p></div>" +
+      '<div id="submit-status" class="no-pdf">' + submitHTML + "</div>" +
+      '<div class="nav-row no-pdf" style="justify-content:flex-start;gap:0.8rem">' +
+      '<button class="btn ghost" data-act="report">' + esc(T("btnReport")) + "</button>" +
+      (back ? '<button class="btn ghost" data-act="to-intro">' + esc(T("btnBackConsole")) + "</button>"
+            : '<button class="linklike" data-act="edit">' + esc(T("editAgain")) + "</button>") +
+      "</div></section>";
+  }
+
+  function standaloneCodeHTML(p) {
+    var code = encodeCode(p);
+    var org = cfg().org;
+    var body = fmt(T("emailBody"), { org: org ? " (" + org + ")" : "", code: code });
+    var mail = "mailto:" + encodeURIComponent(cfg().to) + "?subject=" + encodeURIComponent(T("emailSubject") + (org ? " – " + org : "")) + "&body=" + encodeURIComponent(body);
+    return '<div class="status-banner">' + T("codeIntro") +
+      '<div class="code-box" id="code">' + esc(code) + "</div>" +
+      '<div class="btn-row"><a class="btn small" href="' + esc(mail) + '">' + esc(T("email")) + '</a>' +
+      '<button class="btn ghost small" data-act="copy-code">' + esc(T("copy")) + "</button></div>" +
+      '<p class="msg" id="copy-msg" role="status"></p>' +
+      (p.f === "t" ? '<p style="margin-top:0.6rem;font-size:0.84rem">' + tx("codeAnon") + "</p>" : "") + "</div>";
+  }
+
+  // ============ group results ============
+  function groupData(responses, min) {
+    var teams = responses.filter(function (r) { return r.f === "t"; });
+    var dirs = responses.filter(function (r) { return r.f === "d"; });
+    var groups = {}, order = [];
+    teams.forEach(function (r) {
+      var g = r.role || T("prefNot");
+      if (!groups[g]) { groups[g] = []; order.push(g); }
+      groups[g].push(r);
+    });
+    var rows = [], pooled = [];
+    order.forEach(function (g) { (groups[g].length >= min ? rows : pooled).push({ name: g, list: groups[g] }); });
+    if (pooled.length) {
+      var all = []; pooled.forEach(function (p) { all = all.concat(p.list); });
+      rows.push({ name: fmt(T("cPooled"), { min: min }), list: all, pooled: true });
+    }
+    // Activity text is shown only from groups that reach the minimum size.
+    var eligible = [];
+    rows.forEach(function (row) { if (row.list.length >= min) eligible = eligible.concat(row.list.map(function (r) { return { r: r, g: row.pooled ? "" : row.name }; })); });
+    return { teams: teams, dirs: dirs, rows: rows, eligible: eligible };
+  }
+
+  function renderGroupBody(responses, min) {
+    var G = groupData(responses, min);
+    var allActs = [];
+    responses.forEach(function (r) { allActs = allActs.concat(r.acts); });
+    var H = hoursOf(allActs);
+    var helpP = H.total ? 100 * (H.auto + H.aug) / H.total : 0;
+
+    // Where the time goes
+    var timeRows = [];
+    var maxT = 0;
+    var shown = G.rows.map(function (row) {
+      var acts = []; row.list.forEach(function (r) { acts = acts.concat(r.acts); });
+      var h = hoursOf(acts); if (row.list.length >= min && h.total > maxT) maxT = h.total;
+      return { row: row, h: h };
+    });
+    var dh = null;
+    if (G.dirs.length) {
+      var dacts = []; G.dirs.forEach(function (r) { dacts = dacts.concat(r.acts); });
+      dh = hoursOf(dacts); if (dh.total > maxT) maxT = dh.total;
+    }
+    shown.forEach(function (s) {
+      var n = s.row.list.length;
+      if (n >= min) timeRows.push(stackRow(s.row.name, n + " · " + s.row.list.reduce(function (t, r) { return t + r.acts.length; }, 0) + " act.", s.h, maxT));
+      else timeRows.push('<div class="bar-row"><div class="name">' + esc(s.row.name) + "<small>" + n + '</small></div><div class="muted" style="font-size:0.82rem">' + esc(fmt(T("cHidden"), { min: min })) + "</div></div>");
+    });
+    if (dh) timeRows.push(stackRow(T("cLead"), G.dirs.length + "", dh, maxT));
+
+    // Candidates and keep-human lists (eligible team groups only)
+    var cand = [], keep = [];
+    G.eligible.forEach(function (e) {
+      e.r.acts.forEach(function (x) {
+        var c = classify(x);
+        var item = { x: x, c: c, g: e.g, h: HOURS_MID[x.h] || 0 };
+        if (c !== "hum" && x.w !== 2) cand.push(item);
+        if (c === "hum") keep.push(item);
+      });
+    });
+    var byH = function (m, n) { return n.h - m.h || (m.c === "auto" ? -1 : 1); };
+    cand.sort(byH); keep.sort(byH);
+    function alist(items) {
+      if (!items.length) return '<p class="muted" style="font-size:0.9rem">' + esc(T("cNone")) + "</p>";
+      return '<ul class="alist">' + items.map(function (m) {
+        return '<li><span class="a-n">' + esc(m.x.n) + '</span><span class="a-h">' + esc(T("hours")[m.x.h]) + "</span>" +
+          '<span class="a-m">' + chip(m.c) + (m.g ? "<span>" + esc(m.g) + "</span>" : "") + "</span></li>";
+      }).join("") + "</ul>";
+    }
+
+    // Shares (teams vs leadership)
+    var nt = G.teams.length, nd = G.dirs.length;
+    function shares(k, optKey, list) { return T(optKey).map(function (_, i) { return shareOf(list, k, i); }); }
+    var reT = shares("re", "reinvest", G.teams), reD = shares("re", "reinvest", G.dirs);
+    var coT = shares("co", "concerns", G.teams), coD = shares("co", "concerns", G.dirs);
+    var trT = shares("tr", "train", G.teams);
+
+    // Readiness
+    function avgAgree(list, idx) {
+      var v = list.map(function (r) { return Array.isArray(r.ag) ? r.ag[idx] : null; }).filter(function (x) { return x != null && x < 5; });
+      return v.length ? v.reduce(function (s, x) { return s + x + 1; }, 0) / v.length : null;
+    }
+    function shareAgree(list, idx) {
+      var v = list.map(function (r) { return Array.isArray(r.ag) ? r.ag[idx] : null; }).filter(function (x) { return x != null && x < 5; });
+      return v.length ? 100 * v.filter(function (x) { return x >= 3; }).length / v.length : null;
+    }
+    var usedWork = nt ? 100 * G.teams.filter(function (r) { return r.ai === 2 || r.ai === 3; }).length / nt : null;
+    var feels = G.teams.map(function (r) { return r.feel; }).filter(function (x) { return x != null; });
+    var feelAvg = feels.length ? feels.reduce(function (s, x) { return s + x; }, 0) / feels.length : null;
+    var chT = avgAgree(G.teams, 2), chD = avgAgree(G.dirs, 1);
+    function rrow(label, a, b) {
+      return "<tr><td>" + esc(label) + '</td><td class="num">' + (a == null ? "–" : a) + '</td><td class="num">' + (b == null ? "–" : b) + "</td></tr>";
+    }
+    var rk = shareAgree(G.teams, 0), fi = shareAgree(G.teams, 1);
+    var ready = '<table class="rt"><thead><tr><th></th><th class="num">' + esc(T("cTeams")) + '</th><th class="num">' + esc(T("cDir")) + "</th></tr></thead><tbody>" +
+      rrow(T("rUsedWork"), usedWork == null ? null : pct(usedWork), null) +
+      rrow(T("rFeel"), feelAvg == null ? null : h1(feelAvg), null) +
+      rrow(T("rRekey"), rk == null ? null : pct(rk), null) +
+      rrow(T("rFind"), fi == null ? null : pct(fi), null) +
+      rrow(T("rChange"), chT == null ? null : h1(chT), chD == null ? null : h1(chD)) + "</tbody></table>";
+
+    // Directions to discuss
+    var dirs = [];
+    function lever(tag, p, d) { dirs.push('<div class="lever"><span class="l-tag">' + esc(tag) + "</span><p>" + esc(p) + '</p><p class="decide"><b>' + esc(T("decide")) + "</b> " + esc(d) + "</p></div>"); }
+    var autoItems = cand.filter(function (m) { return m.c === "auto"; });
+    if (H.auto > 0) lever(T("dQuick"), fmt(T("dQuickP"), { h: h1(H.auto), list: autoItems.slice(0, 3).map(function (m) { return (lang === "fr" ? "« " : "“") + m.x.n + (lang === "fr" ? " »" : "”"); }).join(", ") || "—" }), T("dQuickD"));
+    if (H.aug > 0) lever(T("dAug"), fmt(T("dAugP"), { h: h1(H.aug) }), T("dAugD"));
+    var confN = allActs.filter(function (x) { return x.c === 0 || x.c === 2; }).length;
+    if (confN) lever(T("dData"), fmt(T("dDataP"), { n: confN }), T("dDataD"));
+    function topIdx(arr) { var best = -1, bi = -1; arr.forEach(function (v, i) { if (v != null && v > best) { best = v; bi = i; } }); return best > 0 ? bi : -1; }
+    var rt = topIdx(reT), rd = topIdx(reD);
+    if (rt >= 0 && rd >= 0 && rt !== rd) lever(T("dReinvDiff"), fmt(T("dReinvDiffP"), { a: T("reinvest")[rt], b: T("reinvest")[rd] }), T("dReinvDiffD"));
+    else if (rt >= 0 || rd >= 0) lever(T("dReinvSame"), fmt(T("dReinvSameP"), { a: T("reinvest")[rt >= 0 ? rt : rd] }), T("dReinvSameD"));
+    var allResp = G.teams.concat(G.dirs);
+    var coAll = T("concerns").map(function (_, i) { return i === 6 ? null : shareOf(allResp, "co", i); });
+    var ct = topIdx(coAll);
+    if (ct >= 0) lever(T("dConc"), fmt(T("dConcP"), { c: T("concerns")[ct], p: Math.round(coAll[ct]) }), T("dConcD"));
+    if (chT != null && chD != null && Math.abs(chT - chD) >= 0.8) lever(T("dGap"), fmt(T("dGapP"), { d: h1(chD), t: h1(chT) }), T("dGapD"));
+    var tt = topIdx(trT);
+    if (tt >= 0) lever(T("dTrain"), fmt(T("dTrainP"), { x: T("train")[tt] }), T("dTrainD"));
+
+    return '<div class="tiles">' +
+      '<div class="tile"><div class="v">' + responses.length + '</div><div class="l">' + esc(T("gTiles")[0]) + " · " + esc(fmt(T("gRespSplit"), { t: nt, d: nd })) + "</div></div>" +
+      '<div class="tile"><div class="v">' + allActs.length + '</div><div class="l">' + esc(T("gTiles")[1]) + "</div></div>" +
+      '<div class="tile"><div class="v">' + h1(H.total) + '</div><div class="l">' + esc(T("gTiles")[2]) + "</div></div>" +
+      '<div class="tile"><div class="v accent">' + pct(helpP) + '</div><div class="l">' + esc(T("gTiles")[3]) + "</div></div></div>" +
+      '<div class="card"><h3>' + esc(T("cDirs")) + '</h3><p class="sub">' + esc(T("cDirsSub")) + '</p><div class="levers">' + dirs.join("") + "</div></div>" +
+      '<div class="card"><h3>' + esc(T("cTime")) + '</h3><p class="sub">' + esc(fmt(T("cTimeSub"), { min: min })) + "</p>" + catLegend() +
+        '<div class="bars">' + timeRows.join("") + "</div></div>" +
+      '<div class="card"><h3>' + esc(T("cCand")) + '</h3><p class="sub">' + esc(T("cCandSub")) + "</p>" + alist(cand.slice(0, 10)) + "</div>" +
+      '<div class="card"><h3>' + esc(T("cKeep")) + '</h3><p class="sub">' + esc(T("cKeepSub")) + "</p>" + alist(keep.slice(0, 6)) + "</div>" +
+      '<div class="card"><h3>' + esc(T("cReinv")) + '</h3><p class="sub">' + esc(T("cShareSub")) + "</p>" + audienceLegend(nt, nd) + pairRows(T("reinvest"), reT, reD, nd > 0) + "</div>" +
+      '<div class="card"><h3>' + esc(T("cConc")) + '</h3><p class="sub">' + esc(T("cShareSub")) + "</p>" + audienceLegend(nt, nd) + pairRows(T("concerns"), coT, coD, nd > 0) + "</div>" +
+      (nt ? '<div class="card"><h3>' + esc(T("cTrain")) + '</h3><p class="sub">' + esc(T("cTrainSub")) + "</p>" + pairRows(T("train"), trT, [], false) + "</div>" : "") +
+      '<div class="card"><h3>' + esc(T("cReady")) + '</h3><div style="overflow-x:auto">' + ready + "</div></div>";
+  }
+
+  function liveSession() { return LIVE_SRC || SESSION; }
+
+  function renderGroup() {
+    var s = liveSession();
+    var responses = s ? s.responses : [];
+    var isCurrent = !LIVE_SRC && SESSION;
+    var note = LIVE_SRC || (SESSION && SESSION.closed) ? T("gClosed") : T("gLive");
+    return '<section class="screen" id="report-root">' +
+      '<p class="eyebrow"><span class="mark">MR5</span> · ' + esc(T("gEyebrow")) + "</p>" +
+      "<h1>" + esc(T("gTitle")) + "</h1>" +
+      '<p class="org-line"><strong>' + esc(s ? s.org : "") + '</strong><span class="sep">·</span>' + esc(dateStr(s && s.createdAt)) + "</p>" +
+      '<p class="lede no-pdf" style="font-size:0.88rem;margin-top:0.4rem">' + esc(note) + "</p>" +
+      (responses.length ? renderGroupBody(responses, (s && s.min) || 5) : '<div class="status-banner">' + esc(T("gEmpty")) + "</div>") +
+      (isCurrent && ART ? adminHTML() : "") +
+      '<div class="nav-row no-pdf" style="justify-content:flex-start;gap:0.8rem">' +
+      '<button class="btn ghost" data-act="to-intro">' + esc(T("btnBackConsole")) + "</button>" +
+      (responses.length ? '<button class="btn ghost" data-act="report">' + esc(T("btnReport")) + "</button>" : "") +
+      "</div></section>";
+  }
+
+  function adminHTML() {
+    var html = '<div class="admin-box no-pdf">';
+    if (!SESSION.closed) {
+      html += "<h4>" + esc(T("addCodeTitle")) + '</h4><p class="sub" style="font-size:0.86rem;color:var(--ink-2)">' + esc(T("addCodeDesc")) + "</p>" +
+        '<textarea id="code-input" rows="3" aria-label="' + esc(T("addCodePh")) + '" placeholder="' + esc(T("addCodePh")) + '" style="margin-top:0.6rem;font-family:\'IBM Plex Mono\',ui-monospace,monospace;font-size:0.78rem"></textarea>' +
+        '<div class="btn-row"><button class="btn small" data-act="add-codes">' + esc(T("btnAddCode")) + "</button></div>" +
+        '<p class="msg" id="code-msg" role="status">' + esc(codeMsg) + "</p>";
+    }
+    html += '<div class="btn-row">' +
+      (SESSION.responses.length ? '<button class="btn ghost small" data-act="csv-r">' + esc(T("btnCsvR")) + '</button><button class="btn ghost small" data-act="csv-a">' + esc(T("btnCsvA")) + "</button>" : "") +
+      (SESSION.closed ? '<button class="btn ghost small" data-act="reopen">' + esc(T("btnReopen")) + "</button>"
+                      : '<button class="btn ghost small" data-act="close" id="btn-close">' + esc(T("btnClose")) + "</button>") +
+      '</div><p class="msg" id="admin-msg" role="status"></p></div>';
+    return html;
+  }
+
+  // ============ console (Claude artifact) ============
+  function shareUrl(form, sess) {
+    sess = sess || SESSION;
+    var p = new URLSearchParams();
+    if (sess.org) p.set("org", sess.org);
+    if (form === "t" && sess.roles && sess.roles.length) p.set("roles", sess.roles.join("|"));
+    if (sess.min && sess.min !== 5) p.set("min", sess.min);
+    if (sess.email && sess.email !== DEFAULT_TO) p.set("to", sess.email);
+    p.set("lang", sess.lang || "en");
+    p.set("form", form === "d" ? "direction" : "team");
+    // Keep "|" readable: shorter links make smaller, easier-to-scan QR codes.
+    return HOSTED_URL + "?" + p.toString().replace(/%7C/g, "|");
+  }
+  function qrSvg(url) { try { return QR.toSVG(QR.encode(url), 4, 4); } catch (e) { return ""; } }
+
+  function sharePanel(k, title, url, small) {
+    var svg = qrSvg(url);
+    return '<div class="share-block"><h4>' + esc(title) + '</h4><div class="share">' +
+      (svg ? '<div class="qr' + (small ? " sm" : "") + '" aria-hidden="true">' + svg + "</div>" : "") +
+      '<div class="share-right"><div class="code-box" id="link-' + k + '">' + esc(url) + "</div>" +
+      '<div class="btn-row"><button class="btn small" data-act="copy-link" data-k="' + k + '">' + esc(T("copyLink")) + "</button>" +
+      (svg ? '<button class="btn ghost small" data-act="present" data-k="' + k + '">' + esc(T("present")) + "</button>" +
+             '<button class="btn ghost small" data-act="save-qr" data-k="' + k + '">' + esc(T("saveQr")) + "</button>" : "") +
+      '</div><p class="msg" id="msg-' + k + '" role="status">' + (svg ? "" : esc(T("qrLong"))) + "</p></div></div></div>";
+  }
+
+  function renderConsole() {
+    var html = '<section class="screen">' +
+      '<p class="eyebrow"><span class="mark">MR5</span> · ' + esc(T("cEyebrow")) + "</p>" +
+      "<h1>" + esc(T("cTitle")) + "</h1>" +
+      '<p class="lede">' + esc(T("cLede")) + "</p>";
+    var active = SESSION && !SESSION.closed;
+    if (active) {
+      var nt = SESSION.responses.filter(function (r) { return r.f === "t"; }).length;
+      html += '<div class="card live"><span class="tag">' + esc(T("sessLive")) + "</span>" +
+        '<p class="s-org">' + esc(SESSION.org) + '</p><p class="s-count">' + esc(fmt(T("respCount"), { t: nt, d: SESSION.responses.length - nt })) + "</p>" +
+        '<p class="sub" style="margin:0.8rem 0 0">' + esc(T("shareDesc")) + "</p>" +
+        sharePanel("t", T("shareTeam"), shareUrl("t")) +
+        sharePanel("d", T("shareLead"), shareUrl("d"), true) +
+        '<div class="btn-row"><button class="btn" data-act="live">' + esc(T("btnLive")) + "</button>" +
+        '<button class="btn ghost" data-act="answer" data-f="t">' + esc(T("btnAnswerT")) + "</button>" +
+        '<button class="btn ghost" data-act="answer" data-f="d">' + esc(T("btnAnswerD")) + "</button></div></div>";
+    } else if (SESSION && SESSION.closed) {
+      html += '<div class="card"><span class="tag">' + esc(T("sessClosed")) + "</span>" +
+        '<p class="s-org">' + esc(SESSION.org) + '</p><p class="s-count">' + esc(fmt(T("respCount"), {
+          t: SESSION.responses.filter(function (r) { return r.f === "t"; }).length,
+          d: SESSION.responses.filter(function (r) { return r.f === "d"; }).length })) + "</p>" +
+        '<div class="btn-row"><button class="btn" data-act="live">' + esc(T("btnView")) + "</button>" +
+        (ART ? '<button class="btn ghost" data-act="new-session">' + esc(T("btnNew")) + "</button>" : "") + "</div>" +
+        '<p class="msg" id="admin-msg" role="status"></p></div>';
+    } else {
+      var langOpts = '<option value="en"' + (lang === "en" ? " selected" : "") + '>English</option><option value="fr"' + (lang === "fr" ? " selected" : "") + ">Français</option>";
+      html += '<div class="card dashed"><h3>' + esc(T("newSession")) + "</h3>" +
+        '<div class="field" style="margin-top:0.9rem"><label for="n-org">' + esc(T("fOrg")) + '</label><input type="text" id="n-org" maxlength="80"></div>' +
+        '<div class="field"><label for="n-roles">' + esc(T("fRoles")) + '</label><textarea id="n-roles" rows="5">' + esc(DEFAULT_ROLES[lang].join("\n")) + "</textarea></div>" +
+        '<div class="field"><label for="n-min">' + esc(T("fMin")) + '</label><input type="text" id="n-min" inputmode="numeric" value="5"></div>' +
+        '<div class="field"><label for="n-to">' + esc(T("fTo")) + '</label><input type="text" id="n-to" inputmode="email" value="' + esc(DEFAULT_TO) + '"></div>' +
+        '<div class="field"><label for="n-lang">' + esc(T("fLang")) + '</label><select id="n-lang">' + langOpts + "</select></div>" +
+        (ART ? '<div class="btn-row"><button class="btn" data-act="create" id="btn-create" disabled>' + esc(T("btnCreate")) + "</button></div>"
+             : '<p class="sub" style="margin:0.4rem 0 0">' + esc(T("needArt")) + "</p>") +
+        '<p class="msg" id="create-msg" role="status"></p></div>';
+    }
+    html += '<p style="margin-top:1.2rem"><button class="linklike" data-act="answer" data-f="t" data-solo="1">' + esc(T("tryIt")) + "</button></p>";
+    if (ARCHIVE.length) {
+      html += '<div class="card"><h3>' + esc(T("pastTitle")) + "</h3>" + ARCHIVE.map(function (a, i) {
+        var nt2 = a.responses.filter(function (r) { return r.f === "t"; }).length;
+        return '<div class="archive-row"><div><div class="a-org">' + esc(a.org) + '</div><div class="a-meta">' +
+          esc(dateStr(a.createdAt)) + " · " + esc(fmt(T("respCount"), { t: nt2, d: a.responses.length - nt2 })) + "</div></div>" +
+          '<button class="btn ghost small" data-act="archive" data-i="' + i + '">' + esc(T("btnView")) + "</button></div>";
+      }).join("") + "</div>";
+    }
+    return html + "</section>";
+  }
+
+  // ============ public facilitator view (no artifact) ============
+  function renderFacilitator() {
+    var langOpts = '<option value="en"' + (lang === "en" ? " selected" : "") + '>English</option><option value="fr"' + (lang === "fr" ? " selected" : "") + ">Français</option>";
+    var pseudo = { org: P.org || "", roles: roles(), min: P.min, email: P.to, lang: lang };
+    return '<section class="screen">' +
+      '<p class="eyebrow"><span class="mark">MR5</span> · ' + esc(T("fEyebrow")) + "</p>" +
+      "<h1>" + esc(T("fTitle")) + "</h1>" +
+      '<div class="card" id="f-links"><h3>' + esc(T("fLinks")) + '</h3><p class="sub">' + esc(T("fLinksSub")) + "</p>" +
+      '<div class="field"><label for="f-org">' + esc(T("fOrg")) + '</label><input type="text" id="f-org" value="' + esc(P.org) + '"></div>' +
+      '<div class="field"><label for="f-roles">' + esc(T("fRoles")) + '</label><textarea id="f-roles" rows="5">' + esc(roles().join("\n")) + "</textarea></div>" +
+      '<div class="field"><label for="f-min">' + esc(T("fMin")) + '</label><input type="text" id="f-min" inputmode="numeric" value="' + P.min + '"></div>' +
+      '<div class="field"><label for="f-to">' + esc(T("fTo")) + '</label><input type="text" id="f-to" value="' + esc(P.to) + '"></div>' +
+      '<div class="field"><label for="f-lang">' + esc(T("fLang")) + '</label><select id="f-lang">' + langOpts + "</select></div>" +
+      '<div id="f-share">' + sharePanel("t", T("shareTeam"), shareUrl("t", pseudo)) + sharePanel("d", T("shareLead"), shareUrl("d", pseudo), true) + "</div></div>" +
+      '<div class="card"><h3>' + esc(T("fCompile")) + '</h3><p class="sub">' + esc(T("fCompileSub")) + "</p>" +
+      '<textarea id="f-codes" rows="6" aria-label="' + esc(T("addCodePh")) + '" placeholder="' + esc(T("addCodePh")) + '"></textarea>' +
+      '<div class="btn-row"><button class="btn" data-act="f-read">' + esc(T("fRead")) + "</button>" +
+      (compiled.length ? '<button class="btn ghost small" data-act="csv-r">' + esc(T("btnCsvR")) + '</button><button class="btn ghost small" data-act="csv-a">' + esc(T("btnCsvA")) + "</button>" : "") +
+      '</div><p class="msg" id="f-msg" role="status"></p></div>' +
+      (compiled.length ? '<div id="report-root">' +
+        '<p class="eyebrow" style="margin-top:2.4rem"><span class="mark">MR5</span> · ' + esc(T("gEyebrow")) + "</p>" +
+        "<h1>" + esc(T("gTitle")) + '</h1><p class="org-line"><strong>' + esc(P.org || compiled[0].org || "") + '</strong><span class="sep">·</span>' + esc(dateStr()) + "</p>" +
+        renderGroupBody(compiled, P.min) + "</div>" +
+        '<div class="nav-row no-pdf" style="justify-content:flex-start"><button class="btn ghost" data-act="report">' + esc(T("btnReport")) + "</button></div>" : "") +
+      "</section>";
+  }
+  function facilitatorSettings() {
+    return {
+      org: $("f-org").value.trim(),
+      roles: $("f-roles").value.split("\n").map(function (s) { return s.trim(); }).filter(Boolean),
+      min: Math.max(2, parseInt($("f-min").value, 10) || 5),
+      email: $("f-to").value.trim() || DEFAULT_TO,
+      lang: $("f-lang").value
+    };
+  }
+  function updateFacilitatorLinks() {
+    var s = facilitatorSettings();
+    P.org = s.org; P.roles = s.roles; P.min = s.min; P.to = s.email;
+    $("f-share").innerHTML = sharePanel("t", T("shareTeam"), shareUrl("t", s)) + sharePanel("d", T("shareLead"), shareUrl("d", s), true);
+  }
+
+  // ============ render dispatch ============
   function render() {
-    if (VIEW === "facilitator") return renderFacilitator();
-    if (!state || state.step < 0) renderIntro();
-    else if (state.done) renderDone();
-    else renderStep();
+    var html;
+    if (view === "survey") html = renderStep();
+    else if (view === "personal") html = renderPersonal();
+    else if (view === "group") html = renderGroup();
+    else if (view === "facilitator") html = renderFacilitator();
+    else html = STANDALONE ? renderSurveyIntro() : renderConsole();
+    $("app").innerHTML = html;
     $("foot").textContent = T("footer");
+    updateNext();
+    syncCreate();
+  }
+  function go(v) { view = v; render(); window.scrollTo(0, 0); }
+
+  // ============ persistence (the artifact republishes itself) ============
+  function buildDocument(store) {
+    var json = JSON.stringify(store).replace(/</g, "\\u003c");
+    return INITIAL_HTML.replace(/<html[^>]*>/, "<html>").replace(
+      /(<script type="application\/json" id="aia-data">)[\s\S]*?(<\/script>)/,
+      function (m, p1, p2) { return p1 + json + p2; });
+  }
+  function publishStore(store) {
+    if (!ART) return Promise.reject({ code: "unavailable" });
+    return ART.publish(buildDocument(store));
+  }
+  function publishSession(sess) { return publishStore({ v: 1, session: sess, archive: ARCHIVE }); }
+  function copyJSON(o) { return JSON.parse(JSON.stringify(o)); }
+
+  function submitToSession(p) {
+    submitHTML = '<div class="status-banner">' + esc(T("submitPending")) + "</div>";
+    lsSet("aia-pending", p);
+    ssSet("aia-personal", p);
+    if (!ART || !SESSION || SESSION.closed) { fallback(); return; }
+    var ns = copyJSON(SESSION);
+    if (!ns.responses.some(function (r) { return r.id === p.id; })) ns.responses.push(p);
+    publishSession(ns).then(function () {
+      lsDel("aia-pending");
+      // every view reloads to the new version; these results come back from sessionStorage
+    }, function (e) {
+      var code = e && e.code;
+      if (code === "not_granted" || code === "not_writer") fallback();
+      else if (code === "conflict") { /* the reload retries the pending answer */ }
+      else { lsDel("aia-pending"); submitHTML = '<div class="status-banner err">' + esc(T("submitErr")) + '<div class="code-box">' + esc(encodeCode(p)) + "</div></div>"; refreshStatus(); }
+    });
+    function fallback() {
+      lsDel("aia-pending");
+      submitHTML = '<div class="status-banner err">' + T("submitFallback") + '<div class="code-box">' + esc(encodeCode(p)) + "</div></div>";
+      refreshStatus();
+    }
+  }
+  function refreshStatus() { var s = $("submit-status"); if (s) s.innerHTML = submitHTML; }
+
+  function retryPending() {
+    if (!ART || !SESSION || SESSION.closed) return;
+    var p = lsGet("aia-pending");
+    if (!p || !p.id) return;
+    if (SESSION.responses.some(function (r) { return r.id === p.id; })) { lsDel("aia-pending"); return; }
+    var ns = copyJSON(SESSION); ns.responses.push(p);
+    publishSession(ns).then(function () { lsDel("aia-pending"); }, function () {});
   }
 
-  // ---------- events: survey ----------
+  // ============ events ============
   function onClick(e) {
     var t = e.target.closest("[data-act]");
     if (!t) return;
     var act = t.getAttribute("data-act");
     var steps = STEPS[FORM];
-    if (act === "start" || act === "restart") {
-      state = freshState(); state.id = rid(); state.step = 0; save(); render(); window.scrollTo(0, 0);
-    } else if (act === "resume") {
-      state = lsGet(STORE_KEY); if (!state.id) state.id = rid(); render(); window.scrollTo(0, 0);
-    } else if (act === "back") {
-      state.step -= 1; save(); render(); window.scrollTo(0, 0);
-    } else if (act === "next") {
-      if (!stepValid(steps[state.step])) return;
-      if (state.step === steps.length - 1) state.done = true; else state.step += 1;
-      save(); render(); window.scrollTo(0, 0);
-    } else if (act === "add") {
-      state.a.acts.push({}); save(); render();
-      var cards = document.querySelectorAll(".act");
-      var lastCard = cards[cards.length - 1];
-      if (lastCard) { lastCard.scrollIntoView({ behavior: "smooth", block: "start" }); var inp = lastCard.querySelector("input[type=text]"); if (inp) inp.focus({ preventScroll: true }); }
-    } else if (act === "rm") {
-      state.a.acts.splice(+t.getAttribute("data-i"), 1); save(); render();
-    } else if (act === "edit") {
-      state.done = false; save(); render(); window.scrollTo(0, 0);
-    } else if (act === "copy") {
-      var code = $("code").textContent, msg = $("copy-msg");
-      (navigator.clipboard ? navigator.clipboard.writeText(code) : Promise.reject())
-        .then(function () { msg.textContent = T("copied"); }, function () { msg.textContent = T("copyFail"); });
-    } else if (act === "f-copy") {
-      var k = t.getAttribute("data-k"), m = $("f-msg-" + k);
-      (navigator.clipboard ? navigator.clipboard.writeText(linkFor(k)) : Promise.reject())
-        .then(function () { m.textContent = T("copied"); }, function () { m.textContent = T("copyFail"); });
-    } else if (act === "f-present") {
-      openPresent(t.getAttribute("data-k"));
-    } else if (act === "f-qr-save") {
-      var kk = t.getAttribute("data-k"), svg = qrSvg(linkFor(kk));
-      if (svg) download("qr-" + (kk === "t" ? "team" : "leadership") + ".svg", svg, "image/svg+xml");
-    } else if (act === "f-read") {
-      compileCodes();
-    } else if (act === "f-csv-r") {
-      download("responses.csv", respondentsCsv());
-    } else if (act === "f-csv-a") {
-      download("activities.csv", activitiesCsv());
+    switch (act) {
+      case "start":
+        state = freshState(); saveDraft(); go("survey"); break;
+      case "resume":
+        state = lsGet(draftKey()); if (!state.id) state.id = rid(); go("survey"); break;
+      case "back":
+        if (state.step === 0) { go("intro"); break; }
+        state.step -= 1; saveDraft(); go("survey"); break;
+      case "next":
+        if (!stepValid(steps[state.step])) return;
+        if (state.step < steps.length - 1) { state.step += 1; saveDraft(); go("survey"); break; }
+        lastPayload = buildPayload();
+        if (mode === "standalone") { submitHTML = standaloneCodeHTML(lastPayload); state.done = true; saveDraft(); go("personal"); }
+        else if (mode === "respond") { submitToSession(lastPayload); go("personal"); }
+        else { submitHTML = ""; go("personal"); }
+        break;
+      case "add":
+        state.a.acts.push({}); saveDraft(); render();
+        var cards = document.querySelectorAll(".act"), lastCard = cards[cards.length - 1];
+        if (lastCard) { lastCard.scrollIntoView({ behavior: "smooth", block: "start" }); var inp = lastCard.querySelector("input[type=text]"); if (inp) inp.focus({ preventScroll: true }); }
+        break;
+      case "rm":
+        state.a.acts.splice(+t.getAttribute("data-i"), 1); saveDraft(); render(); break;
+      case "edit":
+        state.done = false; state.step = steps.length - 1; saveDraft(); go("survey"); break;
+      case "copy-code":
+        copyText($("code").textContent, $("copy-msg")); break;
+      case "to-intro":
+        ssDel("aia-view"); ssDel("aia-personal"); LIVE_SRC = null; closeArmed = false; codeMsg = ""; mode = STANDALONE ? "standalone" : "solo"; go("intro"); break;
+      case "report":
+        downloadReport(t); break;
+
+      // console
+      case "answer":
+        FORM = t.getAttribute("data-f") === "d" ? "d" : "t";
+        mode = t.getAttribute("data-solo") || !(SESSION && !SESSION.closed) ? "solo" : "respond";
+        state = freshState(); go("survey"); break;
+      case "live":
+        LIVE_SRC = null; ssSet("aia-view", "group"); go("group"); break;
+      case "archive":
+        LIVE_SRC = ARCHIVE[+t.getAttribute("data-i")]; go("group"); break;
+      case "create":
+        createSession(); break;
+      case "new-session":
+        t.disabled = true;
+        publishStore({ v: 1, session: null, archive: ARCHIVE.concat([SESSION]) }).catch(function () {
+          t.disabled = false; var m = $("admin-msg"); if (m) m.textContent = T("saveErr");
+        });
+        break;
+      case "copy-link":
+        copyText($("link-" + t.getAttribute("data-k")).textContent, $("msg-" + t.getAttribute("data-k"))); break;
+      case "present":
+        openPresent($("link-" + t.getAttribute("data-k")).textContent); break;
+      case "save-qr":
+        var svg = qrSvg($("link-" + t.getAttribute("data-k")).textContent);
+        if (svg) saveFile("qr-" + (t.getAttribute("data-k") === "t" ? "team" : "leadership") + ".svg", svg, "image/svg+xml");
+        break;
+      case "add-codes":
+        addCodes(); break;
+      case "close":
+        if (!closeArmed) { closeArmed = true; t.textContent = T("btnCloseConfirm"); break; }
+        var nc = copyJSON(SESSION); nc.closed = true;
+        publishSession(nc).catch(function () { $("admin-msg").textContent = T("saveErr"); });
+        break;
+      case "reopen":
+        var nr = copyJSON(SESSION); nr.closed = false;
+        publishSession(nr).catch(function () { $("admin-msg").textContent = T("saveErr"); });
+        break;
+      case "csv-r":
+        saveFile("respondents.csv", "﻿" + respondentsCsv(currentResponses()), "text/csv;charset=utf-8"); break;
+      case "csv-a":
+        saveFile("activities.csv", "﻿" + activitiesCsv(currentResponses()), "text/csv;charset=utf-8"); break;
+
+      // public facilitator view
+      case "f-read":
+        var res = parseCodes($("f-codes").value, compiled);
+        compiled = compiled.concat(res.valid);
+        var nt = compiled.filter(function (r) { return r.f === "t"; }).length;
+        var msgText = fmt(T("fFound"), { n: compiled.length, t: nt, d: compiled.length - nt, bad: res.bad, dup: res.dup });
+        var codes = $("f-codes").value;
+        render();
+        $("f-codes").value = codes; $("f-msg").textContent = msgText;
+        break;
     }
   }
 
+  function currentResponses() { return view === "facilitator" ? compiled : (liveSession() ? liveSession().responses : []); }
+
   function onChange(e) {
     var el = e.target;
-    if (VIEW === "facilitator") { if (el.closest("#f-links")) updateLinks(); return; }
-    if (!state || state.step < 0 || state.done) return;
+    if (view === "facilitator") { if (el.closest("#f-links")) updateFacilitatorLinks(); return; }
+    if (view === "intro") { syncCreate(); return; }
+    if (view !== "survey") return;
     var a = state.a, name = el.name || "";
-
     if (el.hasAttribute("data-act-i")) {
       a.acts[+el.getAttribute("data-act-i")].n = el.value;
     } else if (el.hasAttribute("data-k")) {
@@ -1067,8 +1828,7 @@
       a.acts[+m[1]][m[2]] = +el.value;
     } else if (/_\d+$/.test(name)) {
       var p = name.match(/^(\w+)_(\d+)$/);
-      var rowsLen = findQ(p[1]).rows.length;
-      if (!Array.isArray(a[p[1]])) a[p[1]] = new Array(rowsLen).fill(null);
+      if (!Array.isArray(a[p[1]])) a[p[1]] = new Array(findQ(p[1]).rows.length).fill(null);
       a[p[1]][+p[2]] = +el.value;
     } else if (el.type === "checkbox") {
       var q = findQ(name);
@@ -1078,8 +1838,7 @@
       if (!el.checked && at >= 0) arr.splice(at, 1);
       arr.sort(function (x, y) { return x - y; });
       a[name] = arr;
-      var boxes = document.querySelectorAll('input[name="' + name + '"]');
-      Array.prototype.forEach.call(boxes, function (b) { b.disabled = !b.checked && arr.length >= q.max; });
+      Array.prototype.forEach.call(document.querySelectorAll('input[name="' + name + '"]'), function (b) { b.disabled = !b.checked && arr.length >= q.max; });
       if (q.other) {
         var oi = document.querySelector('[data-k="' + name + 'o"]');
         var on = arr.indexOf(T(q.o).length) >= 0;
@@ -1090,194 +1849,86 @@
       var qq = findQ(name);
       a[name] = qq && qq.type === "scale" ? +el.value + 1 : +el.value;
     }
-    save(); updateNext();
+    saveDraft(); updateNext();
   }
-
   function findQ(k) {
     var found = null;
     STEPS[FORM].forEach(function (s) { (s.qs || []).forEach(function (q) { if (q.k === k) found = q; }); });
     return found;
   }
 
-  // ---------- facilitator view ----------
-  var compiled = [];
-
-  function renderFacilitator() {
-    var langOpts = '<option value="en"' + (lang === "en" ? " selected" : "") + '>English</option><option value="fr"' + (lang === "fr" ? " selected" : "") + ">Français</option>";
-    $("app").innerHTML =
-      '<section class="screen">' +
-      '<p class="eyebrow"><span class="mark">MR5</span> · ' + esc(T("fEyebrow")) + "</p>" +
-      "<h1>" + esc(T("fTitle")) + "</h1>" +
-      '<div class="card" id="f-links"><h3>' + esc(T("fLinks")) + '</h3><p class="sub">' + esc(T("fLinksSub")) + "</p>" +
-      '<div class="field"><label for="f-org">' + esc(T("fOrg")) + '</label><input type="text" id="f-org" value="' + esc(ORG) + '"></div>' +
-      '<div class="field"><label for="f-roles">' + esc(T("fRoles")) + '</label><textarea id="f-roles" rows="5">' + esc(roles().join("\n")) + "</textarea></div>" +
-      '<div class="field"><label for="f-min">' + esc(T("fMin")) + '</label><input type="text" id="f-min" inputmode="numeric" value="' + MIN_GROUP + '"></div>' +
-      '<div class="field"><label for="f-to">' + esc(T("fTo")) + '</label><input type="text" id="f-to" value="' + esc(TO) + '"></div>' +
-      '<div class="field"><label for="f-lang">' + esc(T("fLang")) + '</label><select id="f-lang">' + langOpts + "</select></div>" +
-      sharePanel("t", T("fTeamLink")) + sharePanel("d", T("fDirLink")) + "</div>" +
-      '<div class="card"><h3>' + esc(T("fCompile")) + '</h3><p class="sub">' + esc(T("fCompileSub")) + "</p>" +
-      '<textarea id="f-codes" rows="6" aria-label="' + esc(T("fPaste")) + '" placeholder="' + esc(T("fPaste")) + '"></textarea>' +
-      '<div class="btn-row"><button class="btn" data-act="f-read">' + esc(T("fRead")) + "</button>" +
-      '<button class="btn ghost" data-act="f-csv-r" id="f-csv-r" disabled>' + esc(T("fCsvR")) + "</button>" +
-      '<button class="btn ghost" data-act="f-csv-a" id="f-csv-a" disabled>' + esc(T("fCsvA")) + "</button></div>" +
-      '<p class="msg" id="f-msg" role="status"></p></div>' +
-      '<div id="f-results"></div></section>';
-    updateLinks();
-    if (compiled.length) renderCompiled();
+  function syncCreate() {
+    var b = $("btn-create");
+    if (b) b.disabled = !($("n-org") && $("n-org").value.trim());
   }
 
-  function sharePanel(k, title) {
-    return '<div class="q"><h4>' + esc(title) + '</h4><div class="share"><div class="qr" id="f-qr-' + k + '"></div>' +
-      '<div class="share-right"><div class="code-box" id="f-link-' + k + '"></div>' +
-      '<div class="btn-row"><button class="btn small" data-act="f-copy" data-k="' + k + '">' + esc(T("fCopyLink")) + "</button>" +
-      '<button class="btn ghost small" data-act="f-present" data-k="' + k + '">' + esc(T("fPresent")) + "</button>" +
-      '<button class="btn ghost small" data-act="f-qr-save" data-k="' + k + '">' + esc(T("fSaveQr")) + "</button></div>" +
-      '<p class="msg" id="f-msg-' + k + '" role="status"></p></div></div></div>';
+  function createSession() {
+    var org = $("n-org").value.trim();
+    if (!org || !ART) return;
+    var sess = {
+      active: true, closed: false, org: org,
+      roles: $("n-roles").value.split("\n").map(function (s) { return s.trim(); }).filter(Boolean),
+      min: Math.max(2, parseInt($("n-min").value, 10) || 5),
+      email: $("n-to").value.trim() || DEFAULT_TO,
+      lang: $("n-lang").value === "fr" ? "fr" : "en",
+      createdAt: Date.now(), responses: []
+    };
+    $("create-msg").textContent = T("creating");
+    publishSession(sess).catch(function () { $("create-msg").textContent = T("saveErr"); });
   }
 
-  function qrSvg(url) {
-    try { return QR.toSVG(QR.encode(url), 4, 4); } catch (e) { return ""; }
+  function addCodes() {
+    var res = parseCodes($("code-input").value, SESSION.responses);
+    var msg = $("code-msg");
+    if (!res.valid.length) { msg.textContent = fmt(T("addCodeRes"), { n: 0, bad: res.bad, dup: res.dup }); return; }
+    var ns = copyJSON(SESSION);
+    res.valid.forEach(function (r) { ns.responses.push(r); });
+    msg.textContent = "…";
+    ssSet("aia-code-msg", fmt(T("addCodeRes"), { n: res.valid.length, bad: res.bad, dup: res.dup }));
+    publishSession(ns).catch(function () { ssDel("aia-code-msg"); msg.textContent = T("saveErr"); });
   }
 
-  function linkFor(k) { return $("f-link-" + k).textContent; }
+  function copyText(text, msgEl) {
+    var ok = function () { if (msgEl) msgEl.textContent = T("copied"); };
+    var fail = function () { if (msgEl) msgEl.textContent = T("copyFail"); };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(ok, fail);
+    else fail();
+  }
 
-  function openPresent(k) {
-    var url = linkFor(k), svg = qrSvg(url);
+  function saveFile(name, data, type) {
+    if (DL) { DL.save({ filename: name, data: data }).catch(function () {}); return; }
+    var blob = new Blob([data], { type: type });
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blob); a.download = name;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
+  }
+
+  function openPresent(url) {
+    var svg = qrSvg(url);
     if (!svg) return;
-    var org = $("f-org").value.trim();
+    var old = $("present-overlay"); if (old) old.parentNode.removeChild(old);
+    var org = SESSION ? SESSION.org : P.org;
     var ov = document.createElement("div");
-    ov.className = "present-overlay";
+    ov.className = "present-overlay"; ov.id = "present-overlay";
     ov.innerHTML = '<div class="p-exit">Esc ✕</div>' +
-      '<div class="p-org">' + esc(org) + '</div>' +
-      '<div class="p-qr">' + svg + '</div>' +
-      '<div class="p-scan">' + esc(T("fScan")) + '</div>' +
-      '<div class="p-url">' + esc(url) + '</div>';
+      '<div class="p-org">' + esc(org || "") + "</div>" +
+      '<div class="p-qr">' + svg + "</div>" +
+      '<div class="p-scan">' + esc(T("scan")) + "</div>" +
+      '<div class="p-url">' + esc(url) + "</div>";
     document.body.appendChild(ov);
+    ssSet("aia-present", url);
     function close() {
       if (ov.parentNode) ov.parentNode.removeChild(ov);
+      ssDel("aia-present");
       document.removeEventListener("keydown", onKey);
     }
-    function onKey(e) { if (e.key === "Escape") close(); }
+    function onKey(ev) { if (ev.key === "Escape") close(); }
     ov.addEventListener("click", close);
     document.addEventListener("keydown", onKey);
   }
 
-  function updateLinks() {
-    var base = location.origin + location.pathname;
-    var p = new URLSearchParams();
-    var org = $("f-org").value.trim(); if (org) p.set("org", org);
-    var rl = $("f-roles").value.split("\n").map(function (s) { return s.trim(); }).filter(Boolean);
-    if (rl.length) p.set("roles", rl.join("|"));
-    var mn = parseInt($("f-min").value, 10); if (mn && mn !== 5) p.set("min", mn);
-    var to = $("f-to").value.trim(); if (to && to !== DEFAULT_TO) p.set("to", to);
-    p.set("lang", $("f-lang").value);
-    var pt = new URLSearchParams(p); pt.set("form", "team");
-    var pd = new URLSearchParams(p); pd.delete("roles"); pd.set("form", "direction");
-    // Keep "|" readable: shorter links make smaller, easier-to-scan QR codes.
-    $("f-link-t").textContent = base + "?" + pt.toString().replace(/%7C/g, "|");
-    $("f-link-d").textContent = base + "?" + pd.toString();
-    ["t", "d"].forEach(function (k) {
-      var svg = qrSvg(linkFor(k));
-      $("f-qr-" + k).innerHTML = svg;
-      $("f-qr-" + k).hidden = !svg;
-      $("f-msg-" + k).textContent = svg ? "" : T("fQrLong");
-      document.querySelectorAll('[data-k="' + k + '"][data-act="f-present"], [data-k="' + k + '"][data-act="f-qr-save"]')
-        .forEach(function (b) { b.disabled = !svg; });
-    });
-  }
-
-  function compileCodes() {
-    var raw = $("f-codes").value.match(/AIA1\.[A-Za-z0-9_-]+/g) || [];
-    var seen = {}, bad = 0, dup = 0;
-    compiled.forEach(function (r) { seen[r.id] = true; });
-    raw.forEach(function (c) {
-      try {
-        var r = JSON.parse(b64urlDecode(c.slice(CODE_PREFIX.length)));
-        if (!r || r.v !== 1 || !Array.isArray(r.acts)) throw new Error("bad");
-        if (seen[r.id]) { dup++; return; }
-        seen[r.id] = true; compiled.push(r);
-      } catch (e) { bad++; }
-    });
-    var nt = compiled.filter(function (r) { return r.f === "t"; }).length;
-    $("f-msg").textContent = fmt(T("fFound"), { n: compiled.length, t: nt, d: compiled.length - nt, bad: bad, dup: dup });
-    $("f-csv-r").disabled = $("f-csv-a").disabled = !compiled.length;
-    renderCompiled();
-  }
-
-  // Decision tree, section 6.3 (proposal only — MR5 and leadership validate):
-  // 1. serious consequence of an error → human to keep
-  // 2. confidential data → augmented at most, pending data rules
-  // 3. always the same way + minor consequence → automatable
-  // 4. otherwise → augmented
-  function classify(x) {
-    if (x.e === 2) return "hum";
-    if (x.c === 0 || x.c === 2) return "augData";
-    if (x.s === 2 && x.e === 0) return "auto";
-    return "aug";
-  }
-  var CAT_LABEL = { auto: "catAuto", aug: "catAug", augData: "catAugData", hum: "catHum" };
-
-  function groupKey(r) { return r.f === "d" ? T("fLeaders") : (r.role || T("prefNot")); }
-
-  function renderCompiled() {
-    if (!compiled.length) { $("f-results").innerHTML = ""; return; }
-    // Hours by role group, pooling team groups below the minimum size. Leadership
-    // answers are named and reported without attribution, so they keep their own row.
-    var groups = {};
-    compiled.forEach(function (r) { var g = groupKey(r); (groups[g] = groups[g] || []).push(r); });
-    var rows = [], pooled = [], leaders = T("fLeaders");
-    Object.keys(groups).forEach(function (g) {
-      if (g !== leaders) (groups[g].length >= MIN_GROUP ? rows : pooled).push([g, groups[g]]);
-    });
-    if (pooled.length) {
-      var all = []; pooled.forEach(function (p) { all = all.concat(p[1]); });
-      rows.push([fmt(T("fPooled"), { min: MIN_GROUP }), all]);
-    }
-    if (groups[leaders]) rows.push([leaders, groups[leaders], true]);
-    var tableRows = rows.map(function (pair) {
-      var h = { auto: 0, aug: 0, hum: 0 }, n = 0;
-      pair[1].forEach(function (r) {
-        r.acts.forEach(function (x) {
-          var c = classify(x); n++;
-          h[c === "augData" ? "aug" : c] += HOURS_MID[x.h] || 0;
-        });
-      });
-      var tot = h.auto + h.aug + h.hum;
-      var cell = pair[1].length < MIN_GROUP && !pair[2] ? function () { return '<td class="num muted">–</td>'; } : function (v) { return '<td class="num">' + v.toFixed(1) + "</td>"; };
-      return "<tr><td>" + esc(pair[0]) + '</td><td class="num">' + pair[1].length + '</td><td class="num">' + n + "</td>" +
-        cell(h.auto) + cell(h.aug) + cell(h.hum) + cell(tot) + "</tr>";
-    }).join("");
-
-    // Leadership vs teams on the shared lists.
-    var teams = compiled.filter(function (r) { return r.f === "t"; });
-    var dirs = compiled.filter(function (r) { return r.f === "d"; });
-    function share(list, k, i) {
-      if (!list.length) return '<td class="num muted">–</td>';
-      var c = list.filter(function (r) { return Array.isArray(r[k]) && r[k].indexOf(i) >= 0; }).length;
-      return '<td class="num">' + Math.round(100 * c / list.length) + " %</td>";
-    }
-    function cmpRows(k, optKey) {
-      return T(optKey).map(function (o, i) { return "<tr><td>" + esc(o) + "</td>" + share(teams, k, i) + share(dirs, k, i) + "</tr>"; }).join("");
-    }
-    function changeAvg(list, idx) {
-      var v = list.map(function (r) { return Array.isArray(r.ag) ? r.ag[idx] : null; }).filter(function (x) { return x != null && x < 5; });
-      return v.length ? '<td class="num">' + (v.reduce(function (s, x) { return s + x + 1; }, 0) / v.length).toFixed(1) + "</td>" : '<td class="num muted">–</td>';
-    }
-    var head3 = "<tr><th>" + esc(T("fItem")) + '</th><th class="num">' + esc(T("fTeams")) + " (" + teams.length + ')</th><th class="num">' + esc(T("fDir")) + " (" + dirs.length + ")</th></tr>";
-
-    $("f-results").innerHTML =
-      '<div class="card"><h3>' + esc(T("fByRole")) + '</h3><p class="sub">' + esc(T("fByRoleSub")) + "</p>" +
-      '<div class="tbl-scroll"><table><thead><tr><th>' + esc(T("fRole")) + '</th><th class="num">' + esc(T("fResp")) + '</th><th class="num">' + esc(T("fActs")) +
-      '</th><th class="num">' + esc(T("fAuto")) + '</th><th class="num">' + esc(T("fAug")) + '</th><th class="num">' + esc(T("fHum")) + '</th><th class="num">' + esc(T("fTot")) +
-      "</th></tr></thead><tbody>" + tableRows + "</tbody></table></div></div>" +
-      '<div class="card"><h3>' + esc(T("fCompare")) + '</h3><p class="sub">' + esc(T("fCompareSub")) + "</p>" +
-      '<div class="tbl-scroll"><table><thead>' + head3 + "</thead><tbody>" +
-      '<tr><th colspan="3">' + esc(T("qReinvestT")) + "</th></tr>" + cmpRows("re", "reinvest") +
-      '<tr><th colspan="3">' + esc(T("qConcernT")) + "</th></tr>" + cmpRows("co", "concerns") +
-      "<tr><td>" + esc(T("fChangeAvg")) + "</td>" + changeAvg(teams, 2) + changeAvg(dirs, 1) + "</tr>" +
-      "</tbody></table></div></div>";
-  }
-
+  // ============ CSV ============
   function csvCell(v) {
     if (v == null) return "";
     var s = Array.isArray(v) ? v.join("; ") : String(v);
@@ -1288,64 +1939,184 @@
     if (Array.isArray(v)) return v.map(function (i) { return i < opts.length ? opts[i] : T("other"); });
     return v == null ? "" : opts[v];
   }
-  function respondentsCsv() {
+  function respondentsCsv(list) {
     var cols = ["id", "form", "date", "lang", "org", "role_group", "name_title", "scope", "top_activities", "exclusions",
       "coverage", "hand_over", "keep", "agree_rekey", "agree_find", "agree_teams_welcome_change", "agree_change_supported",
       "reinvest", "reinvest_other", "ai_used", "ai_feeling_1_5", "concerns", "concerns_other", "concerns_text",
       "training", "training_other", "ai_tools", "ai_tools_which", "data_indicators", "obligations", "written_rules",
       "who_decides", "champion", "n_activities"];
     var lines = [cols.join(",")];
-    compiled.forEach(function (r) {
+    list.forEach(function (r) {
       var ag = r.ag || [], t = r.f === "t";
       var agv = function (i) { return ag[i] == null ? "" : T("agree")[ag[i]]; };
-      var row = [r.id, t ? "team" : "leadership", r.d, r.l, r.org, t ? r.role : "", r.nm, r.sc, r.top, r.ex,
+      lines.push([r.id, t ? "team" : "leadership", r.d, r.l, r.org, t ? r.role : "", r.nm, r.sc, r.top, r.ex,
         pick("cover", r.cov), r.give, r.keep,
         t ? agv(0) : "", t ? agv(1) : "", t ? "" : agv(0), t ? agv(2) : agv(1),
         pick("reinvest", r.re), r.reo, pick("used", r.ai), r.feel, pick("concerns", r.co), r.coo, r.cq,
-        pick("train", r.tr), r.tro, pick("tools", r.tl), r.tlw, r.dt, r.ob, pick("rules", r.ru), r.who, r.ch, r.acts.length];
-      lines.push(row.map(csvCell).join(","));
+        pick("train", r.tr), r.tro, pick("tools", r.tl), r.tlw, r.dt, r.ob, pick("rules", r.ru), r.who, r.ch, r.acts.length].map(csvCell).join(","));
     });
     return lines.join("\n");
   }
-  function activitiesCsv() {
+  function activitiesCsv(list) {
     var cols = ["respondent_id", "form", "role_group", "activity_no", "activity", "hours_per_week_bracket", "hours_per_week_estimate",
       "same_way", "value", "error_consequence", "confidential", "wants_to_lighten", "proposed_category", "validated_category"];
     var lines = [cols.join(",")];
-    compiled.forEach(function (r) {
+    list.forEach(function (r) {
       r.acts.forEach(function (x, i) {
-        lines.push([r.id, r.f === "t" ? "team" : "leadership", groupKey(r), i + 1, x.n, pick("hours", x.h), HOURS_MID[x.h],
-          pick("same", x.s), pick("value", x.v), pick("err", x.e), pick("conf", x.c), pick("lighten", x.w),
-          T(CAT_LABEL[classify(x)]), ""].map(csvCell).join(","));
+        lines.push([r.id, r.f === "t" ? "team" : "leadership", r.f === "d" ? T("cLead") : (r.role || T("prefNot")), i + 1, x.n,
+          pick("hours", x.h), HOURS_MID[x.h], pick("same", x.s), pick("value", x.v), pick("err", x.e), pick("conf", x.c),
+          pick("lighten", x.w), T(CAT_LABEL[classify(x)]), ""].map(csvCell).join(","));
       });
     });
     return lines.join("\n");
   }
-  function download(name, text, type) {
-    var blob = new Blob(type ? [text] : ["﻿" + text], { type: type || "text/csv;charset=utf-8" });
-    var a = document.createElement("a");
-    a.href = URL.createObjectURL(blob); a.download = name;
-    document.body.appendChild(a); a.click(); a.remove();
-    setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
+
+  // ============ PDF report (same approach as the Four Quotients page) ============
+  var PDF_LIBS = [
+    "https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js",
+    "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"
+  ];
+  var pdfLibsP = null;
+  function loadScript(src) {
+    return new Promise(function (res, rej) {
+      var s = document.createElement("script"); s.src = src; s.onload = res; s.onerror = rej;
+      document.head.appendChild(s);
+    });
+  }
+  function loadPdfLibs() {
+    if (!pdfLibsP) {
+      pdfLibsP = loadScript(PDF_LIBS[0]).then(function () { return loadScript(PDF_LIBS[1]); });
+      pdfLibsP.catch(function () { pdfLibsP = null; });
+    }
+    return pdfLibsP;
+  }
+  function slug(s) {
+    return String(s || "").normalize("NFD").replace(/[̀-ͯ]/g, "")
+      .replace(/[^A-Za-z0-9]+/g, "-").replace(/^-+|-+$/g, "").toLowerCase() || "report";
+  }
+  function buildPdf() {
+    var el = document.documentElement, prev = el.getAttribute("data-theme");
+    el.setAttribute("data-theme", "light"); // chart colors are CSS variables, so the capture is light
+    var restore = function () { if (prev === null) el.removeAttribute("data-theme"); else el.setAttribute("data-theme", prev); };
+    return loadPdfLibs().then(function () {
+      var root = $("report-root"), cuts = [], scale = 2;
+      return window.html2canvas(root, {
+        scale: scale, backgroundColor: "#ffffff", windowWidth: 1000, logging: false,
+        onclone: function (doc) {
+          var st = doc.createElement("style");
+          st.textContent = "*{animation:none!important;transition:none!important}.no-pdf{display:none!important}";
+          doc.head.appendChild(st);
+          var wrap = doc.querySelector(".wrap"); if (wrap) wrap.style.maxWidth = "900px";
+          var r = doc.getElementById("report-root"), top = r.getBoundingClientRect().top;
+          Array.prototype.forEach.call(r.querySelectorAll(".card, .tiles, .lever, .bar-row, .alist li"), function (c) {
+            cuts.push((c.getBoundingClientRect().top - top) * scale);
+          });
+        }
+      }).then(function (canvas) {
+        restore();
+        var pdf = new window.jspdf.jsPDF({ unit: "pt", format: "letter", orientation: "portrait" });
+        var pw = pdf.internal.pageSize.getWidth(), ph = pdf.internal.pageSize.getHeight();
+        var margin = 40, footerH = 20, cw = pw - margin * 2, k = canvas.width / cw;
+        var pageH = Math.floor((ph - margin * 2 - footerH) * k);
+        var slices = [], start = 0, total = canvas.height;
+        while (total - start > pageH) {
+          var limit = start + pageH, best = -1;
+          cuts.forEach(function (c) { if (c > start + pageH * 0.3 && c <= limit && c > best) best = c; });
+          var end = best > 0 ? Math.round(best) : limit;
+          slices.push([start, end]); start = end;
+        }
+        if (total - start > 2) slices.push([start, total]);
+        var org = view === "facilitator" ? P.org : (cfg().org || (liveSession() && liveSession().org) || "");
+        slices.forEach(function (sl, i) {
+          var hgt = sl[1] - sl[0], c = document.createElement("canvas");
+          c.width = canvas.width; c.height = hgt;
+          var cx = c.getContext("2d");
+          cx.fillStyle = "#ffffff"; cx.fillRect(0, 0, c.width, hgt);
+          cx.drawImage(canvas, 0, sl[0], canvas.width, hgt, 0, 0, canvas.width, hgt);
+          if (i > 0) pdf.addPage();
+          pdf.addImage(c.toDataURL("image/jpeg", 0.92), "JPEG", margin, margin, cw, hgt / k);
+          pdf.setFontSize(8); pdf.setTextColor(138, 130, 122);
+          pdf.text("MR5 InnovAction · AI Activity Diagnostic · " + org, margin, ph - margin / 2 - 4);
+          pdf.text((i + 1) + " / " + slices.length, pw - margin, ph - margin / 2 - 4, { align: "right" });
+        });
+        pdf.setProperties({ title: org + " — AI Activity Diagnostic", author: "MR5 InnovAction" });
+        var kind = view === "personal" ? "my-results" : "group-results";
+        return { pdf: pdf, filename: "ai-activities-" + kind + "-" + slug(org) + ".pdf" };
+      });
+    }).catch(function (e) { restore(); throw e; });
+  }
+  function downloadReport(btn) {
+    if (btn.disabled) return;
+    btn.disabled = true; btn.textContent = T("pdfPreparing");
+    var reset = function () { btn.disabled = false; btn.textContent = T("btnReport"); };
+    var done = function () { btn.disabled = false; btn.textContent = T("reportSaved"); setTimeout(function () { btn.textContent = T("btnReport"); }, 2000); };
+    buildPdf().then(function (res) {
+      if (!DL) { res.pdf.save(res.filename); done(); return; }
+      return DL.save({ filename: res.filename, data: res.pdf.output("arraybuffer") }).then(done, reset);
+    }).catch(function () { reset(); try { window.print(); } catch (err) {} });
   }
 
-  // ---------- language ----------
+  // ============ tooltip ============
+  var tip = $("tooltip");
+  document.addEventListener("mouseover", function (e) {
+    var el = e.target.closest && e.target.closest("[data-tip]");
+    if (!el) { tip.classList.remove("show"); return; }
+    tip.textContent = el.getAttribute("data-tip"); tip.classList.add("show");
+  });
+  document.addEventListener("mousemove", function (e) {
+    if (!tip.classList.contains("show")) return;
+    var x = Math.min(e.clientX + 14, window.innerWidth - tip.offsetWidth - 8);
+    tip.style.left = x + "px"; tip.style.top = (e.clientY + 14) + "px";
+  });
+
+  // ============ language ============
   function setLang(l) {
     lang = l;
     document.documentElement.lang = l;
     $("lang-en").classList.toggle("active", l === "en"); $("lang-en").setAttribute("aria-pressed", l === "en");
     $("lang-fr").classList.toggle("active", l === "fr"); $("lang-fr").setAttribute("aria-pressed", l === "fr");
+    var keepCodes = $("f-codes") ? $("f-codes").value : null;
     render();
+    if (keepCodes != null && $("f-codes")) $("f-codes").value = keepCodes;
   }
   $("lang-en").addEventListener("click", function () { if (lang !== "en") setLang("en"); });
   $("lang-fr").addEventListener("click", function () { if (lang !== "fr") setLang("fr"); });
 
   document.addEventListener("click", onClick);
   document.addEventListener("change", onChange);
-  document.addEventListener("input", function (e) {
-    if (e.target.matches("input[type=text], textarea")) onChange(e);
-  });
+  document.addEventListener("input", function (e) { if (e.target.matches("input[type=text], textarea")) onChange(e); });
 
+  // ============ start ============
+  if (STANDALONE && P.view === "facilitator") view = "facilitator";
+  if (!STANDALONE) {
+    // Return to where the facilitator or respondent was before the publish-triggered reload.
+    var pv = ssGet("aia-personal");
+    if (pv && SESSION && SESSION.responses.some(function (r) { return r.id === pv.id; })) {
+      lastPayload = pv; FORM = pv.f; mode = "respond"; submitHTML = '<div class="status-banner">' + T("submitOk") + "</div>"; view = "personal";
+    } else if (ssGet("aia-view") === "group" && SESSION) {
+      view = "group";
+    }
+  } else if (view !== "facilitator") {
+    var dr = lsGet(draftKey());
+    if (dr && dr.done && dr.a) { state = dr; lastPayload = buildPayload(); submitHTML = standaloneCodeHTML(lastPayload); view = "personal"; }
+  }
+  codeMsg = ssGet("aia-code-msg") || "";
+  ssDel("aia-code-msg");
   setLang(lang);
+  var pres = ssGet("aia-present");
+  if (pres && SESSION && !SESSION.closed) openPresent(pres);
+
+  // Resolve the artifact capabilities (they arrive after the first run; null when absent).
+  if (!STANDALONE && window.claude && typeof window.claude.use === "function") {
+    window.claude.use("artifact").then(function (ns) {
+      ART = ns || null;
+      if (view === "intro" || view === "group") render();
+      retryPending();
+    }, function () { ART = null; });
+    window.claude.use("downloads").then(function (ns) { DL = ns || null; }, function () { DL = null; });
+  } else {
+    ART = null; DL = null;
+  }
 })();
 </script>
 </body>
