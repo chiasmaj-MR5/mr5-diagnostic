@@ -671,7 +671,7 @@
       cSave: "How AI could save time",
       cSaveSub: "Estimated hours per week AI agents and assistants could free, by group. Solid = low estimate; light = up to the high estimate. Team groups under {min} people are pooled.",
       cSaveTop: "Biggest time savers",
-      cSaveTopSub: "Activities where AI could free the most time — where to start.",
+      cSaveTopSub: "Activities where AI could free the most time — where to start. Shown only for groups of at least {min} people.",
       dSave: "Time to gain", dSaveP: "AI could free about {r} per week across respondents ({pp} per person): AI agents {a}, AI assistants {b}.", dSaveD: "where should that time go, and how will the pilot measure it?",
       catAuto: "Automatable by AI", catAug: "Augmented by AI", catAugData: "Augmented — check data rules", catHum: "Human to keep",
       catAutoS: "Automatable", catAugS: "Augmented", catHumS: "Human to keep",
@@ -688,7 +688,7 @@
       yNext: "What happens next",
       yNextText: "MR5 combines everyone’s answers by group (never fewer than {min} people), checks the proposals with you during the on-site day, and presents the group results to leadership.",
       yNextTextD: "MR5 combines leadership and team answers, and will go over these proposals with you in the interview.",
-      hpw: "h/wk",
+      hpw: "h/wk", nPeople: "{n} people",
 
       codeIntro: "<strong>One last step:</strong> send this response code to MR5 InnovAction. It contains your answers and no name; your answers count in the group results once MR5 adds it.",
       codeAnon: "If you send it by email, only MR5 sees who sent it. {org} receives grouped results only, never for fewer than {min} people.",
@@ -714,7 +714,7 @@
       cTimeSub: "Hours per week, by proposed category. Hours are bracket midpoints (estimates). Team groups under {min} people are pooled.",
       cAll: "All respondents", cPooled: "Pooled (groups under {min})", cLead: "Leadership", cHidden: "Hidden — fewer than {min} people",
       cCand: "Best candidates for AI",
-      cCandSub: "Activities where AI could automate or assist and that people would like to lighten — most hours first.",
+      cCandSub: "Activities where AI could automate or assist and that people would like to lighten — most hours first. Shown only for groups of at least {min} people.",
       cKeep: "Keep human",
       cKeepSub: "Activities with serious consequences if an error slips in.",
       cNone: "Nothing yet.",
@@ -729,6 +729,9 @@
       rRekey: "Often re-enter the same information",
       rFind: "Easily find the information they need",
       rChange: "Changes are well explained and supported (1–5)",
+      rWelcome: "Teams welcome changes in how they work (1–5)",
+      rTools: "Say AI tools are already used (officially or informally)",
+      rRules: "Say written rules on tools and data exist (fully or partly)",
       cTeams: "Teams", cDir: "Leadership",
       cDirs: "Directions to discuss",
       cDirsSub: "Generated from the answers — a starting point for the group’s decisions, to be validated together.",
@@ -737,6 +740,7 @@
       dAug: "Assist, don’t replace", dAugP: "{h} h/week go to activities where AI could assist a person who stays in charge.", dAugD: "which tools, and which human check before anything leaves the team?",
       dData: "Data first", dDataP: "{n} activities involve confidential information (or people are not sure).", dDataD: "who confirms what data AI tools may use, before any pilot?",
       dReinvSame: "Freed time", dReinvSameP: "Teams and leadership agree: freed time should go first to “{a}”.", dReinvSameD: "which indicator will show that the time really went there?",
+      dReinvOneT: "Teams would put freed time first into “{a}” ({p} % chose it).", dReinvOneD: "Leadership would put freed time first into “{a}” ({p} % chose it).",
       dReinvDiff: "Freed time", dReinvDiffP: "Teams would put freed time into “{a}”; leadership into “{b}”.", dReinvDiffD: "how to split the freed time between the two?",
       dConc: "Concerns", dConcP: "The top concern is “{c}” ({p} % of respondents).", dConcD: "what message and what safeguard will address it?",
       dGap: "Change support", dGapP: "Leadership rates how well change is explained and supported at {d}/5; teams at {t}/5.", dGapD: "what will be done differently this time?",
@@ -898,7 +902,7 @@
       cSave: "Comment l’IA pourrait faire gagner du temps",
       cSaveSub: "Heures par semaine que les agents et assistants IA pourraient libérer, par groupe. Plein = estimation basse; pâle = jusqu’à l’estimation haute. Les groupes de moins de {min} personnes sont regroupés.",
       cSaveTop: "Plus grands gains de temps",
-      cSaveTopSub: "Activités où l’IA pourrait libérer le plus de temps — par où commencer.",
+      cSaveTopSub: "Activités où l’IA pourrait libérer le plus de temps — par où commencer. Affichées seulement pour les groupes d’au moins {min} personnes.",
       dSave: "Temps à gagner", dSaveP: "L’IA pourrait libérer environ {r} par semaine pour l’ensemble des répondants ({pp} par personne) : agents IA {a}, assistants IA {b}.", dSaveD: "où ce temps devrait-il aller, et comment l’essai le mesurera-t-il?",
       catAuto: "Automatisable par l’IA", catAug: "Augmentée par l’IA", catAugData: "Augmentée — vérifier les règles de données", catHum: "Humaine à garder",
       catAutoS: "Automatisable", catAugS: "Augmentée", catHumS: "Humaine à garder",
@@ -915,7 +919,7 @@
       yNext: "La suite",
       yNextText: "MR5 regroupe les réponses de tous par groupe (jamais moins de {min} personnes), valide les propositions avec vous lors du diagnostic sur place, puis présente les résultats de groupe à la direction.",
       yNextTextD: "MR5 regroupe les réponses de la direction et des équipes, et reviendra sur ces propositions avec vous en entrevue.",
-      hpw: "h/sem.",
+      hpw: "h/sem.", nPeople: "{n} personnes",
 
       codeIntro: "<strong>Une dernière étape :</strong> envoyez ce code de réponse à MR5 InnovAction. Il contient vos réponses et aucun nom; vos réponses comptent dans les résultats de groupe dès que MR5 l’ajoute.",
       codeAnon: "Si vous l’envoyez par courriel, seule MR5 voit qui l’a envoyé. {org} reçoit uniquement des résultats regroupés, jamais pour moins de {min} personnes.",
@@ -941,7 +945,7 @@
       cTimeSub: "Heures par semaine, par catégorie proposée. Les heures sont le milieu de chaque tranche (estimations). Les groupes de moins de {min} personnes sont regroupés.",
       cAll: "Tous les répondants", cPooled: "Regroupés (groupes de moins de {min})", cLead: "Direction", cHidden: "Masqué — moins de {min} personnes",
       cCand: "Meilleurs candidats pour l’IA",
-      cCandSub: "Activités que l’IA pourrait automatiser ou assister et que les gens aimeraient alléger — les plus longues d’abord.",
+      cCandSub: "Activités que l’IA pourrait automatiser ou assister et que les gens aimeraient alléger — les plus longues d’abord. Affichées seulement pour les groupes d’au moins {min} personnes.",
       cKeep: "Humain à garder",
       cKeepSub: "Activités où une erreur aurait des conséquences importantes.",
       cNone: "Rien pour l’instant.",
@@ -956,6 +960,9 @@
       rRekey: "Ressaisissent souvent la même information",
       rFind: "Trouvent facilement l’information",
       rChange: "Changements bien expliqués et accompagnés (1 à 5)",
+      rWelcome: "Les équipes accueillent bien les changements (1 à 5)",
+      rTools: "Disent que des outils d’IA sont déjà utilisés (officiellement ou non)",
+      rRules: "Disent que des règles écrites sur les outils et les données existent (en tout ou en partie)",
       cTeams: "Équipes", cDir: "Direction",
       cDirs: "Pistes à discuter",
       cDirsSub: "Générées à partir des réponses — un point de départ pour les décisions du groupe, à valider ensemble.",
@@ -964,6 +971,7 @@
       dAug: "Assister, pas remplacer", dAugP: "{h} h/sem. vont à des activités où l’IA pourrait assister une personne qui reste responsable.", dAugD: "quels outils, et quelle vérification humaine avant que quoi que ce soit ne sorte de l’équipe?",
       dData: "Les données d’abord", dDataP: "{n} activités touchent des renseignements confidentiels (ou les gens ne sont pas certains).", dDataD: "qui confirme quelles données les outils d’IA peuvent utiliser, avant tout essai?",
       dReinvSame: "Temps libéré", dReinvSameP: "Les équipes et la direction s’entendent : le temps libéré devrait aller d’abord à « {a} ».", dReinvSameD: "quel indicateur montrera que le temps y est vraiment allé?",
+      dReinvOneT: "Les équipes consacreraient d’abord le temps libéré à « {a} » ({p} % l’ont choisi).", dReinvOneD: "La direction consacrerait d’abord le temps libéré à « {a} » ({p} % l’ont choisi).",
       dReinvDiff: "Temps libéré", dReinvDiffP: "Les équipes consacreraient le temps libéré à « {a} »; la direction, à « {b} ».", dReinvDiffD: "comment répartir le temps libéré entre les deux?",
       dConc: "Préoccupations", dConcP: "La principale préoccupation est « {c} » ({p} % des répondants).", dConcD: "quel message et quelle mesure de protection y répondront?",
       dGap: "Accompagnement du changement", dGapP: "La direction évalue l’accompagnement du changement à {d}/5; les équipes, à {t}/5.", dGapD: "que fera-t-on différemment cette fois-ci?",
@@ -1408,7 +1416,7 @@
     }).join("") + "</div>";
   }
   function audienceLegend(nt, nd) {
-    return '<div class="legend"><span class="key">' + sw("--c-teams") + esc(T("cTeams")) + " (" + nt + ")</span>" +
+    return '<div class="legend">' + (nt ? '<span class="key">' + sw("--c-teams") + esc(T("cTeams")) + " (" + nt + ")</span>" : "") +
       (nd ? '<span class="key">' + sw("--c-lead") + esc(T("cDir")) + " (" + nd + ")</span>" : "") + "</div>";
   }
   function shareOf(list, k, i) {
@@ -1491,6 +1499,21 @@
   }
 
   // ============ group results ============
+  // The same activity named by several people becomes one line: hours and savings add up.
+  function mergeSame(items, kind) {
+    var by = {}, out = [];
+    items.forEach(function (m) {
+      var k = m.x.n.toLowerCase().replace(/\s+/g, " ").trim() + "|" + kind(m);
+      var e = by[k];
+      if (!e) { e = by[k] = { x: m.x, c: m.c, h: 0, v: [0, 0], n: 0, groups: [] }; out.push(e); }
+      e.h += m.h || 0; e.n++;
+      if (m.v) { e.v[0] += m.v[0]; e.v[1] += m.v[1]; }
+      if (m.g && e.groups.indexOf(m.g) < 0) e.groups.push(m.g);
+    });
+    out.forEach(function (e) { e.g = e.groups.join(", "); });
+    return out;
+  }
+  function peopleTag(m) { return m.n > 1 ? "<span>" + esc(fmt(T("nPeople"), { n: m.n })) + "</span>" : ""; }
   function groupData(responses, min) {
     var teams = responses.filter(function (r) { return r.f === "t"; });
     var dirs = responses.filter(function (r) { return r.f === "d"; });
@@ -1509,6 +1532,7 @@
     // Activity text is shown only from groups that reach the minimum size.
     var eligible = [];
     rows.forEach(function (row) { if (row.list.length >= min) eligible = eligible.concat(row.list.map(function (r) { return { r: r, g: row.pooled ? "" : row.name }; })); });
+    if (dirs.length >= min) eligible = eligible.concat(dirs.map(function (r) { return { r: r, g: T("cLead") }; }));
     return { teams: teams, dirs: dirs, rows: rows, eligible: eligible };
   }
 
@@ -1551,12 +1575,13 @@
       });
     });
     var byH = function (m, n) { return n.h - m.h || (m.c === "auto" ? -1 : 1); };
+    cand = mergeSame(cand, function (m) { return m.c; }); keep = mergeSame(keep, function (m) { return m.c; });
     cand.sort(byH); keep.sort(byH);
     function alist(items) {
       if (!items.length) return '<p class="muted" style="font-size:0.9rem">' + esc(T("cNone")) + "</p>";
       return '<ul class="alist">' + items.map(function (m) {
-        return '<li><span class="a-n">' + esc(m.x.n) + '</span><span class="a-h">' + esc(T("hours")[m.x.h]) + "</span>" +
-          '<span class="a-m">' + chip(m.c) + (m.g ? "<span>" + esc(m.g) + "</span>" : "") + "</span></li>";
+        return '<li><span class="a-n">' + esc(m.x.n) + '</span><span class="a-h">' + esc(m.n > 1 ? "≈ " + h1(m.h) + " " + T("hpw") : T("hours")[m.x.h]) + "</span>" +
+          '<span class="a-m">' + chip(m.c) + peopleTag(m) + (m.g ? "<span>" + esc(m.g) + "</span>" : "") + "</span></li>";
       }).join("") + "</ul>";
     }
 
@@ -1581,15 +1606,19 @@
     var feelAvg = feels.length ? feels.reduce(function (s, x) { return s + x; }, 0) / feels.length : null;
     var chT = avgAgree(G.teams, 2), chD = avgAgree(G.dirs, 1);
     function rrow(label, a, b) {
-      return "<tr><td>" + esc(label) + '</td><td class="num">' + (a == null ? "–" : a) + '</td><td class="num">' + (b == null ? "–" : b) + "</td></tr>";
+      if (a == null && b == null) return "";
+      return "<tr><td>" + esc(label) + "</td>" + (nt ? '<td class="num">' + (a == null ? "–" : a) + "</td>" : "") + (nd ? '<td class="num">' + (b == null ? "–" : b) + "</td>" : "") + "</tr>";
     }
     var rk = shareAgree(G.teams, 0), fi = shareAgree(G.teams, 1);
-    var ready = '<table class="rt"><thead><tr><th></th><th class="num">' + esc(T("cTeams")) + '</th><th class="num">' + esc(T("cDir")) + "</th></tr></thead><tbody>" +
+    var ready = '<table class="rt"><thead><tr><th></th>' + (nt ? '<th class="num">' + esc(T("cTeams")) + "</th>" : "") + (nd ? '<th class="num">' + esc(T("cDir")) + "</th>" : "") + "</tr></thead><tbody>" +
       rrow(T("rUsedWork"), usedWork == null ? null : pct(usedWork), null) +
       rrow(T("rFeel"), feelAvg == null ? null : h1(feelAvg), null) +
       rrow(T("rRekey"), rk == null ? null : pct(rk), null) +
       rrow(T("rFind"), fi == null ? null : pct(fi), null) +
-      rrow(T("rChange"), chT == null ? null : h1(chT), chD == null ? null : h1(chD)) + "</tbody></table>";
+      rrow(T("rChange"), chT == null ? null : h1(chT), chD == null ? null : h1(chD)) +
+      rrow(T("rWelcome"), null, avgAgree(G.dirs, 0) == null ? null : h1(avgAgree(G.dirs, 0))) +
+      rrow(T("rTools"), null, nd ? pct(100 * G.dirs.filter(function (r) { return r.tl != null && r.tl <= 2; }).length / nd) : null) +
+      rrow(T("rRules"), null, nd ? pct(100 * G.dirs.filter(function (r) { return r.ru === 0 || r.ru === 1; }).length / nd) : null) + "</tbody></table>";
 
     // Directions to discuss
     var dirs = [];
@@ -1603,7 +1632,8 @@
     function topIdx(arr) { var best = -1, bi = -1; arr.forEach(function (v, i) { if (v != null && v > best) { best = v; bi = i; } }); return best > 0 ? bi : -1; }
     var rt = topIdx(reT), rd = topIdx(reD);
     if (rt >= 0 && rd >= 0 && rt !== rd) lever(T("dReinvDiff"), fmt(T("dReinvDiffP"), { a: T("reinvest")[rt], b: T("reinvest")[rd] }), T("dReinvDiffD"));
-    else if (rt >= 0 || rd >= 0) lever(T("dReinvSame"), fmt(T("dReinvSameP"), { a: T("reinvest")[rt >= 0 ? rt : rd] }), T("dReinvSameD"));
+    else if (rt >= 0 && rd >= 0) lever(T("dReinvSame"), fmt(T("dReinvSameP"), { a: T("reinvest")[rt] }), T("dReinvSameD"));
+    else if (rt >= 0 || rd >= 0) lever(T("dReinvSame"), fmt(T(rt >= 0 ? "dReinvOneT" : "dReinvOneD"), { a: T("reinvest")[rt >= 0 ? rt : rd], p: Math.round(rt >= 0 ? reT[rt] : reD[rd]) }), T("dReinvSameD"));
     var allResp = G.teams.concat(G.dirs);
     var coAll = T("concerns").map(function (_, i) { return i === 6 ? null : shareOf(allResp, "co", i); });
     var ct = topIdx(coAll);
@@ -1621,7 +1651,7 @@
       groupSavings(G, min, responses.length) +
       '<div class="card"><h3>' + esc(T("cTime")) + '</h3><p class="sub">' + esc(fmt(T("cTimeSub"), { min: min })) + "</p>" + catLegend() +
         '<div class="bars">' + timeRows.join("") + "</div></div>" +
-      '<div class="card"><h3>' + esc(T("cCand")) + '</h3><p class="sub">' + esc(T("cCandSub")) + "</p>" + alist(cand.slice(0, 10)) + "</div>" +
+      '<div class="card"><h3>' + esc(T("cCand")) + '</h3><p class="sub">' + esc(fmt(T("cCandSub"), { min: min })) + "</p>" + alist(cand.slice(0, 10)) + "</div>" +
       '<div class="card"><h3>' + esc(T("cKeep")) + '</h3><p class="sub">' + esc(T("cKeepSub")) + "</p>" + alist(keep.slice(0, 6)) + "</div>" +
       '<div class="card"><h3>' + esc(T("cReinv")) + '</h3><p class="sub">' + esc(T("cShareSub")) + "</p>" + audienceLegend(nt, nd) + pairRows(T("reinvest"), reT, reD, nd > 0) + "</div>" +
       '<div class="card"><h3>' + esc(T("cConc")) + '</h3><p class="sub">' + esc(T("cShareSub")) + "</p>" + audienceLegend(nt, nd) + pairRows(T("concerns"), coT, coD, nd > 0) + "</div>" +
@@ -1650,14 +1680,15 @@
     // Biggest savers: activity text only from groups that reach the minimum size.
     var items = [];
     G.eligible.forEach(function (e) { e.r.acts.forEach(function (x) { if (helpType(x) !== "human") items.push({ x: x, g: e.g, v: savedOf(x) }); }); });
+    items = mergeSame(items, function (m) { return helpType(m.x); });
     items.sort(function (a, b) { return b.v[1] - a.v[1]; });
     var top = items.slice(0, 8).map(function (m) {
       return '<li><span class="a-n">' + esc(m.x.n) + '</span><span class="a-h">' + esc(fmt(T("sSaves"), { r: hr(m.v, true) })) + "</span>" +
-        '<span class="a-m">' + helpChip(m.x) + (m.g ? "<span>" + esc(m.g) + "</span>" : "") + "</span></li>";
+        '<span class="a-m">' + helpChip(m.x) + peopleTag(m) + (m.g ? "<span>" + esc(m.g) + "</span>" : "") + "</span></li>";
     }).join("");
     return '<div class="card"><h3>' + esc(T("cSave")) + '</h3><p class="sub">' + esc(fmt(T("cSaveSub"), { min: min })) + "</p>" + helpLegend() +
       (bars ? '<div class="bars">' + bars + "</div>" : '<p class="muted" style="font-size:0.9rem">' + esc(T("cNone")) + "</p>") +
-      '<h4 style="margin-top:1.6rem">' + esc(T("cSaveTop")) + '</h4><p class="sub">' + esc(T("cSaveTopSub")) + "</p>" +
+      '<h4 style="margin-top:1.6rem">' + esc(T("cSaveTop")) + '</h4><p class="sub">' + esc(fmt(T("cSaveTopSub"), { min: min })) + "</p>" +
       (top ? '<ul class="alist">' + top + "</ul>" : '<p class="muted" style="font-size:0.9rem">' + esc(T("cNone")) + "</p>") +
       '<p class="method">' + esc(T("sMethod")) + "</p></div>";
   }
