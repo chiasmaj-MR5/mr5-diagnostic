@@ -692,10 +692,7 @@
       var ap = ALIGN[version];
       for (i = 0; i < ap.length; i++) for (var j3 = 0; j3 < ap.length; j3++) {
         var r0 = ap[i], c0 = ap[j3];
-        // Skip only the three corners under the finder patterns; from version 7 on,
-        // some alignment patterns sit on the timing lines and must still be drawn.
-        var lastA = ap.length - 1;
-        if ((i === 0 && j3 === 0) || (i === 0 && j3 === lastA) || (i === lastA && j3 === 0)) continue;
+        if (F[r0][c0]) continue;
         for (var dr2 = -2; dr2 <= 2; dr2++) for (var dc2 = -2; dc2 <= 2; dc2++) {
           var on2 = Math.max(Math.abs(dr2), Math.abs(dc2)) !== 1;
           setF(r0 + dr2, c0 + dc2, on2 ? 1 : 0);
