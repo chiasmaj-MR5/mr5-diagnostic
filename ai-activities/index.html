@@ -219,6 +219,13 @@
   .bar-row.solo .breakdown { grid-column: 1; }
   .breakdown span + span::before { content: " · "; }
   .muted { color: var(--ink-3); }
+  .fill.rest { background: var(--track); }
+  .fill.light { opacity: 0.4; }
+  .save-hero { font-family: "Fraunces", Georgia, serif; font-size: clamp(1.6rem, 4.5vw, 2.2rem); font-weight: 700; line-height: 1.15; margin: 0.2rem 0 0.4rem; }
+  .save-hero b { color: var(--accent); }
+  .split { display: flex; flex-wrap: wrap; gap: 0.5rem 1.4rem; font-size: 0.88rem; color: var(--ink-2); margin: 0.4rem 0 1rem; }
+  .split strong { color: var(--ink); font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 0.84rem; }
+  .method { font-size: 0.8rem; color: var(--ink-3); margin-top: 1rem; max-width: 66ch; }
 
   .chip { display: inline-flex; align-items: center; gap: 0.35em; font-size: 0.74rem; font-weight: 600; color: var(--ink-2); white-space: nowrap; }
   .alist { list-style: none; margin: 0; padding: 0; }
@@ -646,6 +653,26 @@
       qWho: "Who currently decides on adopting a new tool or changing a role?",
       qChamp: "Who at {org} could act as an AI champion or point person?",
 
+      helpAgent: "AI agent", helpAssist: "AI assistant", helpHuman: "Keep human",
+      helpAgentD: "does the task from start to finish; a person checks the result",
+      helpAssistD: "drafts, summarises, searches or analyses; you stay in charge",
+      approved: "only with tools approved by {org}",
+      sTitle: "How AI could save you time",
+      sHero: "About <b>{r}</b> per week",
+      sHeroNone: "No clear time savings from AI in the activities you described.",
+      sShare: "That is {p} of the time you described ({h} h per week).",
+      sSplit: "AI agents", sSplit2: "AI assistants",
+      sOf: "of {h} h",
+      sSaves: "saves {r}",
+      sMethod: "Estimates from your answers, to be validated during the pilot: an AI agent saves 50–70 % of an activity’s time (results are still checked); an AI assistant saves 30–50 % when the activity is always done the same way, 20–40 % when partly, 10–25 % when every case is different. Activities with serious consequences stay human.",
+      yTilesS: "AI could save you, per week",
+      gTileS: "Time AI could save, per week",
+      gPerPerson: "{r} per person",
+      cSave: "How AI could save time",
+      cSaveSub: "Estimated hours per week AI agents and assistants could free, by group. Solid = low estimate; light = up to the high estimate. Team groups under {min} people are pooled.",
+      cSaveTop: "Biggest time savers",
+      cSaveTopSub: "Activities where AI could free the most time — where to start.",
+      dSave: "Time to gain", dSaveP: "AI could free about {r} per week across respondents ({pp} per person): AI agents {a}, AI assistants {b}.", dSaveD: "where should that time go, and how will the pilot measure it?",
       catAuto: "Automatable by AI", catAug: "Augmented by AI", catAugData: "Augmented — check data rules", catHum: "Human to keep",
       catAutoS: "Automatable", catAugS: "Augmented", catHumS: "Human to keep",
 
@@ -853,6 +880,26 @@
       qWho: "Qui décide aujourd’hui de l’adoption d’un nouvel outil ou d’un changement de rôle?",
       qChamp: "Qui, à {org}, pourrait agir comme personne-relais ou champion de l’IA?",
 
+      helpAgent: "Agent IA", helpAssist: "Assistant IA", helpHuman: "Humain à garder",
+      helpAgentD: "réalise la tâche du début à la fin; une personne vérifie le résultat",
+      helpAssistD: "rédige, résume, cherche ou analyse; vous restez responsable",
+      approved: "seulement avec des outils approuvés par {org}",
+      sTitle: "Comment l’IA pourrait vous faire gagner du temps",
+      sHero: "Environ <b>{r}</b> par semaine",
+      sHeroNone: "Pas de gain de temps évident grâce à l’IA dans les activités décrites.",
+      sShare: "C’est {p} du temps décrit ({h} h par semaine).",
+      sSplit: "Agents IA", sSplit2: "Assistants IA",
+      sOf: "sur {h} h",
+      sSaves: "économise {r}",
+      sMethod: "Estimations tirées de vos réponses, à valider pendant l’essai : un agent IA économise de 50 à 70 % du temps d’une activité (les résultats sont tout de même vérifiés); un assistant IA économise de 30 à 50 % quand l’activité se fait toujours de la même façon, de 20 à 40 % quand c’est en partie le cas, de 10 à 25 % quand chaque cas est différent. Les activités aux conséquences importantes restent humaines.",
+      yTilesS: "Temps que l’IA pourrait vous faire gagner, par semaine",
+      gTileS: "Temps que l’IA pourrait libérer, par semaine",
+      gPerPerson: "{r} par personne",
+      cSave: "Comment l’IA pourrait faire gagner du temps",
+      cSaveSub: "Heures par semaine que les agents et assistants IA pourraient libérer, par groupe. Plein = estimation basse; pâle = jusqu’à l’estimation haute. Les groupes de moins de {min} personnes sont regroupés.",
+      cSaveTop: "Plus grands gains de temps",
+      cSaveTopSub: "Activités où l’IA pourrait libérer le plus de temps — par où commencer.",
+      dSave: "Temps à gagner", dSaveP: "L’IA pourrait libérer environ {r} par semaine pour l’ensemble des répondants ({pp} par personne) : agents IA {a}, assistants IA {b}.", dSaveD: "où ce temps devrait-il aller, et comment l’essai le mesurera-t-il?",
       catAuto: "Automatisable par l’IA", catAug: "Augmentée par l’IA", catAugData: "Augmentée — vérifier les règles de données", catHum: "Humaine à garder",
       catAutoS: "Automatisable", catAugS: "Augmentée", catHumS: "Humaine à garder",
 
@@ -1101,6 +1148,55 @@
   var CAT_LABEL = { auto: "catAuto", aug: "catAug", augData: "catAugData", hum: "catHum" };
   var CAT_SHORT = { auto: "catAutoS", aug: "catAugS", hum: "catHumS" };
   var CAT_VAR = { auto: "--c-auto", aug: "--c-aug", hum: "--c-hum" };
+  // Time AI could save, as a low–high share of the activity's weekly hours (section 7.1
+  // hypotheses, to be validated in the pilot): agents for automatable work, assistants
+  // scaled by how repetitive the work is, nothing for work that stays human.
+  function helpType(x) { var c = classify(x); return c === "auto" ? "agent" : c === "hum" ? "human" : "assistant"; }
+  function saveRate(x) {
+    var t = helpType(x);
+    if (t === "human") return [0, 0];
+    if (t === "agent") return [0.5, 0.7];
+    return x.s === 2 ? [0.3, 0.5] : x.s === 1 ? [0.2, 0.4] : [0.1, 0.25];
+  }
+  function savedOf(x) { var r = saveRate(x), h = HOURS_MID[x.h] || 0; return [h * r[0], h * r[1]]; }
+  function savingsOf(acts) {
+    var s = { agent: [0, 0], assistant: [0, 0], total: [0, 0], hours: 0 };
+    acts.forEach(function (x) {
+      var v = savedOf(x), t = helpType(x);
+      s.hours += HOURS_MID[x.h] || 0;
+      if (t === "human") return;
+      s[t][0] += v[0]; s[t][1] += v[1]; s.total[0] += v[0]; s.total[1] += v[1];
+    });
+    return s;
+  }
+  function half(v) { return Math.round(v * 2) / 2; }
+  function hr(r, perWeek) {
+    var lo = half(r[0]), hi = half(r[1]);
+    var txt = lo === hi ? "≈ " + h1(lo) : h1(lo) + "–" + h1(hi);
+    return txt + " " + (perWeek ? T("hpw") : "h");
+  }
+  var HELP_VAR = { agent: "--c-auto", assistant: "--c-aug" };
+  var HELP_LABEL = { agent: "helpAgent", assistant: "helpAssist", human: "helpHuman" };
+  function helpChip(x) {
+    var t = helpType(x);
+    return '<span class="chip">' + (t === "human" ? sw("--c-hum") : sw(HELP_VAR[t])) + esc(T(HELP_LABEL[t])) + "</span>" +
+      (t !== "human" && (x.c === 0 || x.c === 2) ? '<span>' + tx("approved") + "</span>" : "");
+  }
+  function helpLegend() {
+    return '<div class="legend"><span class="key">' + sw("--c-auto") + "<span><b>" + esc(T("helpAgent")) + "</b> — " + esc(T("helpAgentD")) + "</span></span>" +
+      '<span class="key">' + sw("--c-aug") + "<span><b>" + esc(T("helpAssist")) + "</b> — " + esc(T("helpAssistD")) + "</span></span></div>";
+  }
+  // One bar: current hours scaled to max; saved low (solid) and up to high (light) in the help color.
+  function saveBar(parts, hours, max) {
+    var html = "", used = 0;
+    parts.forEach(function (pt) {
+      if (pt.lo > 0) html += '<div class="fill" style="width:' + (100 * pt.lo / max).toFixed(2) + '%;background:var(' + pt.v + ')" data-tip="' + esc(pt.tip) + '"></div>';
+      if (pt.hi - pt.lo > 0) html += '<div class="fill light" style="width:' + (100 * (pt.hi - pt.lo) / max).toFixed(2) + '%;background:var(' + pt.v + ')" data-tip="' + esc(pt.tip) + '"></div>';
+      used += pt.hi;
+    });
+    if (hours - used > 0.01) html += '<div class="fill rest" style="width:' + (100 * (hours - used) / max).toFixed(2) + '%"></div>';
+    return '<div class="track">' + html + '<span style="width:' + (100 * Math.max(0, max - hours) / max).toFixed(2) + '%"></span></div>';
+  }
   function hoursOf(acts) {
     var h = { auto: 0, aug: 0, hum: 0 };
     acts.forEach(function (x) { h[bucket(classify(x))] += HOURS_MID[x.h] || 0; });
@@ -1323,7 +1419,7 @@
 
   // ============ personal results ============
   function renderPersonal() {
-    var p = lastPayload, h = hoursOf(p.acts);
+    var p = lastPayload, h = hoursOf(p.acts), sv = savingsOf(p.acts);
     var help = h.auto + h.aug, hp = h.total ? 100 * help / h.total : 0;
     var acts = p.acts.map(function (x) { return { x: x, c: classify(x) }; })
       .sort(function (m, n) { return (HOURS_MID[n.x.h] || 0) - (HOURS_MID[m.x.h] || 0); });
@@ -1337,8 +1433,9 @@
       '<p class="lede">' + esc(T("yLede")) + "</p>" +
       '<div class="tiles">' +
       '<div class="tile"><div class="v">' + h1(h.total) + '</div><div class="l">' + esc(T("yTiles")[0]) + "</div></div>" +
-      '<div class="tile"><div class="v accent">' + pct(hp) + '</div><div class="l">' + esc(T("yTiles")[1]) + "</div></div>" +
+      '<div class="tile"><div class="v accent">' + hr(sv.total) + '</div><div class="l">' + esc(T("yTilesS")) + "</div></div>" +
       '<div class="tile"><div class="v">' + p.acts.length + '</div><div class="l">' + esc(T("yTiles")[2]) + "</div></div></div>" +
+      personalSavings(p, sv) +
       '<div class="card"><h3>' + esc(T("yWeek")) + '</h3><p class="sub">' + esc(help ? fmt(T("yHelp"), { h: h1(help), p: Math.round(hp) }) : T("yHelpNone")) + "</p>" +
       catLegend() + '<div class="bars">' + stackRow("", "", h, h.total) + "</div></div>" +
       '<div class="card"><h3>' + esc(T("yActs")) + '</h3><ul class="alist">' + acts.map(function (m) {
@@ -1355,6 +1452,29 @@
       (back ? '<button class="btn ghost" data-act="to-intro">' + esc(T("btnBackConsole")) + "</button>"
             : '<button class="linklike" data-act="edit">' + esc(T("editAgain")) + "</button>") +
       "</div></section>";
+  }
+
+  function personalSavings(p, sv) {
+    var rows = p.acts.slice().sort(function (m, n) { return savedOf(n)[1] - savedOf(m)[1] || (HOURS_MID[n.h] || 0) - (HOURS_MID[m.h] || 0); });
+    var max = 0; rows.forEach(function (x) { max = Math.max(max, HOURS_MID[x.h] || 0); });
+    var sp = sv.hours ? [100 * sv.total[0] / sv.hours, 100 * sv.total[1] / sv.hours] : [0, 0];
+    var spTxt = Math.round(sp[0]) === Math.round(sp[1]) ? pct(sp[0]) : Math.round(sp[0]) + "–" + pct(sp[1]);
+    return '<div class="card"><h3>' + esc(T("sTitle")) + "</h3>" +
+      (sv.total[1] > 0
+        ? '<p class="save-hero">' + fmt(T("sHero"), { r: esc(hr(sv.total)) }) + "</p>" +
+          '<p class="sub" style="margin-bottom:0.4rem">' + esc(fmt(T("sShare"), { p: spTxt, h: h1(sv.hours) })) + "</p>" +
+          '<div class="split"><span>' + sw("--c-auto") + " " + esc(T("sSplit")) + " <strong>" + esc(hr(sv.agent)) + "</strong></span>" +
+          "<span>" + sw("--c-aug") + " " + esc(T("sSplit2")) + " <strong>" + esc(hr(sv.assistant)) + "</strong></span></div>"
+        : '<p class="sub">' + esc(T("sHeroNone")) + "</p>") +
+      helpLegend() +
+      '<div class="bars">' + rows.map(function (x) {
+        var t = helpType(x), v = savedOf(x), hrs = HOURS_MID[x.h] || 0;
+        var parts = t === "human" ? [] : [{ lo: v[0], hi: v[1], v: HELP_VAR[t], tip: T(HELP_LABEL[t]) + " · " + fmt(T("sSaves"), { r: hr(v, true) }) }];
+        return '<div class="bar-row"><div class="name">' + esc(x.n) + '<small class="a-m" style="display:flex;gap:0.6rem;flex-wrap:wrap">' + helpChip(x) + "</small></div>" +
+          '<div class="bar-line">' + saveBar(parts, hrs, max) + '<span class="val">' + (t === "human" ? "–" : esc(hr(v))) + "</span></div>" +
+          '<div class="breakdown"><span>' + esc(t === "human" ? T("helpHuman") : fmt(T("sSaves"), { r: hr(v, true) })) + "</span><span>" + esc(fmt(T("sOf"), { h: h1(hrs) })) + "</span></div></div>";
+      }).join("") + "</div>" +
+      '<p class="method">' + esc(T("sMethod")) + "</p></div>";
   }
 
   function standaloneCodeHTML(p) {
@@ -1397,6 +1517,7 @@
     var allActs = [];
     responses.forEach(function (r) { allActs = allActs.concat(r.acts); });
     var H = hoursOf(allActs);
+    var SV = savingsOf(allActs);
     var helpP = H.total ? 100 * (H.auto + H.aug) / H.total : 0;
 
     // Where the time goes
@@ -1474,6 +1595,7 @@
     var dirs = [];
     function lever(tag, p, d) { dirs.push('<div class="lever"><span class="l-tag">' + esc(tag) + "</span><p>" + esc(p) + '</p><p class="decide"><b>' + esc(T("decide")) + "</b> " + esc(d) + "</p></div>"); }
     var autoItems = cand.filter(function (m) { return m.c === "auto"; });
+    if (SV.total[1] > 0) lever(T("dSave"), fmt(T("dSaveP"), { r: hr(SV.total), pp: hr([SV.total[0] / responses.length, SV.total[1] / responses.length]), a: hr(SV.agent), b: hr(SV.assistant) }), T("dSaveD"));
     if (H.auto > 0) lever(T("dQuick"), fmt(T("dQuickP"), { h: h1(H.auto), list: autoItems.slice(0, 3).map(function (m) { return (lang === "fr" ? "« " : "“") + m.x.n + (lang === "fr" ? " »" : "”"); }).join(", ") || "—" }), T("dQuickD"));
     if (H.aug > 0) lever(T("dAug"), fmt(T("dAugP"), { h: h1(H.aug) }), T("dAugD"));
     var confN = allActs.filter(function (x) { return x.c === 0 || x.c === 2; }).length;
@@ -1494,8 +1616,9 @@
       '<div class="tile"><div class="v">' + responses.length + '</div><div class="l">' + esc(T("gTiles")[0]) + " · " + esc(fmt(T("gRespSplit"), { t: nt, d: nd })) + "</div></div>" +
       '<div class="tile"><div class="v">' + allActs.length + '</div><div class="l">' + esc(T("gTiles")[1]) + "</div></div>" +
       '<div class="tile"><div class="v">' + h1(H.total) + '</div><div class="l">' + esc(T("gTiles")[2]) + "</div></div>" +
-      '<div class="tile"><div class="v accent">' + pct(helpP) + '</div><div class="l">' + esc(T("gTiles")[3]) + "</div></div></div>" +
+      '<div class="tile"><div class="v accent">' + hr(SV.total) + '</div><div class="l">' + esc(T("gTileS")) + " · " + esc(fmt(T("gPerPerson"), { r: hr([SV.total[0] / responses.length, SV.total[1] / responses.length]) })) + "</div></div></div>" +
       '<div class="card"><h3>' + esc(T("cDirs")) + '</h3><p class="sub">' + esc(T("cDirsSub")) + '</p><div class="levers">' + dirs.join("") + "</div></div>" +
+      groupSavings(G, min, responses.length) +
       '<div class="card"><h3>' + esc(T("cTime")) + '</h3><p class="sub">' + esc(fmt(T("cTimeSub"), { min: min })) + "</p>" + catLegend() +
         '<div class="bars">' + timeRows.join("") + "</div></div>" +
       '<div class="card"><h3>' + esc(T("cCand")) + '</h3><p class="sub">' + esc(T("cCandSub")) + "</p>" + alist(cand.slice(0, 10)) + "</div>" +
@@ -1504,6 +1627,39 @@
       '<div class="card"><h3>' + esc(T("cConc")) + '</h3><p class="sub">' + esc(T("cShareSub")) + "</p>" + audienceLegend(nt, nd) + pairRows(T("concerns"), coT, coD, nd > 0) + "</div>" +
       (nt ? '<div class="card"><h3>' + esc(T("cTrain")) + '</h3><p class="sub">' + esc(T("cTrainSub")) + "</p>" + pairRows(T("train"), trT, [], false) + "</div>" : "") +
       '<div class="card"><h3>' + esc(T("cReady")) + '</h3><div style="overflow-x:auto">' + ready + "</div></div>";
+  }
+
+  function groupSavings(G, min, n) {
+    var rows = [];
+    G.rows.forEach(function (row) { if (row.list.length >= min) rows.push({ name: row.name, list: row.list }); });
+    if (G.dirs.length) rows.push({ name: T("cLead"), list: G.dirs });
+    var data = rows.map(function (row) {
+      var acts = []; row.list.forEach(function (r) { acts = acts.concat(r.acts); });
+      return { name: row.name, n: row.list.length, s: savingsOf(acts) };
+    });
+    var max = 0; data.forEach(function (d) { max = Math.max(max, d.s.hours); });
+    var bars = data.map(function (d) {
+      var parts = [
+        { lo: d.s.agent[0], hi: d.s.agent[1], v: "--c-auto", tip: T("helpAgent") + " · " + hr(d.s.agent, true) },
+        { lo: d.s.assistant[0], hi: d.s.assistant[1], v: "--c-aug", tip: T("helpAssist") + " · " + hr(d.s.assistant, true) }
+      ];
+      return '<div class="bar-row"><div class="name">' + esc(d.name) + "<small>" + esc(fmt(T("gPerPerson"), { r: hr([d.s.total[0] / d.n, d.s.total[1] / d.n]) })) + "</small></div>" +
+        '<div class="bar-line">' + saveBar(parts, d.s.hours, max || 1) + '<span class="val">' + esc(hr(d.s.total)) + "</span></div>" +
+        '<div class="breakdown"><span>' + esc(T("helpAgent")) + " " + esc(hr(d.s.agent)) + "</span><span>" + esc(T("helpAssist")) + " " + esc(hr(d.s.assistant)) + "</span><span>" + esc(fmt(T("sOf"), { h: h1(d.s.hours) })) + "</span></div></div>";
+    }).join("");
+    // Biggest savers: activity text only from groups that reach the minimum size.
+    var items = [];
+    G.eligible.forEach(function (e) { e.r.acts.forEach(function (x) { if (helpType(x) !== "human") items.push({ x: x, g: e.g, v: savedOf(x) }); }); });
+    items.sort(function (a, b) { return b.v[1] - a.v[1]; });
+    var top = items.slice(0, 8).map(function (m) {
+      return '<li><span class="a-n">' + esc(m.x.n) + '</span><span class="a-h">' + esc(fmt(T("sSaves"), { r: hr(m.v, true) })) + "</span>" +
+        '<span class="a-m">' + helpChip(m.x) + (m.g ? "<span>" + esc(m.g) + "</span>" : "") + "</span></li>";
+    }).join("");
+    return '<div class="card"><h3>' + esc(T("cSave")) + '</h3><p class="sub">' + esc(fmt(T("cSaveSub"), { min: min })) + "</p>" + helpLegend() +
+      (bars ? '<div class="bars">' + bars + "</div>" : '<p class="muted" style="font-size:0.9rem">' + esc(T("cNone")) + "</p>") +
+      '<h4 style="margin-top:1.6rem">' + esc(T("cSaveTop")) + '</h4><p class="sub">' + esc(T("cSaveTopSub")) + "</p>" +
+      (top ? '<ul class="alist">' + top + "</ul>" : '<p class="muted" style="font-size:0.9rem">' + esc(T("cNone")) + "</p>") +
+      '<p class="method">' + esc(T("sMethod")) + "</p></div>";
   }
 
   function liveSession() { return LIVE_SRC || SESSION; }
@@ -1959,13 +2115,13 @@
   }
   function activitiesCsv(list) {
     var cols = ["respondent_id", "form", "role_group", "activity_no", "activity", "hours_per_week_bracket", "hours_per_week_estimate",
-      "same_way", "value", "error_consequence", "confidential", "wants_to_lighten", "proposed_category", "validated_category"];
+      "same_way", "value", "error_consequence", "confidential", "wants_to_lighten", "proposed_category", "ai_help", "hours_saved_low", "hours_saved_high", "validated_category"];
     var lines = [cols.join(",")];
     list.forEach(function (r) {
       r.acts.forEach(function (x, i) {
         lines.push([r.id, r.f === "t" ? "team" : "leadership", r.f === "d" ? T("cLead") : (r.role || T("prefNot")), i + 1, x.n,
           pick("hours", x.h), HOURS_MID[x.h], pick("same", x.s), pick("value", x.v), pick("err", x.e), pick("conf", x.c),
-          pick("lighten", x.w), T(CAT_LABEL[classify(x)]), ""].map(csvCell).join(","));
+          pick("lighten", x.w), T(CAT_LABEL[classify(x)]), T(HELP_LABEL[helpType(x)]), savedOf(x)[0], savedOf(x)[1], ""].map(csvCell).join(","));
       });
     });
     return lines.join("\n");
