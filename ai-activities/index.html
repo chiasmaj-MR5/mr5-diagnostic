@@ -1,0 +1,1056 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Activity Diagnostic</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&amp;family=Instrument+Sans:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@400;600&amp;display=swap">
+<style>
+  :root {
+    --bg: #F6F3EF; --surface: #FDFBF8; --surface-2: #EFEAE3;
+    --ink: #26221E; --ink-2: #5C554D; --ink-3: #8A827A;
+    --line: #DDD6CC; --line-strong: #C4BBAE;
+    --accent: #B4432A; --accent-ink: #FFFFFF; --accent-soft: rgba(180, 67, 42, 0.10);
+    --track: #E7E1D8;
+    --shadow: 0 1px 2px rgba(38, 34, 30, 0.05), 0 8px 28px rgba(38, 34, 30, 0.07);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #191817; --surface: #211F1E; --surface-2: #2A2725;
+      --ink: #ECE7E0; --ink-2: #B3ACA3; --ink-3: #7D766D;
+      --line: #363330; --line-strong: #4A4540;
+      --accent: #E0664A; --accent-ink: #1B1210; --accent-soft: rgba(224, 102, 74, 0.13);
+      --track: #2E2B29;
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 28px rgba(0, 0, 0, 0.35);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #191817; --surface: #211F1E; --surface-2: #2A2725;
+    --ink: #ECE7E0; --ink-2: #B3ACA3; --ink-3: #7D766D;
+    --line: #363330; --line-strong: #4A4540;
+    --accent: #E0664A; --accent-ink: #1B1210; --accent-soft: rgba(224, 102, 74, 0.13);
+    --track: #2E2B29;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 28px rgba(0, 0, 0, 0.35);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: "Instrument Sans", "Helvetica Neue", Arial, sans-serif;
+    font-size: 16px; line-height: 1.55; -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 2.5rem 1rem 5rem; position: relative; }
+
+  .lang-switch {
+    position: absolute; top: 2.3rem; right: 1rem;
+    display: flex; border: 1px solid var(--line-strong); border-radius: 999px;
+    overflow: hidden; background: var(--surface);
+  }
+  .lang-switch button {
+    font: inherit; font-size: 0.74rem; font-weight: 600; letter-spacing: 0.06em;
+    padding: 0.32rem 0.75rem; border: none; background: transparent; color: var(--ink-3); cursor: pointer;
+  }
+  .lang-switch button.active { background: var(--ink); color: var(--bg); cursor: default; }
+  .lang-switch button:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+
+  .eyebrow {
+    font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--ink-3); font-weight: 600; margin: 0 0 0.75rem; padding-right: 7rem;
+  }
+  .eyebrow .mark { color: var(--accent); }
+  h1, h2, h3 { font-family: "Fraunces", Georgia, serif; text-wrap: balance; margin: 0; }
+  h1 { font-size: clamp(1.9rem, 5vw, 2.7rem); font-weight: 600; line-height: 1.12; letter-spacing: -0.01em; }
+  h2 { font-size: 1.4rem; font-weight: 600; }
+  h3 { font-size: 1.05rem; font-weight: 600; }
+  p { margin: 0; }
+  .lede { color: var(--ink-2); font-size: 1.04rem; max-width: 60ch; margin-top: 1rem; }
+  ul.points { margin: 1.4rem 0 0; padding-left: 1.2rem; color: var(--ink-2); max-width: 60ch; }
+  ul.points li { margin-bottom: 0.35rem; }
+
+  .btn {
+    display: inline-flex; align-items: center; gap: 0.5em;
+    font: inherit; font-weight: 600; font-size: 0.95rem; padding: 0.7rem 1.5rem;
+    border-radius: 6px; border: 1px solid transparent; cursor: pointer;
+    background: var(--accent); color: var(--accent-ink); transition: filter 120ms ease;
+  }
+  .btn:hover { filter: brightness(1.08); }
+  .btn:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .btn[disabled] { opacity: 0.45; cursor: not-allowed; }
+  .btn.ghost { background: transparent; color: var(--ink-2); border-color: var(--line-strong); }
+  .btn.ghost:hover { color: var(--ink); filter: none; border-color: var(--ink-3); }
+  .btn.small { font-size: 0.84rem; padding: 0.5rem 1rem; }
+  .linklike { background: none; border: none; font: inherit; font-size: 0.86rem; color: var(--ink-3); text-decoration: underline; cursor: pointer; padding: 0; }
+  .linklike:hover { color: var(--ink); }
+
+  .progress { margin: 0 0 2rem; }
+  .progress-steps { display: flex; gap: 0.4rem; margin-bottom: 0.5rem; }
+  .progress-steps .seg { flex: 1; height: 4px; border-radius: 2px; background: var(--track); }
+  .progress-steps .seg.done { background: var(--accent); }
+  .progress-note {
+    font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 0.72rem; color: var(--ink-3);
+    display: flex; justify-content: space-between; gap: 1rem;
+  }
+
+  .s-head { border-left: 3px solid var(--accent); padding-left: 1rem; margin-bottom: 1.4rem; }
+  .s-head p { color: var(--ink-2); font-size: 0.95rem; margin-top: 0.4rem; max-width: 60ch; }
+
+  .q { padding: 1.2rem 0; border-bottom: 1px solid var(--line); }
+  .q:last-child { border-bottom: none; }
+  .q .stmt { font-weight: 500; margin-bottom: 0.7rem; max-width: 62ch; }
+  .q .stmt .opt { font-weight: 400; color: var(--ink-3); font-size: 0.88rem; }
+  .q .help { font-size: 0.84rem; color: var(--ink-3); margin: -0.4rem 0 0.7rem; max-width: 62ch; }
+
+  .choices { display: flex; flex-wrap: wrap; gap: 0.45rem; }
+  .choices.stack { flex-direction: column; align-items: stretch; }
+  .choices input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+  .choices label {
+    display: block; padding: 0.5rem 0.85rem; border: 1px solid var(--line-strong); border-radius: 6px;
+    background: var(--surface); color: var(--ink-2); font-size: 0.92rem; cursor: pointer; user-select: none;
+    transition: border-color 100ms, background 100ms, color 100ms;
+  }
+  .choices label:hover { border-color: var(--ink-3); color: var(--ink); }
+  .choices input:checked + label { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); font-weight: 600; }
+  .choices input:focus-visible + label { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .choices input:disabled + label { opacity: 0.4; cursor: not-allowed; }
+  .choices.scale label { min-width: 2.6rem; text-align: center; font-family: "IBM Plex Mono", ui-monospace, monospace; }
+  .scale-caps { display: flex; justify-content: space-between; font-size: 0.76rem; color: var(--ink-3); max-width: 16.5rem; margin-top: 0.3rem; }
+
+  input[type="text"], textarea, select {
+    width: 100%; font: inherit; font-size: 0.95rem; padding: 0.55rem 0.75rem;
+    border: 1px solid var(--line-strong); border-radius: 6px; background: var(--surface); color: var(--ink);
+  }
+  textarea { min-height: 4.6em; resize: vertical; }
+  input:focus-visible, textarea:focus-visible, select:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; border-color: var(--accent); }
+  input::placeholder, textarea::placeholder { color: var(--ink-3); opacity: 1; }
+  .other-input { margin-top: 0.5rem; }
+
+  .act {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 10px;
+    padding: 1.1rem 1.2rem 0.4rem; margin-top: 1.2rem; box-shadow: var(--shadow);
+  }
+  .act-head { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; }
+  .act-tag {
+    font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 0.72rem; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--accent); font-weight: 600;
+  }
+  .act .q { padding: 0.9rem 0; }
+  .act .q .stmt { font-size: 0.95rem; margin-bottom: 0.55rem; }
+  .act .choices label { font-size: 0.86rem; padding: 0.42rem 0.7rem; }
+  .add-row { margin-top: 1.2rem; display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
+  .add-row .hint { font-size: 0.84rem; color: var(--ink-3); }
+
+  .agree-row { padding: 0.9rem 0; border-bottom: 1px dashed var(--line); }
+  .agree-row:last-child { border-bottom: none; }
+  .agree-row .stmt { margin-bottom: 0.55rem; }
+  .agree-row .choices label { font-size: 0.82rem; padding: 0.4rem 0.6rem; }
+
+  .nav-row { display: flex; justify-content: space-between; align-items: center; margin-top: 2rem; gap: 1rem; flex-wrap: wrap; }
+  .nav-row .hint { font-size: 0.82rem; color: var(--ink-3); flex: 1; text-align: center; min-width: 10rem; }
+
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 1.4rem; margin-top: 1.4rem; box-shadow: var(--shadow); }
+  .card > h3 { margin-bottom: 0.35rem; }
+  .card .sub { font-size: 0.86rem; color: var(--ink-3); margin-bottom: 1rem; }
+  .notice { margin-top: 1.4rem; padding: 0.9rem 1.2rem; border-radius: 8px; background: var(--accent-soft); color: var(--ink-2); font-size: 0.92rem; max-width: 62ch; }
+  .notice strong { color: var(--ink); }
+  .code-box {
+    font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 0.72rem; padding: 0.6rem;
+    border: 1px solid var(--line-strong); border-radius: 6px; background: var(--bg); color: var(--ink-2);
+    word-break: break-all; margin-top: 0.6rem; user-select: all; max-height: 8em; overflow-y: auto;
+  }
+  .btn-row { display: flex; gap: 0.7rem; flex-wrap: wrap; margin-top: 1rem; }
+  .msg { font-size: 0.84rem; color: var(--ink-3); margin-top: 0.5rem; min-height: 1.2em; }
+
+  .tbl-scroll { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; font-size: 0.86rem; }
+  th, td { text-align: left; padding: 0.45rem 0.6rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { font-weight: 600; color: var(--ink-2); font-size: 0.78rem; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; font-family: "IBM Plex Mono", ui-monospace, monospace; }
+  .muted { color: var(--ink-3); }
+  .field { margin-bottom: 0.9rem; }
+  .field label { display: block; font-size: 0.82rem; font-weight: 600; color: var(--ink-2); margin-bottom: 0.3rem; }
+
+  .foot { margin-top: 3rem; padding-top: 1.2rem; border-top: 1px solid var(--line); font-size: 0.8rem; color: var(--ink-3); max-width: 62ch; }
+  .screen { animation: fade 240ms ease; }
+  @keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) { .screen { animation: none; } }
+  @media (max-width: 520px) { .eyebrow { padding-right: 6rem; } .nav-row .hint { order: 3; flex-basis: 100%; } }
+  @media print { .btn, .nav-row, .lang-switch, .linklike { display: none !important; } body { background: #fff; color: #111; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="lang-switch" role="group" aria-label="Language / Langue">
+    <button id="lang-en" class="active" aria-pressed="true">EN</button>
+    <button id="lang-fr" aria-pressed="false">FR</button>
+  </div>
+  <main id="app"></main>
+  <p class="foot" id="foot"></p>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  // Per-engagement settings come from the link, so this page names no client:
+  //   ?org=Name&form=team|direction&lang=en|fr&roles=Role A|Role B&min=5&to=facilitator@example.com
+  //   ?view=facilitator — link builder and response compiler
+  var qp = new URLSearchParams(location.search);
+  var ORG = (qp.get("org") || "").trim();
+  var FORM = qp.get("form") === "direction" ? "d" : "t";
+  var VIEW = qp.get("view") === "facilitator" ? "facilitator" : "survey";
+  var MIN_GROUP = Math.max(2, parseInt(qp.get("min"), 10) || 5);
+  var TO = (qp.get("to") || "chiasmaj@gmail.com").trim();
+  var ROLES_PARAM = (qp.get("roles") || "").split("|").map(function (s) { return s.trim(); }).filter(Boolean);
+  var CODE_PREFIX = "AIA1.";
+  var STORE_KEY = "aia-draft:" + FORM + ":" + ORG;
+
+  var lang = qp.get("lang") === "fr" ? "fr" : "en";
+
+  // Weekly-hours brackets → midpoint used for estimates (flagged as estimates in exports).
+  var HOURS_MID = [0.5, 2, 4, 7.5, 12];
+
+  var I18N = {
+    en: {
+      eyebrowT: "AI activity diagnostic · Team questionnaire",
+      eyebrowD: "AI activity diagnostic · Leadership questionnaire",
+      titleT: "How do you spend your time at work?",
+      titleD: "Before the on-site diagnostic",
+      ledeT: "This takes about 15 minutes. We want to understand what you spend your time on, which tasks feel most useful and which you would like to lighten — to find where AI could take over repetitive work so you can spend more time on what matters: clients, higher-value work and the development of {org}.",
+      ledeD: "This takes about 15 minutes. It mostly gathers facts (teams, tools, data, rules) that may need a quick check. Questions about vision and direction will be discussed with you in the interview.",
+      pointsT: [
+        "This is not an evaluation of your work or performance.",
+        "It is anonymous: no name, no email address, no login.",
+        "Results are reported by group of roles, never for fewer than {min} people.",
+        "Estimates are fine — an order of magnitude is perfect.",
+        "Do not enter personal information about clients, colleagues or third parties."
+      ],
+      pointsD: [
+        "Your answers carry your name for follow-up, but are reported without attribution.",
+        "Do not enter personal information about clients, employees or third parties.",
+        "Do not attach documents; we will collect them during the diagnostic if needed."
+      ],
+      start: "Start", resume: "Resume where I left off", restart: "Start over",
+      back: "Back", next: "Next", finish: "Finish",
+      stepOf: "Step {n} of {t}",
+      required: "Answer the questions marked * to continue.",
+      optional: "(optional)",
+      upTo: "Up to {n} choices.",
+      other: "Other", otherPh: "Please specify",
+      prefNot: "Prefer not to answer",
+      ourOrg: "the organization",
+
+      sRole: "Your role",
+      qRole: "What is your main role?",
+      qRoleHelp: "Choose the group that best matches your work.",
+
+      sActs: "Your main activities",
+      sActsSubT: "Think of a typical work week. Describe {lo} to {hi} activities that take up most of your time — one card each, about a minute per card.",
+      sActsSubD: "Describe {lo} to {hi} of your own main activities, using the same card as your teams.",
+      actEx: "Use a verb and an object, e.g. “prepare the monthly reports”, “answer client requests by email”, “enter invoices”.",
+      act: "Activity {n}", remove: "Remove",
+      addAct: "+ Add another activity", actsLeft: "{n} of {hi} activities",
+      aName: "Describe the activity", aNamePh: "verb + object",
+      aHours: "Time spent per week, on average",
+      aHoursHelp: "For a monthly task, divide the month’s time by 4.",
+      hours: ["Under 1 h", "1–3 h", "3–5 h", "5–10 h", "Over 10 h"],
+      aSame: "Is it always done the same way?",
+      same: ["No, every case is different", "Partly", "Yes, almost always the same way"],
+      aValue: "What effect does it have on clients or on {org}’s results?",
+      value: ["Low (support task)", "Medium", "High (direct effect on clients, revenue or quality)"],
+      aErr: "If an error slips in, the consequences are…",
+      err: ["Minor and easy to fix", "Moderate", "Serious (financial, legal or reputational)"],
+      aConf: "Does it involve confidential information (clients, employees)?",
+      conf: ["Yes", "No", "Not sure"],
+      aLighten: "Would you like to lighten this activity?",
+      lighten: ["Yes", "Partly", "No"],
+
+      sSummary: "Looking back at your activities",
+      qCover: "Roughly what share of your work week do the activities you described represent?",
+      cover: ["Less than a quarter", "A quarter to half", "Half to three quarters", "More than three quarters"],
+      qGive: "Which of these activities would you most like to hand over to an assistant? Why?",
+      qKeep: "Which one must absolutely stay in your hands? Why?",
+
+      sDaily: "Your day-to-day work",
+      agreeIntro: "How much do you agree with each statement?",
+      agree: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree", "Don’t know"],
+      stRekey: "I often have to enter the same information in several places.",
+      stFind: "I easily find the information I need.",
+      stChange: "At {org}, changes in how we work are well explained and supported.",
+      stTeams: "Our teams generally welcome changes in how they work.",
+      qReinvestT: "If you gained a few hours a week, what would you spend them on first?",
+      qReinvestD: "If your teams gained time, what would you want them to spend it on first?",
+      reinvest: ["Client relationships", "Higher-value work (analysis, advice, problem-solving)", "Strategy and business development", "Quality and continuous improvement", "Training and skills development"],
+
+      sAI: "AI and you",
+      qUsed: "Have you ever used an AI tool (e.g. ChatGPT, Copilot, Gemini)?",
+      used: ["Never", "Yes, personally", "Yes, at work", "Yes, both"],
+      qFeel: "The idea of using AI in my work feels…",
+      feelLo: "Worrying", feelHi: "Exciting",
+      qConcernT: "What concerns you most about AI?",
+      qConcernD: "What are your main concerns about AI?",
+      concerns: ["Errors or inaccurate information", "Data confidentiality (clients, employees)", "Effect on roles and jobs", "Lack of training or support", "Loss of human contact (clients, colleagues)", "Dependence on a tool or vendor", "No particular concern"],
+      qFears: "Any questions or concerns about AI and its effect on your role you would like to add?",
+      qTrain: "Which topics would you most like training on?",
+      train: ["Writing", "Finding information", "Data analysis", "Automating tasks", "Good practices and risks"],
+
+      sProfile: "Profile and scope",
+      qName: "Name and title",
+      qScope: "Which roles, teams or functions report to you?",
+      qScopeHelp: "If you see fit, add the approximate number of people in each.",
+      qTop: "For each function you oversee, which 3 activities take up most of the team’s time?",
+      qExclude: "Are there any functions or activities to leave out of this exercise for now?",
+      sAdoption: "Conditions for adoption",
+      qTools: "Are AI tools already used at {org}?",
+      tools: ["Yes, officially", "Yes, informally", "Both", "No", "Not sure"],
+      qToolsWhich: "If so, which ones and for what?",
+      qData: "What data or indicators does {org} already track (volumes, turnaround times, processing times) that could help estimate time saved?",
+      qDataHelp: "Describe them only — please don’t attach anything.",
+      qOblig: "What legal, contractual or regulatory obligations govern the use of {org}’s or its clients’ data?",
+      qObligHelp: "For example: privacy, client requirements, industry standards.",
+      qRules: "Does {org} have written rules on the use of digital tools and data?",
+      rules: ["Yes", "Partly", "No", "Not sure"],
+      qWho: "Who currently decides on adopting a new tool or changing a role?",
+      qChamp: "Who at {org} could act as an AI champion or point person?",
+
+      doneEyebrow: "Done — one last step",
+      doneTitle: "Thank you!",
+      doneLede: "Send the response code below to MR5 InnovAction. It contains your answers and no name. Your answers count once MR5 adds the code to the results.",
+      doneAnon: "If you send it by email, only MR5 sees who sent it. {org} receives grouped results only, never for fewer than {min} people.",
+      codeLabel: "Your response code",
+      email: "Send by email", copy: "Copy code", copied: "Copied.", copyFail: "Select the code above and copy it.",
+      emailSubject: "AI activity diagnostic – response code",
+      emailBody: "Here is my response code{org}:\n\n{code}\n",
+      editAgain: "Change my answers",
+
+      footer: "MR5 InnovAction Solutions · AI activity diagnostic. Answers are used only for this engagement.",
+
+      fEyebrow: "Facilitator",
+      fTitle: "Links and results",
+      fLinks: "Create the survey links",
+      fLinksSub: "Settings travel in the link, so nothing about the client is stored on this page.",
+      fOrg: "Organization name", fRoles: "Role groups (one per line — each should have at least the minimum group size)",
+      fMin: "Minimum group size", fTo: "Email address that receives response codes", fLang: "Default language",
+      fTeamLink: "Team questionnaire (anonymous)", fDirLink: "Leadership questionnaire",
+      fCompile: "Compile response codes",
+      fCompileSub: "Paste the codes you received (several at once works). Nothing leaves this browser.",
+      fPaste: "Paste codes here",
+      fRead: "Read codes", fCsvR: "Download respondents (CSV)", fCsvA: "Download activities (CSV)",
+      fFound: "{n} valid responses ({t} team, {d} leadership). {bad} code(s) could not be read. {dup} duplicate(s) ignored.",
+      fByRole: "Weekly hours by proposed category",
+      fByRoleSub: "Hours are bracket midpoints (estimates). Categories follow the decision tree and must be validated by MR5 and leadership. Groups under the minimum size are pooled.",
+      fRole: "Role group", fResp: "Resp.", fActs: "Activities", fAuto: "Automatable", fAug: "Augmented", fHum: "Human to keep", fTot: "Total h/wk",
+      fPooled: "Pooled (groups under {min})", fLeaders: "Leadership",
+      fCompare: "Leadership vs teams",
+      fCompareSub: "Share of respondents choosing each option.",
+      fItem: "Item", fTeams: "Teams", fDir: "Leadership",
+      fChangeAvg: "“Changes are well explained and supported” — average agreement (1–5)",
+      catAuto: "Automatable by AI", catAug: "Augmented by AI", catAugData: "Augmented — check data rules", catHum: "Human to keep"
+    },
+    fr: {
+      eyebrowT: "Diagnostic IA des activités · Questionnaire Équipes",
+      eyebrowD: "Diagnostic IA des activités · Questionnaire Direction",
+      titleT: "À quoi consacrez-vous votre temps au travail?",
+      titleD: "Avant le diagnostic sur place",
+      ledeT: "Ce questionnaire prend environ 15 minutes. Nous voulons comprendre à quoi vous consacrez votre temps, quelles tâches vous semblent les plus utiles et lesquelles vous aimeriez alléger — afin de repérer où l’IA pourrait prendre en charge des tâches répétitives et vous laisser plus de temps pour ce qui compte : les clients, les tâches à valeur ajoutée et le développement de {org}.",
+      ledeD: "Ce questionnaire prend environ 15 minutes. Il rassemble surtout des faits (équipes, outils, données, règles) qui demandent parfois une vérification. Les questions de vision et d’orientation seront abordées avec vous en entrevue.",
+      pointsT: [
+        "Il ne s’agit pas d’une évaluation de votre travail ni de votre performance.",
+        "Le questionnaire est anonyme : aucun nom, aucune adresse courriel, aucune connexion.",
+        "Les résultats sont présentés par groupe de fonctions, jamais pour moins de {min} personnes.",
+        "Des estimations suffisent : un ordre de grandeur est parfait.",
+        "N’inscrivez aucun renseignement personnel sur des clients, des collègues ou des tiers."
+      ],
+      pointsD: [
+        "Vos réponses sont nominatives pour permettre le suivi, mais elles sont rapportées sans attribution.",
+        "N’inscrivez aucun renseignement personnel sur des clients, des employés ou des tiers.",
+        "Ne joignez aucun document : nous les recueillerons au besoin lors du diagnostic."
+      ],
+      start: "Commencer", resume: "Reprendre où j’en étais", restart: "Recommencer",
+      back: "Retour", next: "Suivant", finish: "Terminer",
+      stepOf: "Étape {n} sur {t}",
+      required: "Répondez aux questions marquées d’un * pour continuer.",
+      optional: "(facultatif)",
+      upTo: "{n} choix au maximum.",
+      other: "Autre", otherPh: "Précisez",
+      prefNot: "Je préfère ne pas répondre",
+      ourOrg: "l’organisation",
+
+      sRole: "Votre fonction",
+      qRole: "Quelle est votre fonction principale?",
+      qRoleHelp: "Choisissez le groupe qui correspond le mieux à votre travail.",
+
+      sActs: "Vos principales activités",
+      sActsSubT: "Pensez à une semaine de travail habituelle. Décrivez de {lo} à {hi} activités qui occupent l’essentiel de votre temps — une fiche par activité, environ une minute chacune.",
+      sActsSubD: "Décrivez de {lo} à {hi} de vos principales activités personnelles, avec la même fiche que vos équipes.",
+      actEx: "Utilisez un verbe et un objet, par exemple : « préparer les rapports mensuels », « répondre aux demandes des clients par courriel », « saisir les factures ».",
+      act: "Activité {n}", remove: "Retirer",
+      addAct: "+ Ajouter une autre activité", actsLeft: "{n} activités sur {hi}",
+      aName: "Décrivez l’activité", aNamePh: "verbe + objet",
+      aHours: "Temps consacré par semaine, en moyenne",
+      aHoursHelp: "Pour une activité mensuelle, divisez le temps du mois par 4.",
+      hours: ["Moins de 1 h", "1 à 3 h", "3 à 5 h", "5 à 10 h", "Plus de 10 h"],
+      aSame: "Se fait-elle toujours de la même façon?",
+      same: ["Non, chaque cas est différent", "En partie", "Oui, presque toujours de la même façon"],
+      aValue: "Quel effet a-t-elle sur les clients ou les résultats de {org}?",
+      value: ["Faible (tâche de soutien)", "Moyen", "Élevé (effet direct sur les clients, les revenus ou la qualité)"],
+      aErr: "Si une erreur s’y glisse, les conséquences sont…",
+      err: ["Faibles et faciles à corriger", "Moyennes", "Importantes (financières, légales ou de réputation)"],
+      aConf: "Touche-t-elle des renseignements confidentiels (clients, employés)?",
+      conf: ["Oui", "Non", "Je ne sais pas"],
+      aLighten: "Aimeriez-vous alléger cette activité?",
+      lighten: ["Oui", "En partie", "Non"],
+
+      sSummary: "Bilan de vos activités",
+      qCover: "Les activités que vous avez décrites représentent environ quelle part de votre semaine de travail?",
+      cover: ["Moins du quart", "Du quart à la moitié", "De la moitié aux trois quarts", "Plus des trois quarts"],
+      qGive: "Parmi ces activités, laquelle aimeriez-vous le plus confier à un assistant? Pourquoi?",
+      qKeep: "Laquelle doit absolument rester entre vos mains? Pourquoi?",
+
+      sDaily: "Votre quotidien au travail",
+      agreeIntro: "Indiquez votre degré d’accord avec chaque énoncé.",
+      agree: ["Pas du tout d’accord", "Plutôt en désaccord", "Neutre", "Plutôt d’accord", "Tout à fait d’accord", "Ne sais pas"],
+      stRekey: "Il m’arrive souvent de saisir la même information à plusieurs endroits.",
+      stFind: "Je trouve facilement l’information dont j’ai besoin.",
+      stChange: "À {org}, les changements dans notre façon de travailler sont bien expliqués et accompagnés.",
+      stTeams: "Nos équipes accueillent généralement bien les changements dans leur façon de travailler.",
+      qReinvestT: "Si vous gagniez quelques heures par semaine, à quoi les consacreriez-vous en priorité?",
+      qReinvestD: "Si vos équipes gagnaient du temps, à quoi souhaiteriez-vous qu’elles le consacrent en priorité?",
+      reinvest: ["Relation avec les clients", "Tâches à plus forte valeur (analyse, conseil, résolution de problèmes)", "Stratégie et développement des affaires", "Qualité et amélioration continue", "Formation et développement des compétences"],
+
+      sAI: "L’IA et vous",
+      qUsed: "Avez-vous déjà utilisé un outil d’IA (par exemple ChatGPT, Copilot, Gemini)?",
+      used: ["Jamais", "Oui, à titre personnel", "Oui, au travail", "Oui, les deux"],
+      qFeel: "L’idée d’utiliser l’IA dans mon travail me semble…",
+      feelLo: "Préoccupante", feelHi: "Stimulante",
+      qConcernT: "Qu’est-ce qui vous préoccupe le plus au sujet de l’IA?",
+      qConcernD: "Quelles sont vos principales préoccupations à l’égard de l’IA?",
+      concerns: ["Erreurs ou informations inexactes", "Confidentialité des données (clients, employés)", "Effet sur les rôles et les emplois", "Manque de formation ou d’accompagnement", "Perte du contact humain (clients, collègues)", "Dépendance envers un outil ou un fournisseur", "Aucune préoccupation particulière"],
+      qFears: "Avez-vous des questions ou des craintes à préciser au sujet de l’IA et de son effet sur votre rôle?",
+      qTrain: "Sur quels sujets aimeriez-vous être formé en priorité?",
+      train: ["Rédaction", "Recherche d’information", "Analyse de données", "Automatisation de tâches", "Bonnes pratiques et risques"],
+
+      sProfile: "Profil et périmètre",
+      qName: "Nom et titre",
+      qScope: "Quelles fonctions, équipes ou quels rôles relèvent de vous?",
+      qScopeHelp: "Indiquez, si vous le jugez approprié, le nombre approximatif de personnes pour chacun.",
+      qTop: "Pour chaque fonction sous votre responsabilité, quelles sont les 3 activités qui consomment le plus de temps des équipes?",
+      qExclude: "Y a-t-il des fonctions ou des activités à exclure de la démarche pour l’instant?",
+      sAdoption: "Conditions d’adoption",
+      qTools: "Des outils d’IA sont-ils déjà utilisés à {org}?",
+      tools: ["Oui, officiellement", "Oui, de façon informelle", "Les deux", "Non", "Je ne sais pas"],
+      qToolsWhich: "Si oui, lesquels et pour quelles activités?",
+      qData: "Quelles données ou quels indicateurs {org} suit-il déjà (volumes, délais, temps de traitement) et pourrait-il fournir pour estimer le temps libéré?",
+      qDataHelp: "Décrivez-les seulement; ne joignez rien.",
+      qOblig: "Quelles obligations légales, contractuelles ou réglementaires encadrent l’utilisation des données de {org} ou de ses clients?",
+      qObligHelp: "Par exemple : vie privée, exigences de clients, normes de l’industrie.",
+      qRules: "{org} dispose-t-il de règles écrites sur l’utilisation des outils numériques et des données?",
+      rules: ["Oui", "En partie", "Non", "Je ne sais pas"],
+      qWho: "Qui décide aujourd’hui de l’adoption d’un nouvel outil ou d’un changement de rôle?",
+      qChamp: "Qui, à {org}, pourrait agir comme personne-relais ou champion de l’IA?",
+
+      doneEyebrow: "Terminé — une dernière étape",
+      doneTitle: "Merci!",
+      doneLede: "Envoyez le code de réponse ci-dessous à MR5 InnovAction. Il contient vos réponses et aucun nom. Vos réponses comptent dès que MR5 ajoute le code aux résultats.",
+      doneAnon: "Si vous l’envoyez par courriel, seule MR5 voit qui l’a envoyé. {org} reçoit uniquement des résultats regroupés, jamais pour moins de {min} personnes.",
+      codeLabel: "Votre code de réponse",
+      email: "Envoyer par courriel", copy: "Copier le code", copied: "Copié.", copyFail: "Sélectionnez le code ci-dessus et copiez-le.",
+      emailSubject: "Diagnostic IA des activités – code de réponse",
+      emailBody: "Voici mon code de réponse{org} :\n\n{code}\n",
+      editAgain: "Modifier mes réponses",
+
+      footer: "MR5 InnovAction Solutions · Diagnostic IA des activités. Les réponses servent uniquement à ce mandat.",
+
+      fEyebrow: "Animation",
+      fTitle: "Liens et résultats",
+      fLinks: "Créer les liens du questionnaire",
+      fLinksSub: "Les paramètres voyagent dans le lien : aucune information sur le client n’est enregistrée dans cette page.",
+      fOrg: "Nom de l’organisation", fRoles: "Groupes de fonctions (un par ligne — chacun devrait atteindre la taille minimale)",
+      fMin: "Taille minimale d’un groupe", fTo: "Adresse courriel qui reçoit les codes", fLang: "Langue par défaut",
+      fTeamLink: "Questionnaire Équipes (anonyme)", fDirLink: "Questionnaire Direction",
+      fCompile: "Compiler les codes de réponse",
+      fCompileSub: "Collez les codes reçus (plusieurs à la fois fonctionne). Rien ne quitte ce navigateur.",
+      fPaste: "Collez les codes ici",
+      fRead: "Lire les codes", fCsvR: "Télécharger les répondants (CSV)", fCsvA: "Télécharger les activités (CSV)",
+      fFound: "{n} réponses valides ({t} équipes, {d} direction). {bad} code(s) illisible(s). {dup} doublon(s) ignoré(s).",
+      fByRole: "Heures par semaine selon la catégorie proposée",
+      fByRoleSub: "Les heures sont le milieu de chaque tranche (estimations). Les catégories suivent l’arbre de décision et doivent être validées par MR5 et la direction. Les groupes sous la taille minimale sont regroupés.",
+      fRole: "Groupe", fResp: "Rép.", fActs: "Activités", fAuto: "Automatisable", fAug: "Augmentée", fHum: "Humaine à garder", fTot: "Total h/sem.",
+      fPooled: "Regroupés (groupes de moins de {min})", fLeaders: "Direction",
+      fCompare: "Direction et équipes",
+      fCompareSub: "Part des répondants ayant choisi chaque option.",
+      fItem: "Élément", fTeams: "Équipes", fDir: "Direction",
+      fChangeAvg: "« Les changements sont bien expliqués et accompagnés » — accord moyen (1 à 5)",
+      catAuto: "Automatisable par l’IA", catAug: "Augmentée par l’IA", catAugData: "Augmentée — vérifier les règles de données", catHum: "Humaine à garder"
+    }
+  };
+
+  var DEFAULT_ROLES = {
+    en: ["Client service", "Operations", "Administration and finance", "Sales and business development", "Management"],
+    fr: ["Service à la clientèle", "Opérations", "Administration et finances", "Ventes et développement des affaires", "Gestion"]
+  };
+
+  // ---------- helpers ----------
+  function T(k) { return I18N[lang][k]; }
+  function fmt(s, o) {
+    return String(s).replace(/\{(\w+)\}/g, function (m, k) { return o && o[k] != null ? o[k] : m; });
+  }
+  function orgName() { return ORG || T("ourOrg"); }
+  function tx(k, o) { return fmt(T(k), Object.assign({ org: esc(orgName()), min: MIN_GROUP }, o || {})); }
+  function esc(s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+  function $(id) { return document.getElementById(id); }
+  function lsGet(k) { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } }
+  function lsSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+  function lsDel(k) { try { localStorage.removeItem(k); } catch (e) {} }
+  function roles() { return ROLES_PARAM.length ? ROLES_PARAM : DEFAULT_ROLES[lang]; }
+  function filled(v) { return v != null && v !== "" && !(Array.isArray(v) && !v.length); }
+  function rid() {
+    var a = new Uint8Array(6);
+    (window.crypto || {}).getRandomValues ? crypto.getRandomValues(a) : a.forEach(function (_, i) { a[i] = Math.random() * 256; });
+    return Array.prototype.map.call(a, function (b) { return b.toString(16).padStart(2, "0"); }).join("");
+  }
+  function b64urlEncode(str) {
+    return btoa(unescape(encodeURIComponent(str))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+  }
+  function b64urlDecode(s) {
+    s = s.replace(/-/g, "+").replace(/_/g, "/");
+    while (s.length % 4) s += "=";
+    return decodeURIComponent(escape(atob(s)));
+  }
+
+  // ---------- form definition ----------
+  // Field keys stay short: they end up in the response code.
+  var ACT_FIELDS = [
+    { k: "h", q: "aHours", o: "hours", help: "aHoursHelp" },
+    { k: "s", q: "aSame", o: "same" },
+    { k: "v", q: "aValue", o: "value" },
+    { k: "e", q: "aErr", o: "err" },
+    { k: "c", q: "aConf", o: "conf" },
+    { k: "w", q: "aLighten", o: "lighten" }
+  ];
+
+  var STEPS = {
+    t: [
+      { title: "sRole", qs: [{ k: "role", type: "role", q: "qRole", help: "qRoleHelp", req: true }] },
+      { title: "sActs", sub: "sActsSubT", acts: { lo: 3, hi: 7 } },
+      { title: "sSummary", qs: [
+        { k: "cov", type: "one", q: "qCover", o: "cover", req: true, stack: true },
+        { k: "give", type: "long", q: "qGive" },
+        { k: "keep", type: "long", q: "qKeep" }
+      ] },
+      { title: "sDaily", qs: [
+        { k: "ag", type: "agree", q: "agreeIntro", rows: ["stRekey", "stFind", "stChange"], req: true },
+        { k: "re", type: "many", q: "qReinvestT", o: "reinvest", max: 2, other: true, req: true }
+      ] },
+      { title: "sAI", qs: [
+        { k: "ai", type: "one", q: "qUsed", o: "used", req: true },
+        { k: "feel", type: "scale", q: "qFeel" },
+        { k: "co", type: "many", q: "qConcernT", o: "concerns", max: 3, other: true, req: true },
+        { k: "cq", type: "long", q: "qFears" },
+        { k: "tr", type: "many", q: "qTrain", o: "train", max: 3, other: true, req: true }
+      ] }
+    ],
+    d: [
+      { title: "sProfile", qs: [
+        { k: "nm", type: "short", q: "qName", req: true },
+        { k: "sc", type: "long", q: "qScope", help: "qScopeHelp", req: true },
+        { k: "top", type: "long", q: "qTop", req: true },
+        { k: "ex", type: "long", q: "qExclude" },
+        { k: "re", type: "many", q: "qReinvestD", o: "reinvest", max: 2, other: true, req: true }
+      ] },
+      { title: "sAdoption", qs: [
+        { k: "tl", type: "one", q: "qTools", o: "tools", req: true },
+        { k: "tlw", type: "long", q: "qToolsWhich" },
+        { k: "dt", type: "long", q: "qData", help: "qDataHelp" },
+        { k: "ob", type: "long", q: "qOblig", help: "qObligHelp" },
+        { k: "ru", type: "one", q: "qRules", o: "rules", req: true },
+        { k: "who", type: "short", q: "qWho" },
+        { k: "co", type: "many", q: "qConcernD", o: "concerns", max: 3, other: true, req: true },
+        { k: "ag", type: "agree", q: "agreeIntro", rows: ["stTeams", "stChange"], req: true },
+        { k: "ch", type: "short", q: "qChamp" }
+      ] },
+      { title: "sActs", sub: "sActsSubD", acts: { lo: 3, hi: 5 } }
+    ]
+  };
+
+  // ---------- state ----------
+  var state = null;      // { a: answers, step, done }
+  function freshState() {
+    var lo = STEPS[FORM].filter(function (s) { return s.acts; })[0].acts.lo;
+    var acts = [];
+    for (var i = 0; i < lo; i++) acts.push({});
+    return { step: -1, done: false, a: { acts: acts } };
+  }
+  function save() { lsSet(STORE_KEY, state); }
+
+  // ---------- rendering: survey ----------
+  function renderIntro() {
+    var draft = lsGet(STORE_KEY);
+    var hasDraft = draft && draft.step >= 0;
+    var pts = T(FORM === "t" ? "pointsT" : "pointsD").map(function (p) { return "<li>" + fmt(p, { min: MIN_GROUP }) + "</li>"; }).join("");
+    $("app").innerHTML =
+      '<section class="screen">' +
+      '<p class="eyebrow"><span class="mark">MR5</span> · ' + esc(T(FORM === "t" ? "eyebrowT" : "eyebrowD")) + (ORG ? " · " + esc(ORG) : "") + "</p>" +
+      "<h1>" + esc(T(FORM === "t" ? "titleT" : "titleD")) + "</h1>" +
+      '<p class="lede">' + tx(FORM === "t" ? "ledeT" : "ledeD") + "</p>" +
+      '<ul class="points">' + pts + "</ul>" +
+      '<div class="btn-row" style="margin-top:1.8rem">' +
+      (hasDraft
+        ? '<button class="btn" data-act="resume">' + esc(T("resume")) + '</button><button class="btn ghost" data-act="restart">' + esc(T("restart")) + "</button>"
+        : '<button class="btn" data-act="start">' + esc(T("start")) + "</button>") +
+      "</div></section>";
+  }
+
+  function choiceGroup(name, opts, val, multi, extra) {
+    extra = extra || {};
+    var cls = "choices" + (extra.stack ? " stack" : "") + (extra.scale ? " scale" : "");
+    var atMax = multi && extra.max && Array.isArray(val) && val.length >= extra.max;
+    return '<div class="' + cls + '" role="' + (multi ? "group" : "radiogroup") + '">' + opts.map(function (o, i) {
+      var id = name + "-" + i;
+      var on = multi ? (Array.isArray(val) && val.indexOf(i) >= 0) : val === i;
+      return '<input type="' + (multi ? "checkbox" : "radio") + '" id="' + id + '" name="' + name + '" value="' + i + '"' +
+        (on ? " checked" : "") + (atMax && !on ? " disabled" : "") + '><label for="' + id + '">' + esc(o) + "</label>";
+    }).join("") + "</div>";
+  }
+
+  function qBlock(q, a) {
+    var head = '<p class="stmt" id="lbl-' + q.k + '">' + tx(q.q) + (q.req ? " *" : ' <span class="opt">' + esc(T("optional")) + "</span>") + "</p>" +
+      (q.help ? '<p class="help">' + tx(q.help) + "</p>" : "");
+    var v = a[q.k], body = "";
+    switch (q.type) {
+      case "role":
+        body = choiceGroup(q.k, roles().concat([T("prefNot")]), v, false, { stack: true });
+        break;
+      case "one":
+        body = choiceGroup(q.k, T(q.o), v, false, { stack: q.stack });
+        break;
+      case "many":
+        body = '<p class="help">' + esc(fmt(T("upTo"), { n: q.max })) + "</p>" +
+          choiceGroup(q.k, T(q.o).concat(q.other ? [T("other")] : []), v, true, { stack: true, max: q.max });
+        if (q.other) {
+          var otherOn = Array.isArray(v) && v.indexOf(T(q.o).length) >= 0;
+          body += '<input type="text" class="other-input" data-k="' + q.k + 'o" maxlength="200" placeholder="' + esc(T("otherPh")) + '" value="' + esc(a[q.k + "o"] || "") + '"' + (otherOn ? "" : " hidden") + ">";
+        }
+        break;
+      case "scale":
+        body = choiceGroup(q.k, ["1", "2", "3", "4", "5"], v == null ? null : v - 1, false, { scale: true }) +
+          '<div class="scale-caps"><span>' + esc(T("feelLo")) + "</span><span>" + esc(T("feelHi")) + "</span></div>";
+        break;
+      case "agree":
+        body = q.rows.map(function (r, i) {
+          var vv = Array.isArray(v) ? v[i] : null;
+          return '<div class="agree-row"><p class="stmt">' + tx(r) + "</p>" + choiceGroup(q.k + "_" + i, T("agree"), vv, false) + "</div>";
+        }).join("");
+        break;
+      case "short":
+        body = '<input type="text" data-k="' + q.k + '" maxlength="200" aria-labelledby="lbl-' + q.k + '" value="' + esc(v || "") + '">';
+        break;
+      case "long":
+        body = '<textarea data-k="' + q.k + '" maxlength="1500" aria-labelledby="lbl-' + q.k + '">' + esc(v || "") + "</textarea>";
+        break;
+    }
+    return '<div class="q">' + head + body + "</div>";
+  }
+
+  function actCard(act, i, canRemove) {
+    var n = i + 1;
+    return '<div class="act" data-i="' + i + '">' +
+      '<div class="act-head"><span class="act-tag">' + esc(fmt(T("act"), { n: n })) + "</span>" +
+      (canRemove ? '<button class="linklike" data-act="rm" data-i="' + i + '">' + esc(T("remove")) + "</button>" : "") + "</div>" +
+      '<div class="q"><p class="stmt" id="lbl-a' + i + '">' + esc(T("aName")) + ' *</p><input type="text" data-act-i="' + i + '" data-k="n" maxlength="160" aria-labelledby="lbl-a' + i + '" placeholder="' + esc(T("aNamePh")) + '" value="' + esc(act.n || "") + '"></div>' +
+      ACT_FIELDS.map(function (f) {
+        return '<div class="q"><p class="stmt">' + tx(f.q) + " *</p>" + (f.help ? '<p class="help">' + esc(T(f.help)) + "</p>" : "") +
+          choiceGroup("a" + i + "_" + f.k, T(f.o), act[f.k], false) + "</div>";
+      }).join("") + "</div>";
+  }
+
+  function stepValid(step) {
+    var a = state.a;
+    if (step.acts) {
+      return a.acts.length >= step.acts.lo && a.acts.every(function (x) {
+        return filled((x.n || "").trim()) && ACT_FIELDS.every(function (f) { return x[f.k] != null; });
+      });
+    }
+    return step.qs.every(function (q) {
+      if (!q.req) return true;
+      if (q.type === "agree") return Array.isArray(a[q.k]) && q.rows.every(function (_, i) { return a[q.k][i] != null; });
+      if (q.type === "short" || q.type === "long") return filled((a[q.k] || "").trim());
+      return filled(a[q.k]);
+    });
+  }
+
+  function renderStep() {
+    var steps = STEPS[FORM], step = steps[state.step], a = state.a;
+    var segs = steps.map(function (_, i) { return '<div class="seg' + (i <= state.step ? " done" : "") + '"></div>'; }).join("");
+    var body;
+    if (step.acts) {
+      var canRemove = a.acts.length > step.acts.lo;
+      body = '<div class="s-head"><h2>' + esc(T(step.title)) + "</h2><p>" + esc(fmt(T(step.sub), step.acts)) + "</p><p>" + esc(T("actEx")) + "</p></div>" +
+        a.acts.map(function (x, i) { return actCard(x, i, canRemove); }).join("") +
+        '<div class="add-row">' + (a.acts.length < step.acts.hi ? '<button class="btn ghost small" data-act="add">' + esc(T("addAct")) + "</button>" : "") +
+        '<span class="hint">' + esc(fmt(T("actsLeft"), { n: a.acts.length, hi: step.acts.hi })) + "</span></div>";
+    } else {
+      body = '<div class="s-head"><h2>' + tx(step.title) + "</h2></div>" + step.qs.map(function (q) { return qBlock(q, a); }).join("");
+    }
+    var last = state.step === steps.length - 1;
+    $("app").innerHTML =
+      '<section class="screen">' +
+      '<div class="progress" aria-hidden="true"><div class="progress-steps">' + segs + '</div>' +
+      '<div class="progress-note"><span>' + esc(fmt(T("stepOf"), { n: state.step + 1, t: steps.length })) + "</span><span>" + esc(ORG) + "</span></div></div>" +
+      body +
+      '<div class="nav-row"><button class="btn ghost" data-act="back">' + esc(T("back")) + "</button>" +
+      '<span class="hint" id="nav-hint"></span>' +
+      '<button class="btn" data-act="next" id="btn-next">' + esc(T(last ? "finish" : "next")) + "</button></div></section>";
+    updateNext();
+  }
+
+  function updateNext() {
+    var ok = stepValid(STEPS[FORM][state.step]);
+    var b = $("btn-next");
+    if (b) b.disabled = !ok;
+    var h = $("nav-hint");
+    if (h) h.textContent = ok ? "" : T("required");
+  }
+
+  // ---------- response code ----------
+  function buildPayload() {
+    var a = state.a, out = { v: 1, f: FORM, id: state.id, d: new Date().toISOString().slice(0, 10), l: lang };
+    if (ORG) out.org = ORG;
+    if (FORM === "t" && a.role != null) {
+      var rl = roles();
+      out.role = a.role < rl.length ? rl[a.role] : "";
+    }
+    Object.keys(a).forEach(function (k) {
+      if (k === "role" || k === "acts") return;
+      var v = a[k];
+      if (typeof v === "string") v = v.trim();
+      if (filled(v)) out[k] = v;
+    });
+    out.acts = a.acts.map(function (x) {
+      var o = { n: (x.n || "").trim() };
+      ACT_FIELDS.forEach(function (f) { o[f.k] = x[f.k]; });
+      return o;
+    });
+    return out;
+  }
+
+  function renderDone() {
+    var code = CODE_PREFIX + b64urlEncode(JSON.stringify(buildPayload()));
+    var body = fmt(T("emailBody"), { org: ORG ? " (" + ORG + ")" : "", code: code });
+    var mail = "mailto:" + encodeURIComponent(TO) + "?subject=" + encodeURIComponent(T("emailSubject") + (ORG ? " – " + ORG : "")) + "&body=" + encodeURIComponent(body);
+    $("app").innerHTML =
+      '<section class="screen">' +
+      '<p class="eyebrow"><span class="mark">MR5</span> · ' + esc(T("doneEyebrow")) + "</p>" +
+      "<h1>" + esc(T("doneTitle")) + "</h1>" +
+      '<p class="lede">' + esc(T("doneLede")) + "</p>" +
+      '<div class="card"><h3>' + esc(T("codeLabel")) + '</h3><div class="code-box" id="code">' + esc(code) + "</div>" +
+      '<div class="btn-row"><a class="btn" href="' + esc(mail) + '">' + esc(T("email")) + '</a><button class="btn ghost" data-act="copy">' + esc(T("copy")) + "</button></div>" +
+      '<p class="msg" id="copy-msg" role="status"></p></div>' +
+      (FORM === "t" ? '<p class="notice">' + tx("doneAnon") + "</p>" : "") +
+      '<div class="btn-row" style="margin-top:1.6rem"><button class="linklike" data-act="edit">' + esc(T("editAgain")) + "</button></div></section>";
+  }
+
+  function render() {
+    if (VIEW === "facilitator") return renderFacilitator();
+    if (!state || state.step < 0) renderIntro();
+    else if (state.done) renderDone();
+    else renderStep();
+    $("foot").textContent = T("footer");
+  }
+
+  // ---------- events: survey ----------
+  function onClick(e) {
+    var t = e.target.closest("[data-act]");
+    if (!t) return;
+    var act = t.getAttribute("data-act");
+    var steps = STEPS[FORM];
+    if (act === "start" || act === "restart") {
+      state = freshState(); state.id = rid(); state.step = 0; save(); render(); window.scrollTo(0, 0);
+    } else if (act === "resume") {
+      state = lsGet(STORE_KEY); if (!state.id) state.id = rid(); render(); window.scrollTo(0, 0);
+    } else if (act === "back") {
+      state.step -= 1; save(); render(); window.scrollTo(0, 0);
+    } else if (act === "next") {
+      if (!stepValid(steps[state.step])) return;
+      if (state.step === steps.length - 1) state.done = true; else state.step += 1;
+      save(); render(); window.scrollTo(0, 0);
+    } else if (act === "add") {
+      state.a.acts.push({}); save(); render();
+      var cards = document.querySelectorAll(".act");
+      var lastCard = cards[cards.length - 1];
+      if (lastCard) { lastCard.scrollIntoView({ behavior: "smooth", block: "start" }); var inp = lastCard.querySelector("input[type=text]"); if (inp) inp.focus({ preventScroll: true }); }
+    } else if (act === "rm") {
+      state.a.acts.splice(+t.getAttribute("data-i"), 1); save(); render();
+    } else if (act === "edit") {
+      state.done = false; save(); render(); window.scrollTo(0, 0);
+    } else if (act === "copy") {
+      var code = $("code").textContent, msg = $("copy-msg");
+      (navigator.clipboard ? navigator.clipboard.writeText(code) : Promise.reject())
+        .then(function () { msg.textContent = T("copied"); }, function () { msg.textContent = T("copyFail"); });
+    } else if (act === "f-read") {
+      compileCodes();
+    } else if (act === "f-csv-r") {
+      download("responses.csv", respondentsCsv());
+    } else if (act === "f-csv-a") {
+      download("activities.csv", activitiesCsv());
+    }
+  }
+
+  function onChange(e) {
+    var el = e.target;
+    if (VIEW === "facilitator") { if (el.closest("#f-links")) updateLinks(); return; }
+    if (!state || state.step < 0 || state.done) return;
+    var a = state.a, name = el.name || "";
+
+    if (el.hasAttribute("data-act-i")) {
+      a.acts[+el.getAttribute("data-act-i")].n = el.value;
+    } else if (el.hasAttribute("data-k")) {
+      a[el.getAttribute("data-k")] = el.value;
+    } else if (/^a\d+_\w$/.test(name)) {
+      var m = name.match(/^a(\d+)_(\w)$/);
+      a.acts[+m[1]][m[2]] = +el.value;
+    } else if (/_\d+$/.test(name)) {
+      var p = name.match(/^(\w+)_(\d+)$/);
+      var rowsLen = findQ(p[1]).rows.length;
+      if (!Array.isArray(a[p[1]])) a[p[1]] = new Array(rowsLen).fill(null);
+      a[p[1]][+p[2]] = +el.value;
+    } else if (el.type === "checkbox") {
+      var q = findQ(name);
+      var arr = Array.isArray(a[name]) ? a[name].slice() : [];
+      var v = +el.value, at = arr.indexOf(v);
+      if (el.checked && at < 0) arr.push(v);
+      if (!el.checked && at >= 0) arr.splice(at, 1);
+      arr.sort(function (x, y) { return x - y; });
+      a[name] = arr;
+      var boxes = document.querySelectorAll('input[name="' + name + '"]');
+      Array.prototype.forEach.call(boxes, function (b) { b.disabled = !b.checked && arr.length >= q.max; });
+      if (q.other) {
+        var oi = document.querySelector('[data-k="' + name + 'o"]');
+        var on = arr.indexOf(T(q.o).length) >= 0;
+        if (oi) { oi.hidden = !on; if (on && el.checked && v === T(q.o).length) oi.focus(); }
+        if (!on) delete a[name + "o"];
+      }
+    } else if (el.type === "radio") {
+      var qq = findQ(name);
+      a[name] = qq && qq.type === "scale" ? +el.value + 1 : +el.value;
+    }
+    save(); updateNext();
+  }
+
+  function findQ(k) {
+    var found = null;
+    STEPS[FORM].forEach(function (s) { (s.qs || []).forEach(function (q) { if (q.k === k) found = q; }); });
+    return found;
+  }
+
+  // ---------- facilitator view ----------
+  var compiled = [];
+
+  function renderFacilitator() {
+    var langOpts = '<option value="en"' + (lang === "en" ? " selected" : "") + '>English</option><option value="fr"' + (lang === "fr" ? " selected" : "") + ">Français</option>";
+    $("app").innerHTML =
+      '<section class="screen">' +
+      '<p class="eyebrow"><span class="mark">MR5</span> · ' + esc(T("fEyebrow")) + "</p>" +
+      "<h1>" + esc(T("fTitle")) + "</h1>" +
+      '<div class="card" id="f-links"><h3>' + esc(T("fLinks")) + '</h3><p class="sub">' + esc(T("fLinksSub")) + "</p>" +
+      '<div class="field"><label for="f-org">' + esc(T("fOrg")) + '</label><input type="text" id="f-org" value="' + esc(ORG) + '"></div>' +
+      '<div class="field"><label for="f-roles">' + esc(T("fRoles")) + '</label><textarea id="f-roles" rows="5">' + esc(roles().join("\n")) + "</textarea></div>" +
+      '<div class="field"><label for="f-min">' + esc(T("fMin")) + '</label><input type="text" id="f-min" inputmode="numeric" value="' + MIN_GROUP + '"></div>' +
+      '<div class="field"><label for="f-to">' + esc(T("fTo")) + '</label><input type="text" id="f-to" value="' + esc(TO) + '"></div>' +
+      '<div class="field"><label for="f-lang">' + esc(T("fLang")) + '</label><select id="f-lang">' + langOpts + "</select></div>" +
+      '<p class="stmt" style="font-weight:600;margin-top:1rem">' + esc(T("fTeamLink")) + '</p><div class="code-box" id="f-link-t"></div>' +
+      '<p class="stmt" style="font-weight:600;margin-top:1rem">' + esc(T("fDirLink")) + '</p><div class="code-box" id="f-link-d"></div></div>' +
+      '<div class="card"><h3>' + esc(T("fCompile")) + '</h3><p class="sub">' + esc(T("fCompileSub")) + "</p>" +
+      '<textarea id="f-codes" rows="6" aria-label="' + esc(T("fPaste")) + '" placeholder="' + esc(T("fPaste")) + '"></textarea>' +
+      '<div class="btn-row"><button class="btn" data-act="f-read">' + esc(T("fRead")) + "</button>" +
+      '<button class="btn ghost" data-act="f-csv-r" id="f-csv-r" disabled>' + esc(T("fCsvR")) + "</button>" +
+      '<button class="btn ghost" data-act="f-csv-a" id="f-csv-a" disabled>' + esc(T("fCsvA")) + "</button></div>" +
+      '<p class="msg" id="f-msg" role="status"></p></div>' +
+      '<div id="f-results"></div></section>';
+    updateLinks();
+    if (compiled.length) renderCompiled();
+  }
+
+  function updateLinks() {
+    var base = location.origin + location.pathname;
+    var p = new URLSearchParams();
+    var org = $("f-org").value.trim(); if (org) p.set("org", org);
+    var rl = $("f-roles").value.split("\n").map(function (s) { return s.trim(); }).filter(Boolean);
+    if (rl.length) p.set("roles", rl.join("|"));
+    var mn = parseInt($("f-min").value, 10); if (mn && mn !== 5) p.set("min", mn);
+    var to = $("f-to").value.trim(); if (to) p.set("to", to);
+    p.set("lang", $("f-lang").value);
+    var pt = new URLSearchParams(p); pt.set("form", "team");
+    var pd = new URLSearchParams(p); pd.delete("roles"); pd.set("form", "direction");
+    $("f-link-t").textContent = base + "?" + pt.toString();
+    $("f-link-d").textContent = base + "?" + pd.toString();
+  }
+
+  function compileCodes() {
+    var raw = $("f-codes").value.match(/AIA1\.[A-Za-z0-9_-]+/g) || [];
+    var seen = {}, bad = 0, dup = 0;
+    compiled.forEach(function (r) { seen[r.id] = true; });
+    raw.forEach(function (c) {
+      try {
+        var r = JSON.parse(b64urlDecode(c.slice(CODE_PREFIX.length)));
+        if (!r || r.v !== 1 || !Array.isArray(r.acts)) throw new Error("bad");
+        if (seen[r.id]) { dup++; return; }
+        seen[r.id] = true; compiled.push(r);
+      } catch (e) { bad++; }
+    });
+    var nt = compiled.filter(function (r) { return r.f === "t"; }).length;
+    $("f-msg").textContent = fmt(T("fFound"), { n: compiled.length, t: nt, d: compiled.length - nt, bad: bad, dup: dup });
+    $("f-csv-r").disabled = $("f-csv-a").disabled = !compiled.length;
+    renderCompiled();
+  }
+
+  // Decision tree, section 6.3 (proposal only — MR5 and leadership validate):
+  // 1. serious consequence of an error → human to keep
+  // 2. confidential data → augmented at most, pending data rules
+  // 3. always the same way + minor consequence → automatable
+  // 4. otherwise → augmented
+  function classify(x) {
+    if (x.e === 2) return "hum";
+    if (x.c === 0 || x.c === 2) return "augData";
+    if (x.s === 2 && x.e === 0) return "auto";
+    return "aug";
+  }
+  var CAT_LABEL = { auto: "catAuto", aug: "catAug", augData: "catAugData", hum: "catHum" };
+
+  function groupKey(r) { return r.f === "d" ? T("fLeaders") : (r.role || T("prefNot")); }
+
+  function renderCompiled() {
+    if (!compiled.length) { $("f-results").innerHTML = ""; return; }
+    // Hours by role group, pooling team groups below the minimum size. Leadership
+    // answers are named and reported without attribution, so they keep their own row.
+    var groups = {};
+    compiled.forEach(function (r) { var g = groupKey(r); (groups[g] = groups[g] || []).push(r); });
+    var rows = [], pooled = [], leaders = T("fLeaders");
+    Object.keys(groups).forEach(function (g) {
+      if (g !== leaders) (groups[g].length >= MIN_GROUP ? rows : pooled).push([g, groups[g]]);
+    });
+    if (pooled.length) {
+      var all = []; pooled.forEach(function (p) { all = all.concat(p[1]); });
+      rows.push([fmt(T("fPooled"), { min: MIN_GROUP }), all]);
+    }
+    if (groups[leaders]) rows.push([leaders, groups[leaders], true]);
+    var tableRows = rows.map(function (pair) {
+      var h = { auto: 0, aug: 0, hum: 0 }, n = 0;
+      pair[1].forEach(function (r) {
+        r.acts.forEach(function (x) {
+          var c = classify(x); n++;
+          h[c === "augData" ? "aug" : c] += HOURS_MID[x.h] || 0;
+        });
+      });
+      var tot = h.auto + h.aug + h.hum;
+      var cell = pair[1].length < MIN_GROUP && !pair[2] ? function () { return '<td class="num muted">–</td>'; } : function (v) { return '<td class="num">' + v.toFixed(1) + "</td>"; };
+      return "<tr><td>" + esc(pair[0]) + '</td><td class="num">' + pair[1].length + '</td><td class="num">' + n + "</td>" +
+        cell(h.auto) + cell(h.aug) + cell(h.hum) + cell(tot) + "</tr>";
+    }).join("");
+
+    // Leadership vs teams on the shared lists.
+    var teams = compiled.filter(function (r) { return r.f === "t"; });
+    var dirs = compiled.filter(function (r) { return r.f === "d"; });
+    function share(list, k, i) {
+      if (!list.length) return '<td class="num muted">–</td>';
+      var c = list.filter(function (r) { return Array.isArray(r[k]) && r[k].indexOf(i) >= 0; }).length;
+      return '<td class="num">' + Math.round(100 * c / list.length) + " %</td>";
+    }
+    function cmpRows(k, optKey) {
+      return T(optKey).map(function (o, i) { return "<tr><td>" + esc(o) + "</td>" + share(teams, k, i) + share(dirs, k, i) + "</tr>"; }).join("");
+    }
+    function changeAvg(list, idx) {
+      var v = list.map(function (r) { return Array.isArray(r.ag) ? r.ag[idx] : null; }).filter(function (x) { return x != null && x < 5; });
+      return v.length ? '<td class="num">' + (v.reduce(function (s, x) { return s + x + 1; }, 0) / v.length).toFixed(1) + "</td>" : '<td class="num muted">–</td>';
+    }
+    var head3 = "<tr><th>" + esc(T("fItem")) + '</th><th class="num">' + esc(T("fTeams")) + " (" + teams.length + ')</th><th class="num">' + esc(T("fDir")) + " (" + dirs.length + ")</th></tr>";
+
+    $("f-results").innerHTML =
+      '<div class="card"><h3>' + esc(T("fByRole")) + '</h3><p class="sub">' + esc(T("fByRoleSub")) + "</p>" +
+      '<div class="tbl-scroll"><table><thead><tr><th>' + esc(T("fRole")) + '</th><th class="num">' + esc(T("fResp")) + '</th><th class="num">' + esc(T("fActs")) +
+      '</th><th class="num">' + esc(T("fAuto")) + '</th><th class="num">' + esc(T("fAug")) + '</th><th class="num">' + esc(T("fHum")) + '</th><th class="num">' + esc(T("fTot")) +
+      "</th></tr></thead><tbody>" + tableRows + "</tbody></table></div></div>" +
+      '<div class="card"><h3>' + esc(T("fCompare")) + '</h3><p class="sub">' + esc(T("fCompareSub")) + "</p>" +
+      '<div class="tbl-scroll"><table><thead>' + head3 + "</thead><tbody>" +
+      '<tr><th colspan="3">' + esc(T("qReinvestT")) + "</th></tr>" + cmpRows("re", "reinvest") +
+      '<tr><th colspan="3">' + esc(T("qConcernT")) + "</th></tr>" + cmpRows("co", "concerns") +
+      "<tr><td>" + esc(T("fChangeAvg")) + "</td>" + changeAvg(teams, 2) + changeAvg(dirs, 1) + "</tr>" +
+      "</tbody></table></div></div>";
+  }
+
+  function csvCell(v) {
+    if (v == null) return "";
+    var s = Array.isArray(v) ? v.join("; ") : String(v);
+    return /[",\n;]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+  }
+  function pick(optKey, v) {
+    var opts = T(optKey);
+    if (Array.isArray(v)) return v.map(function (i) { return i < opts.length ? opts[i] : T("other"); });
+    return v == null ? "" : opts[v];
+  }
+  function respondentsCsv() {
+    var cols = ["id", "form", "date", "lang", "org", "role_group", "name_title", "scope", "top_activities", "exclusions",
+      "coverage", "hand_over", "keep", "agree_rekey", "agree_find", "agree_teams_welcome_change", "agree_change_supported",
+      "reinvest", "reinvest_other", "ai_used", "ai_feeling_1_5", "concerns", "concerns_other", "concerns_text",
+      "training", "training_other", "ai_tools", "ai_tools_which", "data_indicators", "obligations", "written_rules",
+      "who_decides", "champion", "n_activities"];
+    var lines = [cols.join(",")];
+    compiled.forEach(function (r) {
+      var ag = r.ag || [], t = r.f === "t";
+      var agv = function (i) { return ag[i] == null ? "" : T("agree")[ag[i]]; };
+      var row = [r.id, t ? "team" : "leadership", r.d, r.l, r.org, t ? r.role : "", r.nm, r.sc, r.top, r.ex,
+        pick("cover", r.cov), r.give, r.keep,
+        t ? agv(0) : "", t ? agv(1) : "", t ? "" : agv(0), t ? agv(2) : agv(1),
+        pick("reinvest", r.re), r.reo, pick("used", r.ai), r.feel, pick("concerns", r.co), r.coo, r.cq,
+        pick("train", r.tr), r.tro, pick("tools", r.tl), r.tlw, r.dt, r.ob, pick("rules", r.ru), r.who, r.ch, r.acts.length];
+      lines.push(row.map(csvCell).join(","));
+    });
+    return lines.join("\n");
+  }
+  function activitiesCsv() {
+    var cols = ["respondent_id", "form", "role_group", "activity_no", "activity", "hours_per_week_bracket", "hours_per_week_estimate",
+      "same_way", "value", "error_consequence", "confidential", "wants_to_lighten", "proposed_category", "validated_category"];
+    var lines = [cols.join(",")];
+    compiled.forEach(function (r) {
+      r.acts.forEach(function (x, i) {
+        lines.push([r.id, r.f === "t" ? "team" : "leadership", groupKey(r), i + 1, x.n, pick("hours", x.h), HOURS_MID[x.h],
+          pick("same", x.s), pick("value", x.v), pick("err", x.e), pick("conf", x.c), pick("lighten", x.w),
+          T(CAT_LABEL[classify(x)]), ""].map(csvCell).join(","));
+      });
+    });
+    return lines.join("\n");
+  }
+  function download(name, text) {
+    var blob = new Blob(["﻿" + text], { type: "text/csv;charset=utf-8" });
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blob); a.download = name;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
+  }
+
+  // ---------- language ----------
+  function setLang(l) {
+    lang = l;
+    document.documentElement.lang = l;
+    $("lang-en").classList.toggle("active", l === "en"); $("lang-en").setAttribute("aria-pressed", l === "en");
+    $("lang-fr").classList.toggle("active", l === "fr"); $("lang-fr").setAttribute("aria-pressed", l === "fr");
+    render();
+  }
+  $("lang-en").addEventListener("click", function () { if (lang !== "en") setLang("en"); });
+  $("lang-fr").addEventListener("click", function () { if (lang !== "fr") setLang("fr"); });
+
+  document.addEventListener("click", onClick);
+  document.addEventListener("change", onChange);
+  document.addEventListener("input", function (e) {
+    if (e.target.matches("input[type=text], textarea")) onChange(e);
+  });
+
+  setLang(lang);
+})();
+</script>
+</body>
+</html>
