@@ -170,6 +170,24 @@
   .field { margin-bottom: 0.9rem; }
   .field label { display: block; font-size: 0.82rem; font-weight: 600; color: var(--ink-2); margin-bottom: 0.3rem; }
 
+  .share { display: flex; gap: 1.2rem; align-items: flex-start; flex-wrap: wrap; margin-top: 0.5rem; }
+  .share .qr { width: 148px; flex: none; border-radius: 6px; overflow: hidden; border: 1px solid var(--line); background: #fff; }
+  .share .qr svg { display: block; width: 100%; height: auto; }
+  .share .share-right { flex: 1; min-width: 220px; }
+  .share .code-box { margin-top: 0; }
+  .share h4 { font-size: 0.95rem; font-weight: 600; margin: 0 0 0.4rem; }
+  .present-overlay {
+    position: fixed; inset: 0; z-index: 60; background: var(--bg); color: var(--ink);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 1.1rem; padding: 2rem; text-align: center; cursor: pointer;
+  }
+  .present-overlay .p-org { font-family: "Fraunces", Georgia, serif; font-weight: 600; font-size: clamp(1.8rem, 4.5vw, 3.2rem); line-height: 1.1; }
+  .present-overlay .p-qr { width: min(56vh, 82vw); background: #fff; border-radius: 12px; overflow: hidden; box-shadow: var(--shadow); }
+  .present-overlay .p-qr svg { display: block; width: 100%; height: auto; }
+  .present-overlay .p-scan { font-size: clamp(1.1rem, 2.6vw, 1.7rem); font-weight: 600; color: var(--ink-2); }
+  .present-overlay .p-url { font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: clamp(0.75rem, 1.6vw, 1rem); color: var(--ink-3); word-break: break-all; max-width: 90vw; }
+  .present-overlay .p-exit { position: fixed; top: 1rem; right: 1.4rem; font-size: 0.8rem; color: var(--ink-3); }
+
   .foot { margin-top: 3rem; padding-top: 1.2rem; border-top: 1px solid var(--line); font-size: 0.8rem; color: var(--ink-3); max-width: 62ch; }
   .screen { animation: fade 240ms ease; }
   @keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
@@ -192,6 +210,224 @@
 (function () {
   "use strict";
 
+  // ============ QR encoder (byte mode, EC level M, v1-15) ============
+  var QR = (function () {
+    var SPEC = {
+      1: [26, 10, 1, 16, 0, 0], 2: [44, 16, 1, 28, 0, 0], 3: [70, 26, 1, 44, 0, 0],
+      4: [100, 18, 2, 32, 0, 0], 5: [134, 24, 2, 43, 0, 0], 6: [172, 16, 4, 27, 0, 0],
+      7: [196, 18, 4, 31, 0, 0], 8: [242, 22, 2, 38, 2, 39], 9: [292, 22, 3, 36, 2, 37],
+      10: [346, 26, 4, 43, 1, 44], 11: [404, 30, 1, 50, 4, 51], 12: [466, 22, 6, 36, 2, 37],
+      13: [532, 22, 8, 37, 1, 38], 14: [581, 24, 4, 40, 5, 41], 15: [655, 24, 5, 41, 5, 42]
+    };
+    var ALIGN = { 1: [], 2: [6, 18], 3: [6, 22], 4: [6, 26], 5: [6, 30], 6: [6, 34],
+      7: [6, 22, 38], 8: [6, 24, 42], 9: [6, 26, 46], 10: [6, 28, 50],
+      11: [6, 30, 54], 12: [6, 32, 58], 13: [6, 34, 62], 14: [6, 26, 46, 66], 15: [6, 26, 48, 70] };
+    var EXP = new Array(512), LOG = new Array(256);
+    (function () {
+      var x = 1;
+      for (var i = 0; i < 255; i++) { EXP[i] = x; LOG[x] = i; x <<= 1; if (x & 0x100) x ^= 0x11D; }
+      for (i = 255; i < 512; i++) EXP[i] = EXP[i - 255];
+    })();
+    function gmul(a, b) { if (!a || !b) return 0; return EXP[LOG[a] + LOG[b]]; }
+    function rsGenPoly(n) {
+      var g = [1];
+      for (var i = 0; i < n; i++) {
+        var ng = new Array(g.length + 1).fill(0);
+        for (var j = 0; j < g.length; j++) { ng[j] ^= gmul(g[j], EXP[i]); ng[j + 1] ^= g[j]; }
+        g = ng;
+      }
+      return g;
+    }
+    function ecBytes(data, nEc) {
+      var gen = rsGenPoly(nEc).reverse();
+      var res = data.concat(new Array(nEc).fill(0));
+      for (var i = 0; i < data.length; i++) {
+        var coef = res[i];
+        if (coef !== 0) for (var j = 0; j < gen.length; j++) res[i + j] ^= gmul(gen[j], coef);
+      }
+      return res.slice(data.length);
+    }
+    function encode(text) {
+      var bytes = [];
+      var enc = unescape(encodeURIComponent(text));
+      for (var i = 0; i < enc.length; i++) bytes.push(enc.charCodeAt(i));
+      var version = null;
+      for (var v = 1; v <= 15; v++) {
+        var sv = SPEC[v];
+        var dcw = sv[0] - sv[1] * (sv[2] + sv[4]);
+        var cb = v <= 9 ? 8 : 16;
+        if (4 + cb + bytes.length * 8 <= dcw * 8) { version = v; break; }
+      }
+      if (!version) throw new Error("too long");
+      var s = SPEC[version];
+      var nBlocks = s[2] + s[4];
+      var dataCW = s[0] - s[1] * nBlocks;
+      var countBits = version <= 9 ? 8 : 16;
+      var bits = [];
+      function put(val, len) { for (var k = len - 1; k >= 0; k--) bits.push((val >> k) & 1); }
+      put(4, 4); put(bytes.length, countBits);
+      for (i = 0; i < bytes.length; i++) put(bytes[i], 8);
+      var cap = dataCW * 8;
+      put(0, Math.min(4, cap - bits.length));
+      while (bits.length % 8) bits.push(0);
+      var dataBytes = [];
+      for (i = 0; i < bits.length; i += 8) {
+        var b = 0;
+        for (var k2 = 0; k2 < 8; k2++) b = (b << 1) | bits[i + k2];
+        dataBytes.push(b);
+      }
+      var pad = [0xEC, 0x11], pi = 0;
+      while (dataBytes.length < dataCW) dataBytes.push(pad[(pi++) % 2]);
+      var blocks = [], ecs = [], off = 0;
+      for (i = 0; i < s[2]; i++) { var d = dataBytes.slice(off, off + s[3]); off += s[3]; blocks.push(d); ecs.push(ecBytes(d, s[1])); }
+      for (i = 0; i < s[4]; i++) { d = dataBytes.slice(off, off + s[5]); off += s[5]; blocks.push(d); ecs.push(ecBytes(d, s[1])); }
+      var seq = [];
+      var maxD = 0;
+      for (i = 0; i < blocks.length; i++) if (blocks[i].length > maxD) maxD = blocks[i].length;
+      for (i = 0; i < maxD; i++) for (var j2 = 0; j2 < blocks.length; j2++) if (i < blocks[j2].length) seq.push(blocks[j2][i]);
+      for (i = 0; i < s[1]; i++) for (j2 = 0; j2 < ecs.length; j2++) seq.push(ecs[j2][i]);
+      var size = 17 + version * 4;
+      var M = [], F = [];
+      for (i = 0; i < size; i++) { M.push(new Array(size).fill(0)); F.push(new Array(size).fill(false)); }
+      function setF(r, c, val) { M[r][c] = val; F[r][c] = true; }
+      function finder(r, c) {
+        for (var dr = -1; dr <= 7; dr++) for (var dc = -1; dc <= 7; dc++) {
+          var rr = r + dr, cc = c + dc;
+          if (rr < 0 || rr >= size || cc < 0 || cc >= size) continue;
+          var on = dr >= 0 && dr <= 6 && dc >= 0 && dc <= 6 &&
+            (dr === 0 || dr === 6 || dc === 0 || dc === 6 || (dr >= 2 && dr <= 4 && dc >= 2 && dc <= 4));
+          setF(rr, cc, on ? 1 : 0);
+        }
+      }
+      finder(0, 0); finder(0, size - 7); finder(size - 7, 0);
+      for (i = 8; i < size - 8; i++) {
+        if (!F[6][i]) setF(6, i, i % 2 === 0 ? 1 : 0);
+        if (!F[i][6]) setF(i, 6, i % 2 === 0 ? 1 : 0);
+      }
+      var ap = ALIGN[version];
+      for (i = 0; i < ap.length; i++) for (var j3 = 0; j3 < ap.length; j3++) {
+        var r0 = ap[i], c0 = ap[j3];
+        // Skip only the three corners under the finder patterns; from version 7 on,
+        // some alignment patterns sit on the timing lines and must still be drawn.
+        var lastA = ap.length - 1;
+        if ((i === 0 && j3 === 0) || (i === 0 && j3 === lastA) || (i === lastA && j3 === 0)) continue;
+        for (var dr2 = -2; dr2 <= 2; dr2++) for (var dc2 = -2; dc2 <= 2; dc2++) {
+          var on2 = Math.max(Math.abs(dr2), Math.abs(dc2)) !== 1;
+          setF(r0 + dr2, c0 + dc2, on2 ? 1 : 0);
+        }
+      }
+      setF(size - 8, 8, 1);
+      for (i = 0; i <= 8; i++) {
+        if (i !== 6) { if (!F[8][i]) setF(8, i, 0); if (!F[i][8]) setF(i, 8, 0); }
+      }
+      for (i = 0; i < 8; i++) { if (!F[8][size - 1 - i]) setF(8, size - 1 - i, 0); }
+      for (i = 0; i < 7; i++) { if (!F[size - 1 - i][8]) setF(size - 1 - i, 8, 0); }
+      if (version >= 7) {
+        var rem = version << 12;
+        for (i = 17; i >= 12; i--) if ((rem >> i) & 1) rem ^= 0x1F25 << (i - 12);
+        var vinfo = (version << 12) | rem;
+        for (i = 0; i < 18; i++) {
+          var bit = (vinfo >> i) & 1;
+          setF(Math.floor(i / 3), i % 3 + size - 11, bit);
+          setF(i % 3 + size - 11, Math.floor(i / 3), bit);
+        }
+      }
+      var FMASK = [];
+      for (i = 0; i < size; i++) FMASK.push(F[i].slice());
+      var bitIdx = 0, totalBits = seq.length * 8;
+      var col = size - 1, up = true;
+      while (col > 0) {
+        if (col === 6) col--;
+        for (var rIdx = 0; rIdx < size; rIdx++) {
+          var r = up ? size - 1 - rIdx : rIdx;
+          for (var cOff = 0; cOff < 2; cOff++) {
+            var c = col - cOff;
+            if (F[r][c]) continue;
+            var val = 0;
+            if (bitIdx < totalBits) val = (seq[bitIdx >> 3] >> (7 - (bitIdx & 7))) & 1;
+            bitIdx++;
+            M[r][c] = val;
+          }
+        }
+        up = !up; col -= 2;
+      }
+      function maskFn(m, r, c) {
+        switch (m) {
+          case 0: return (r + c) % 2 === 0;
+          case 1: return r % 2 === 0;
+          case 2: return c % 3 === 0;
+          case 3: return (r + c) % 3 === 0;
+          case 4: return (Math.floor(r / 2) + Math.floor(c / 3)) % 2 === 0;
+          case 5: return (r * c) % 2 + (r * c) % 3 === 0;
+          case 6: return ((r * c) % 2 + (r * c) % 3) % 2 === 0;
+          case 7: return ((r + c) % 2 + (r * c) % 3) % 2 === 0;
+        }
+      }
+      function applyFormat(mat, maskId) {
+        var fmt = (0 << 3) | maskId;
+        var f = fmt << 10;
+        for (var i2 = 14; i2 >= 10; i2--) if ((f >> i2) & 1) f ^= 0x537 << (i2 - 10);
+        f = ((fmt << 10) | f) ^ 0x5412;
+        for (i2 = 0; i2 < 15; i2++) {
+          var bit2 = (f >> i2) & 1;
+          if (i2 < 6) mat[i2][8] = bit2;
+          else if (i2 < 8) mat[i2 + 1][8] = bit2;
+          else mat[size - 15 + i2][8] = bit2;
+          if (i2 < 8) mat[8][size - 1 - i2] = bit2;
+          else if (i2 < 9) mat[8][15 - i2] = bit2;
+          else mat[8][14 - i2] = bit2;
+        }
+      }
+      function penalty(mat) {
+        var p = 0, i2, j4;
+        for (var dir = 0; dir < 2; dir++) {
+          for (i2 = 0; i2 < size; i2++) {
+            var run = 1;
+            for (j4 = 1; j4 < size; j4++) {
+              var a = dir ? mat[j4][i2] : mat[i2][j4];
+              var b2 = dir ? mat[j4 - 1][i2] : mat[i2][j4 - 1];
+              if (a === b2) { run++; }
+              else { if (run >= 5) p += 3 + (run - 5); run = 1; }
+            }
+            if (run >= 5) p += 3 + (run - 5);
+          }
+        }
+        for (i2 = 0; i2 < size - 1; i2++) for (j4 = 0; j4 < size - 1; j4++) {
+          var v2 = mat[i2][j4];
+          if (mat[i2][j4 + 1] === v2 && mat[i2 + 1][j4] === v2 && mat[i2 + 1][j4 + 1] === v2) p += 3;
+        }
+        var dark = 0;
+        for (i2 = 0; i2 < size; i2++) for (j4 = 0; j4 < size; j4++) dark += mat[i2][j4];
+        p += Math.floor(Math.abs(dark * 100 / (size * size) - 50) / 5) * 10;
+        return p;
+      }
+      var best = null, bestP = Infinity;
+      for (var mk = 0; mk < 8; mk++) {
+        var mat = M.map(function (row) { return row.slice(); });
+        for (i = 0; i < size; i++) for (var j5 = 0; j5 < size; j5++) {
+          if (!FMASK[i][j5] && maskFn(mk, i, j5)) mat[i][j5] ^= 1;
+        }
+        applyFormat(mat, mk);
+        var pen = penalty(mat);
+        if (pen < bestP) { bestP = pen; best = mat; }
+      }
+      return best;
+    }
+    function toSVG(matrix, moduleSize, quiet) {
+      moduleSize = moduleSize || 4; quiet = quiet == null ? 4 : quiet;
+      var n = matrix.length, dim = (n + quiet * 2) * moduleSize;
+      var parts = ['<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + dim + ' ' + dim + '" shape-rendering="crispEdges">'];
+      parts.push('<rect width="' + dim + '" height="' + dim + '" fill="#ffffff"/>');
+      var path = "";
+      for (var r = 0; r < n; r++) for (var c = 0; c < n; c++) {
+        if (matrix[r][c]) path += "M" + ((c + quiet) * moduleSize) + " " + ((r + quiet) * moduleSize) + "h" + moduleSize + "v" + moduleSize + "h-" + moduleSize + "z";
+      }
+      parts.push('<path d="' + path + '" fill="#000000"/></svg>');
+      return parts.join("");
+    }
+    return { encode: encode, toSVG: toSVG };
+  })();
+
   // Per-engagement settings come from the link, so this page names no client:
   //   ?org=Name&form=team|direction&lang=en|fr&roles=Role A|Role B&min=5&to=facilitator@example.com
   //   ?view=facilitator — link builder and response compiler
@@ -200,7 +436,8 @@
   var FORM = qp.get("form") === "direction" ? "d" : "t";
   var VIEW = qp.get("view") === "facilitator" ? "facilitator" : "survey";
   var MIN_GROUP = Math.max(2, parseInt(qp.get("min"), 10) || 5);
-  var TO = (qp.get("to") || "chiasmaj@gmail.com").trim();
+  var DEFAULT_TO = "chiasmaj@gmail.com";
+  var TO = (qp.get("to") || DEFAULT_TO).trim();
   var ROLES_PARAM = (qp.get("roles") || "").split("|").map(function (s) { return s.trim(); }).filter(Boolean);
   var CODE_PREFIX = "AIA1.";
   var STORE_KEY = "aia-draft:" + FORM + ":" + ORG;
@@ -332,6 +569,9 @@
       fOrg: "Organization name", fRoles: "Role groups (one per line — each should have at least the minimum group size)",
       fMin: "Minimum group size", fTo: "Email address that receives response codes", fLang: "Default language",
       fTeamLink: "Team questionnaire (anonymous)", fDirLink: "Leadership questionnaire",
+      fCopyLink: "Copy link", fPresent: "Present QR", fSaveQr: "Download QR",
+      fQrLong: "This link is too long for a QR code — shorten the organization or role-group names. The link itself still works.",
+      fScan: "Scan to begin · Balayez pour commencer",
       fCompile: "Compile response codes",
       fCompileSub: "Paste the codes you received (several at once works). Nothing leaves this browser.",
       fPaste: "Paste codes here",
@@ -468,6 +708,9 @@
       fOrg: "Nom de l’organisation", fRoles: "Groupes de fonctions (un par ligne — chacun devrait atteindre la taille minimale)",
       fMin: "Taille minimale d’un groupe", fTo: "Adresse courriel qui reçoit les codes", fLang: "Langue par défaut",
       fTeamLink: "Questionnaire Équipes (anonyme)", fDirLink: "Questionnaire Direction",
+      fCopyLink: "Copier le lien", fPresent: "Présenter le code QR", fSaveQr: "Télécharger le code QR",
+      fQrLong: "Ce lien est trop long pour un code QR — raccourcissez le nom de l’organisation ou des groupes. Le lien lui-même fonctionne.",
+      fScan: "Balayez pour commencer · Scan to begin",
       fCompile: "Compiler les codes de réponse",
       fCompileSub: "Collez les codes reçus (plusieurs à la fois fonctionne). Rien ne quitte ce navigateur.",
       fPaste: "Collez les codes ici",
@@ -791,6 +1034,15 @@
       var code = $("code").textContent, msg = $("copy-msg");
       (navigator.clipboard ? navigator.clipboard.writeText(code) : Promise.reject())
         .then(function () { msg.textContent = T("copied"); }, function () { msg.textContent = T("copyFail"); });
+    } else if (act === "f-copy") {
+      var k = t.getAttribute("data-k"), m = $("f-msg-" + k);
+      (navigator.clipboard ? navigator.clipboard.writeText(linkFor(k)) : Promise.reject())
+        .then(function () { m.textContent = T("copied"); }, function () { m.textContent = T("copyFail"); });
+    } else if (act === "f-present") {
+      openPresent(t.getAttribute("data-k"));
+    } else if (act === "f-qr-save") {
+      var kk = t.getAttribute("data-k"), svg = qrSvg(linkFor(kk));
+      if (svg) download("qr-" + (kk === "t" ? "team" : "leadership") + ".svg", svg, "image/svg+xml");
     } else if (act === "f-read") {
       compileCodes();
     } else if (act === "f-csv-r") {
@@ -862,8 +1114,7 @@
       '<div class="field"><label for="f-min">' + esc(T("fMin")) + '</label><input type="text" id="f-min" inputmode="numeric" value="' + MIN_GROUP + '"></div>' +
       '<div class="field"><label for="f-to">' + esc(T("fTo")) + '</label><input type="text" id="f-to" value="' + esc(TO) + '"></div>' +
       '<div class="field"><label for="f-lang">' + esc(T("fLang")) + '</label><select id="f-lang">' + langOpts + "</select></div>" +
-      '<p class="stmt" style="font-weight:600;margin-top:1rem">' + esc(T("fTeamLink")) + '</p><div class="code-box" id="f-link-t"></div>' +
-      '<p class="stmt" style="font-weight:600;margin-top:1rem">' + esc(T("fDirLink")) + '</p><div class="code-box" id="f-link-d"></div></div>' +
+      sharePanel("t", T("fTeamLink")) + sharePanel("d", T("fDirLink")) + "</div>" +
       '<div class="card"><h3>' + esc(T("fCompile")) + '</h3><p class="sub">' + esc(T("fCompileSub")) + "</p>" +
       '<textarea id="f-codes" rows="6" aria-label="' + esc(T("fPaste")) + '" placeholder="' + esc(T("fPaste")) + '"></textarea>' +
       '<div class="btn-row"><button class="btn" data-act="f-read">' + esc(T("fRead")) + "</button>" +
@@ -875,6 +1126,42 @@
     if (compiled.length) renderCompiled();
   }
 
+  function sharePanel(k, title) {
+    return '<div class="q"><h4>' + esc(title) + '</h4><div class="share"><div class="qr" id="f-qr-' + k + '"></div>' +
+      '<div class="share-right"><div class="code-box" id="f-link-' + k + '"></div>' +
+      '<div class="btn-row"><button class="btn small" data-act="f-copy" data-k="' + k + '">' + esc(T("fCopyLink")) + "</button>" +
+      '<button class="btn ghost small" data-act="f-present" data-k="' + k + '">' + esc(T("fPresent")) + "</button>" +
+      '<button class="btn ghost small" data-act="f-qr-save" data-k="' + k + '">' + esc(T("fSaveQr")) + "</button></div>" +
+      '<p class="msg" id="f-msg-' + k + '" role="status"></p></div></div></div>';
+  }
+
+  function qrSvg(url) {
+    try { return QR.toSVG(QR.encode(url), 4, 4); } catch (e) { return ""; }
+  }
+
+  function linkFor(k) { return $("f-link-" + k).textContent; }
+
+  function openPresent(k) {
+    var url = linkFor(k), svg = qrSvg(url);
+    if (!svg) return;
+    var org = $("f-org").value.trim();
+    var ov = document.createElement("div");
+    ov.className = "present-overlay";
+    ov.innerHTML = '<div class="p-exit">Esc ✕</div>' +
+      '<div class="p-org">' + esc(org) + '</div>' +
+      '<div class="p-qr">' + svg + '</div>' +
+      '<div class="p-scan">' + esc(T("fScan")) + '</div>' +
+      '<div class="p-url">' + esc(url) + '</div>';
+    document.body.appendChild(ov);
+    function close() {
+      if (ov.parentNode) ov.parentNode.removeChild(ov);
+      document.removeEventListener("keydown", onKey);
+    }
+    function onKey(e) { if (e.key === "Escape") close(); }
+    ov.addEventListener("click", close);
+    document.addEventListener("keydown", onKey);
+  }
+
   function updateLinks() {
     var base = location.origin + location.pathname;
     var p = new URLSearchParams();
@@ -882,12 +1169,21 @@
     var rl = $("f-roles").value.split("\n").map(function (s) { return s.trim(); }).filter(Boolean);
     if (rl.length) p.set("roles", rl.join("|"));
     var mn = parseInt($("f-min").value, 10); if (mn && mn !== 5) p.set("min", mn);
-    var to = $("f-to").value.trim(); if (to) p.set("to", to);
+    var to = $("f-to").value.trim(); if (to && to !== DEFAULT_TO) p.set("to", to);
     p.set("lang", $("f-lang").value);
     var pt = new URLSearchParams(p); pt.set("form", "team");
     var pd = new URLSearchParams(p); pd.delete("roles"); pd.set("form", "direction");
-    $("f-link-t").textContent = base + "?" + pt.toString();
+    // Keep "|" readable: shorter links make smaller, easier-to-scan QR codes.
+    $("f-link-t").textContent = base + "?" + pt.toString().replace(/%7C/g, "|");
     $("f-link-d").textContent = base + "?" + pd.toString();
+    ["t", "d"].forEach(function (k) {
+      var svg = qrSvg(linkFor(k));
+      $("f-qr-" + k).innerHTML = svg;
+      $("f-qr-" + k).hidden = !svg;
+      $("f-msg-" + k).textContent = svg ? "" : T("fQrLong");
+      document.querySelectorAll('[data-k="' + k + '"][data-act="f-present"], [data-k="' + k + '"][data-act="f-qr-save"]')
+        .forEach(function (b) { b.disabled = !svg; });
+    });
   }
 
   function compileCodes() {
@@ -1024,8 +1320,8 @@
     });
     return lines.join("\n");
   }
-  function download(name, text) {
-    var blob = new Blob(["﻿" + text], { type: "text/csv;charset=utf-8" });
+  function download(name, text, type) {
+    var blob = new Blob(type ? [text] : ["﻿" + text], { type: type || "text/csv;charset=utf-8" });
     var a = document.createElement("a");
     a.href = URL.createObjectURL(blob); a.download = name;
     document.body.appendChild(a); a.click(); a.remove();

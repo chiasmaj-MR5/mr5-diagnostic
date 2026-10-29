@@ -27,10 +27,11 @@ minimum reporting group size travel in the link, so the page itself names no cli
 ```
 …/ai-activities/?org=Organization&form=team&roles=Role A|Role B&lang=fr        # anonymous team questionnaire
 …/ai-activities/?org=Organization&form=direction&lang=fr                       # leadership questionnaire
-…/ai-activities/?view=facilitator                                              # link builder + code compiler
+…/ai-activities/?view=facilitator                                              # links, QR codes + code compiler
 ```
 
-The facilitator view compiles pasted codes in the browser: weekly hours by
+The facilitator view shows each link with a QR code (copy, download, or
+present full screen), and compiles pasted codes in the browser: weekly hours by
 proposed category (automatable / augmented / human) per role group, with groups
 under the minimum size pooled; leadership vs. team comparison; and CSV exports
 (one row per respondent, one row per activity) for the consolidation workbook.
