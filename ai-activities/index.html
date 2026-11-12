@@ -587,7 +587,7 @@
       sActs: "Your main activities",
       sActsSubT: "Think of a typical work week. Describe {lo} to {hi} activities that take up most of your time — one card each, about a minute per card.",
       sActsSubD: "Describe {lo} to {hi} of your own main activities, using the same card as your teams.",
-      actEx: "Use a verb and an object, e.g. “prepare the monthly reports”, “answer client requests by email”, “enter invoices”.",
+      actEx: "Use a verb and an object, e.g. “prepare the monthly reports”, “answer client requests by email”, “enter invoices”, “connect colleagues with the right person”.",
       act: "Activity {n}", remove: "Remove",
       addAct: "+ Add another activity", actsLeft: "{n} of {hi} activities",
       aName: "Describe the activity", aNamePh: "verb + object",
@@ -653,6 +653,31 @@
       qWho: "Who currently decides on adopting a new tool or changing a role?",
       qChamp: "Who at {org} could act as an AI champion or point person?",
 
+      sInvisible: "The work no one sees",
+      sInvisibleSub: "Much important work never shows up in a task list: knowing who to call, connecting people, unblocking problems between teams. This work stays human, and it is counted separately from the activities above.",
+      sInvisibleSubD: "Optional. Much important work never shows up in a task list: knowing who to call, connecting people, unblocking problems between teams.",
+      qNv: "Apart from the activities above, how much of your week goes to helping others navigate the organization (connecting people, explaining who to go to, unblocking problems across teams)?",
+      qNvHelp: "An estimate is fine.",
+      nvOpts: ["None", "Under 1 h", "1–3 h", "3–5 h", "5–10 h", "Over 10 h"],
+      qRl: "How often do colleagues from other teams come to you to find out who to go to or how to get something done?",
+      rlOpts: ["Never", "A few times a year", "Monthly", "Weekly", "Daily"],
+      rlLower: ["never", "a few times a year", "monthly", "weekly", "daily"],
+      qKp: "If you were away for a month, what would stall because only you know how — or whom to ask?",
+      qKd: "Which activities or decisions depend on one or two people who know how to navigate the organization?",
+      qKw: "Is that knowledge written down anywhere?",
+      kwOpts: ["Yes", "Partly", "No", "Not sure"],
+      yInv: "Your invisible work",
+      yInvP: "About <b>{r}</b> per week goes to helping others navigate the organization.",
+      yInvRl: "Colleagues from other teams come to you for this: {f}.",
+      yInvNote: "This work stays human and is not counted in the time AI could save. It becomes more valuable as AI takes over routine tasks.",
+      cInv: "Invisible coordination work",
+      cInvSub: "Time spent helping others navigate the organization — connecting people, explaining who to go to, unblocking problems. It stays human and is not counted in the time AI could save. By group, never by name; team groups under {min} people are pooled.",
+      cInvTot: "h per week in total", cInvPer: "h per person per week", cInvOften: "asked at least weekly to help others navigate",
+      cInvRow: "{p} asked weekly or daily", cInvAns: "{n} of {t} answered",
+      cInvQuotes: "What would stall without them — in their words",
+      cInvQuotesSub: "Answers to “what would stall if you were away” and, for leadership, “which activities depend on one or two people”. Shown only for groups of at least {min} people.",
+      cInvDoc: "Leadership: knowledge written down", 
+      dInv: "Protect the connectors", dInvP: "{p} of respondents are asked at least weekly to help others navigate the organization, and this invisible work takes about {h} h per week in total.", dInvD: "how to keep this capacity — and recognize it — as roles change?",
       helpAgent: "AI agent", helpAssist: "AI assistant", helpHuman: "Keep human",
       helpAgentD: "does the task from start to finish; a person checks the result",
       helpAssistD: "drafts, summarises, searches or analyses; you stay in charge",
@@ -818,7 +843,7 @@
       sActs: "Vos principales activités",
       sActsSubT: "Pensez à une semaine de travail habituelle. Décrivez de {lo} à {hi} activités qui occupent l’essentiel de votre temps — une fiche par activité, environ une minute chacune.",
       sActsSubD: "Décrivez de {lo} à {hi} de vos principales activités personnelles, avec la même fiche que vos équipes.",
-      actEx: "Utilisez un verbe et un objet, par exemple : « préparer les rapports mensuels », « répondre aux demandes des clients par courriel », « saisir les factures ».",
+      actEx: "Utilisez un verbe et un objet, par exemple : « préparer les rapports mensuels », « répondre aux demandes des clients par courriel », « saisir les factures », « mettre des collègues en contact avec la bonne personne ».",
       act: "Activité {n}", remove: "Retirer",
       addAct: "+ Ajouter une autre activité", actsLeft: "{n} activités sur {hi}",
       aName: "Décrivez l’activité", aNamePh: "verbe + objet",
@@ -884,6 +909,31 @@
       qWho: "Qui décide aujourd’hui de l’adoption d’un nouvel outil ou d’un changement de rôle?",
       qChamp: "Qui, à {org}, pourrait agir comme personne-relais ou champion de l’IA?",
 
+      sInvisible: "Le travail que personne ne voit",
+      sInvisibleSub: "Une grande partie du travail important n’apparaît dans aucune liste de tâches : savoir qui appeler, mettre les gens en contact, débloquer des problèmes entre équipes. Ce travail reste humain et il est compté à part des activités ci-dessus.",
+      sInvisibleSubD: "Facultatif. Une grande partie du travail important n’apparaît dans aucune liste de tâches : savoir qui appeler, mettre les gens en contact, débloquer des problèmes entre équipes.",
+      qNv: "En dehors des activités ci-dessus, quelle part de votre semaine consacrez-vous à aider les autres à s’y retrouver dans l’organisation (mettre des gens en contact, expliquer à qui s’adresser, débloquer des problèmes entre équipes)?",
+      qNvHelp: "Une estimation suffit.",
+      nvOpts: ["Aucune", "Moins de 1 h", "1 à 3 h", "3 à 5 h", "5 à 10 h", "Plus de 10 h"],
+      qRl: "À quelle fréquence des collègues d’autres équipes viennent-ils vous voir pour savoir à qui s’adresser ou comment faire avancer quelque chose?",
+      rlOpts: ["Jamais", "Quelques fois par année", "Chaque mois", "Chaque semaine", "Chaque jour"],
+      rlLower: ["jamais", "quelques fois par année", "chaque mois", "chaque semaine", "chaque jour"],
+      qKp: "Si vous étiez absent un mois, qu’est-ce qui serait bloqué parce que vous seul savez comment faire — ou à qui demander?",
+      qKd: "Quelles activités ou décisions dépendent d’une ou deux personnes qui savent naviguer dans l’organisation?",
+      qKw: "Ce savoir est-il consigné quelque part?",
+      kwOpts: ["Oui", "En partie", "Non", "Je ne sais pas"],
+      yInv: "Votre travail invisible",
+      yInvP: "Environ <b>{r}</b> par semaine vont à aider les autres à s’y retrouver dans l’organisation.",
+      yInvRl: "Des collègues d’autres équipes viennent vous voir pour cela : {f}.",
+      yInvNote: "Ce travail reste humain et n’est pas compté dans le temps que l’IA pourrait faire gagner. Il prend de la valeur à mesure que l’IA prend en charge les tâches routinières.",
+      cInv: "Travail de coordination invisible",
+      cInvSub: "Temps consacré à aider les autres à s’y retrouver dans l’organisation — mettre les gens en contact, expliquer à qui s’adresser, débloquer des problèmes. Il reste humain et n’est pas compté dans le temps que l’IA pourrait faire gagner. Par groupe, jamais par nom; les groupes de moins de {min} personnes sont regroupés.",
+      cInvTot: "h par semaine au total", cInvPer: "h par personne par semaine", cInvOften: "sollicités au moins chaque semaine pour aider les autres à s’y retrouver",
+      cInvRow: "{p} sollicités chaque semaine ou chaque jour", cInvAns: "{n} sur {t} ont répondu",
+      cInvQuotes: "Ce qui serait bloqué sans eux — dans leurs mots",
+      cInvQuotesSub: "Réponses à « qu’est-ce qui serait bloqué si vous étiez absent » et, pour la direction, « quelles activités dépendent d’une ou deux personnes ». Affichées seulement pour les groupes d’au moins {min} personnes.",
+      cInvDoc: "Direction : savoir consigné",
+      dInv: "Protéger les connecteurs", dInvP: "{p} des répondants sont sollicités au moins chaque semaine pour aider les autres à s’y retrouver dans l’organisation, et ce travail invisible représente environ {h} h par semaine au total.", dInvD: "comment préserver cette capacité — et la reconnaître — à mesure que les rôles évoluent?",
       helpAgent: "Agent IA", helpAssist: "Assistant IA", helpHuman: "Humain à garder",
       helpAgentD: "réalise la tâche du début à la fin; une personne vérifie le résultat",
       helpAssistD: "rédige, résume, cherche ou analyse; vous restez responsable",
@@ -1079,6 +1129,11 @@
     t: [
       { title: "sRole", qs: [{ k: "role", type: "role", q: "qRole", help: "qRoleHelp", req: true }] },
       { title: "sActs", sub: "sActsSubT", acts: { lo: 3, hi: 7 } },
+      { title: "sInvisible", sub: "sInvisibleSub", qs: [
+        { k: "nv", type: "one", q: "qNv", o: "nvOpts", help: "qNvHelp", req: true },
+        { k: "rl", type: "one", q: "qRl", o: "rlOpts", req: true },
+        { k: "kp", type: "long", q: "qKp" }
+      ] },
       { title: "sSummary", qs: [
         { k: "cov", type: "one", q: "qCover", o: "cover", req: true, stack: true },
         { k: "give", type: "long", q: "qGive" },
@@ -1114,6 +1169,13 @@
         { k: "co", type: "many", q: "qConcernD", o: "concerns", max: 3, other: true, req: true },
         { k: "ag", type: "agree", q: "agreeIntro", rows: ["stTeams", "stChange"], req: true },
         { k: "ch", type: "short", q: "qChamp" }
+      ] },
+      { title: "sInvisible", sub: "sInvisibleSubD", qs: [
+        { k: "nv", type: "one", q: "qNv", o: "nvOpts", help: "qNvHelp" },
+        { k: "rl", type: "one", q: "qRl", o: "rlOpts" },
+        { k: "kd", type: "long", q: "qKd" },
+        { k: "kw", type: "one", q: "qKw", o: "kwOpts" },
+        { k: "kp", type: "long", q: "qKp" }
       ] },
       { title: "sActs", sub: "sActsSubD", acts: { lo: 3, hi: 5 } }
     ]
@@ -1176,6 +1238,15 @@
       s[t][0] += v[0]; s[t][1] += v[1]; s.total[0] += v[0]; s.total[1] += v[1];
     });
     return s;
+  }
+  // Invisible coordination work: weekly hours from its own bracket (0 for "none").
+  var NV_MID = [0, 0.5, 2, 4, 7.5, 12];
+  function invisibleOf(list) {
+    var ans = list.filter(function (r) { return r.nv != null; });
+    var rl = list.filter(function (r) { return r.rl != null; });
+    var h = ans.reduce(function (t, r) { return t + (NV_MID[r.nv] || 0); }, 0);
+    return { n: ans.length, h: h, per: ans.length ? h / ans.length : 0, nRl: rl.length,
+      often: rl.length ? 100 * rl.filter(function (r) { return r.rl >= 3; }).length / rl.length : null };
   }
   function half(v) { return Math.round(v * 2) / 2; }
   function hr(r, perWeek) {
@@ -1317,7 +1388,7 @@
         '<div class="add-row">' + (a.acts.length < step.acts.hi ? '<button class="btn ghost small" data-act="add">' + esc(T("addAct")) + "</button>" : "") +
         '<span class="hint">' + esc(fmt(T("actsLeft"), { n: a.acts.length, hi: step.acts.hi })) + "</span></div>";
     } else {
-      body = '<div class="s-head"><h2>' + tx(step.title) + "</h2></div>" + step.qs.map(function (q) { return qBlock(q, a); }).join("");
+      body = '<div class="s-head"><h2>' + tx(step.title) + "</h2>" + (step.sub ? "<p>" + tx(step.sub) + "</p>" : "") + "</div>" + step.qs.map(function (q) { return qBlock(q, a); }).join("");
     }
     var last = state.step === steps.length - 1;
     return '<section class="screen">' +
@@ -1444,6 +1515,7 @@
       '<div class="tile"><div class="v accent">' + hr(sv.total) + '</div><div class="l">' + esc(T("yTilesS")) + "</div></div>" +
       '<div class="tile"><div class="v">' + p.acts.length + '</div><div class="l">' + esc(T("yTiles")[2]) + "</div></div></div>" +
       personalSavings(p, sv) +
+      personalInvisible(p) +
       '<div class="card"><h3>' + esc(T("yWeek")) + '</h3><p class="sub">' + esc(help ? fmt(T("yHelp"), { h: h1(help), p: Math.round(hp) }) : T("yHelpNone")) + "</p>" +
       catLegend() + '<div class="bars">' + stackRow("", "", h, h.total) + "</div></div>" +
       '<div class="card"><h3>' + esc(T("yActs")) + '</h3><ul class="alist">' + acts.map(function (m) {
@@ -1483,6 +1555,15 @@
           '<div class="breakdown"><span>' + esc(t === "human" ? T("helpHuman") : fmt(T("sSaves"), { r: hr(v, true) })) + "</span><span>" + esc(fmt(T("sOf"), { h: h1(hrs) })) + "</span></div></div>";
       }).join("") + "</div>" +
       '<p class="method">' + esc(T("sMethod")) + "</p></div>";
+  }
+
+  function personalInvisible(p) {
+    if (p.nv == null && p.rl == null) return "";
+    var h = p.nv != null ? NV_MID[p.nv] : 0;
+    return '<div class="card"><h3>' + esc(T("yInv")) + "</h3>" +
+      (h > 0 ? '<p class="save-hero" style="font-size:clamp(1.3rem,3.6vw,1.7rem)">' + fmt(T("yInvP"), { r: esc(T("nvOpts")[p.nv]) }) + "</p>" : "") +
+      (p.rl != null ? '<p class="sub" style="margin-bottom:0.4rem">' + esc(fmt(T("yInvRl"), { f: T("rlLower")[p.rl] })) + "</p>" : "") +
+      '<p class="method" style="margin-top:0.6rem">' + esc(T("yInvNote")) + "</p></div>";
   }
 
   function standaloneCodeHTML(p) {
@@ -1624,6 +1705,8 @@
     var dirs = [];
     function lever(tag, p, d) { dirs.push('<div class="lever"><span class="l-tag">' + esc(tag) + "</span><p>" + esc(p) + '</p><p class="decide"><b>' + esc(T("decide")) + "</b> " + esc(d) + "</p></div>"); }
     var autoItems = cand.filter(function (m) { return m.c === "auto"; });
+    var INV = invisibleOf(G.teams.concat(G.dirs));
+    if (INV.often != null && INV.often > 0) lever(T("dInv"), fmt(T("dInvP"), { p: pct(INV.often), h: h1(INV.h) }), T("dInvD"));
     if (SV.total[1] > 0) lever(T("dSave"), fmt(T("dSaveP"), { r: hr(SV.total), pp: hr([SV.total[0] / responses.length, SV.total[1] / responses.length]), a: hr(SV.agent), b: hr(SV.assistant) }), T("dSaveD"));
     if (H.auto > 0) lever(T("dQuick"), fmt(T("dQuickP"), { h: h1(H.auto), list: autoItems.slice(0, 3).map(function (m) { return (lang === "fr" ? "« " : "“") + m.x.n + (lang === "fr" ? " »" : "”"); }).join(", ") || "—" }), T("dQuickD"));
     if (H.aug > 0) lever(T("dAug"), fmt(T("dAugP"), { h: h1(H.aug) }), T("dAugD"));
@@ -1649,6 +1732,7 @@
       '<div class="tile"><div class="v accent">' + hr(SV.total) + '</div><div class="l">' + esc(T("gTileS")) + " · " + esc(fmt(T("gPerPerson"), { r: hr([SV.total[0] / responses.length, SV.total[1] / responses.length]) })) + "</div></div></div>" +
       '<div class="card"><h3>' + esc(T("cDirs")) + '</h3><p class="sub">' + esc(T("cDirsSub")) + '</p><div class="levers">' + dirs.join("") + "</div></div>" +
       groupSavings(G, min, responses.length) +
+      groupInvisible(G, min) +
       '<div class="card"><h3>' + esc(T("cTime")) + '</h3><p class="sub">' + esc(fmt(T("cTimeSub"), { min: min })) + "</p>" + catLegend() +
         '<div class="bars">' + timeRows.join("") + "</div></div>" +
       '<div class="card"><h3>' + esc(T("cCand")) + '</h3><p class="sub">' + esc(fmt(T("cCandSub"), { min: min })) + "</p>" + alist(cand.slice(0, 10)) + "</div>" +
@@ -1691,6 +1775,45 @@
       '<h4 style="margin-top:1.6rem">' + esc(T("cSaveTop")) + '</h4><p class="sub">' + esc(fmt(T("cSaveTopSub"), { min: min })) + "</p>" +
       (top ? '<ul class="alist">' + top + "</ul>" : '<p class="muted" style="font-size:0.9rem">' + esc(T("cNone")) + "</p>") +
       '<p class="method">' + esc(T("sMethod")) + "</p></div>";
+  }
+
+  function groupInvisible(G, min) {
+    var all = G.teams.concat(G.dirs), I = invisibleOf(all);
+    if (!I.n && !I.nRl) return "";
+    var rows = [];
+    G.rows.forEach(function (row) { if (row.list.length >= min) rows.push({ name: row.name, list: row.list }); });
+    if (G.dirs.length) rows.push({ name: T("cLead"), list: G.dirs, lead: true });
+    var data = rows.map(function (row) { return { row: row, i: invisibleOf(row.list) }; }).filter(function (d) { return d.i.n || d.i.nRl; });
+    var max = 0; data.forEach(function (d) { max = Math.max(max, d.i.per); });
+    var bars = data.map(function (d) {
+      var w = max ? 100 * d.i.per / max : 0;
+      var sub = d.row.lead && d.i.n < d.row.list.length ? fmt(T("cInvAns"), { n: d.i.n, t: d.row.list.length }) : "";
+      return '<div class="bar-row"><div class="name">' + esc(d.row.name) + (sub ? "<small>" + esc(sub) + "</small>" : "") + "</div>" +
+        '<div class="bar-line"><div class="track"><div class="fill" style="width:' + w.toFixed(2) + '%;background:var(--c-hum)" data-tip="' +
+        esc(h1(d.i.per) + " " + T("cInvPer")) + '"></div><span style="width:' + (100 - w).toFixed(2) + '%"></span></div>' +
+        '<span class="val">' + h1(d.i.per) + " h</span></div>" +
+        '<div class="breakdown"><span>' + esc(T("cInvPer")) + "</span>" + (d.i.often != null ? "<span>" + esc(fmt(T("cInvRow"), { p: pct(d.i.often) })) + "</span>" : "") + "</div></div>";
+    }).join("");
+    // Free-text answers only from groups that reach the minimum size.
+    var quotes = [];
+    G.eligible.forEach(function (e) {
+      [e.r.kp, e.r.kd].forEach(function (q) { if (q && String(q).trim()) quotes.push({ q: String(q).trim(), g: e.g }); });
+    });
+    var dirsKw = G.dirs.filter(function (r) { return r.kw != null; });
+    var docTxt = dirsKw.length ? T("kwOpts").map(function (o, i) {
+      var c = dirsKw.filter(function (r) { return r.kw === i; }).length; return c ? o + " " + c : "";
+    }).filter(Boolean).join(" · ") : "";
+    return '<div class="card"><h3>' + esc(T("cInv")) + '</h3><p class="sub">' + esc(fmt(T("cInvSub"), { min: min })) + "</p>" +
+      '<div class="tiles" style="margin-top:0.4rem;margin-bottom:1.2rem">' +
+      '<div class="tile"><div class="v">' + h1(I.h) + '</div><div class="l">' + esc(T("cInvTot")) + "</div></div>" +
+      '<div class="tile"><div class="v">' + h1(I.per) + '</div><div class="l">' + esc(T("cInvPer")) + "</div></div>" +
+      (I.often != null ? '<div class="tile"><div class="v accent">' + pct(I.often) + '</div><div class="l">' + esc(T("cInvOften")) + "</div></div>" : "") + "</div>" +
+      (bars ? '<div class="bars">' + bars + "</div>" : "") +
+      (docTxt ? '<p class="method">' + esc(T("cInvDoc")) + " — " + esc(docTxt) + "</p>" : "") +
+      (quotes.length ? '<h4 style="margin-top:1.6rem">' + esc(T("cInvQuotes")) + '</h4><p class="sub">' + esc(fmt(T("cInvQuotesSub"), { min: min })) + "</p>" +
+        '<ul class="alist">' + quotes.slice(0, 10).map(function (m) {
+          return '<li><span class="a-n" style="font-weight:400">“' + esc(m.q) + '”</span><span></span>' + (m.g ? '<span class="a-m"><span>' + esc(m.g) + "</span></span>" : "") + "</li>";
+        }).join("") + "</ul>" : "") + "</div>";
   }
 
   function liveSession() { return LIVE_SRC || SESSION; }
@@ -2131,7 +2254,8 @@
       "coverage", "hand_over", "keep", "agree_rekey", "agree_find", "agree_teams_welcome_change", "agree_change_supported",
       "reinvest", "reinvest_other", "ai_used", "ai_feeling_1_5", "concerns", "concerns_other", "concerns_text",
       "training", "training_other", "ai_tools", "ai_tools_which", "data_indicators", "obligations", "written_rules",
-      "who_decides", "champion", "n_activities"];
+      "who_decides", "champion", "invisible_work_bracket", "invisible_work_hours_estimate", "relied_on_frequency",
+      "key_person_stall", "key_dependencies", "dependencies_documented", "n_activities"];
     var lines = [cols.join(",")];
     list.forEach(function (r) {
       var ag = r.ag || [], t = r.f === "t";
@@ -2140,7 +2264,8 @@
         pick("cover", r.cov), r.give, r.keep,
         t ? agv(0) : "", t ? agv(1) : "", t ? "" : agv(0), t ? agv(2) : agv(1),
         pick("reinvest", r.re), r.reo, pick("used", r.ai), r.feel, pick("concerns", r.co), r.coo, r.cq,
-        pick("train", r.tr), r.tro, pick("tools", r.tl), r.tlw, r.dt, r.ob, pick("rules", r.ru), r.who, r.ch, r.acts.length].map(csvCell).join(","));
+        pick("train", r.tr), r.tro, pick("tools", r.tl), r.tlw, r.dt, r.ob, pick("rules", r.ru), r.who, r.ch, pick("nvOpts", r.nv), r.nv != null ? NV_MID[r.nv] : "", pick("rlOpts", r.rl),
+        r.kp, r.kd, pick("kwOpts", r.kw), r.acts.length].map(csvCell).join(","));
     });
     return lines.join("\n");
   }
