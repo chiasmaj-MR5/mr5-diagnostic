@@ -40,6 +40,11 @@ carried by its links, its answers and its results page, so each results page sho
 its own client's answers. (Sessions created before survey codes existed show only
 answers without one.)
 
+The live session card can change the role groups (that changes the team link and QR
+code; the old link keeps the old list). Past sessions keep a link to their results page
+and can be deleted from the console (two clicks); answers already in the Google Sheet
+stay there.
+
 Each activity is placed by the analysis from how it is described: serious
 consequences if an error slips in: human; done the same way each time: agent, a person
 checking the result; otherwise: assistant. Confidential data is flagged "approved tools only". Groups under the
