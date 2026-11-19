@@ -566,6 +566,7 @@
     to: (qp.get("to") || DEFAULT_TO).trim(),
     view: qp.get("view") === "facilitator" ? "facilitator" : qp.get("view") === "results" ? "results" : "",
     key: sheetId(qp.get("k")),
+    sid: /^[a-f0-9]{8,24}$/.test(qp.get("s") || "") ? qp.get("s") : "",
     collect: collectorUrl(qp.get("c"))
   };
   var CODE_PREFIX = "AIA1.";
@@ -595,7 +596,7 @@
         "Do not attach documents; we will collect them during the diagnostic if needed."
       ],
       start: "Start", resume: "Resume where I left off", restart: "Start over",
-      back: "Back", next: "Next", finish: "See my results",
+      back: "Back", next: "Next", finish: "Send my answers",
       stepOf: "Step {n} of {t}",
       required: "Answer the questions marked * to continue.",
       optional: "(optional)",
@@ -685,15 +686,10 @@
       nvOpts: ["None", "Under 1 h", "1–3 h", "3–5 h", "5–10 h", "Over 10 h"],
       qRl: "How often do colleagues from other teams come to you to find out who to go to or how to get something done?",
       rlOpts: ["Never", "A few times a year", "Monthly", "Weekly", "Daily"],
-      rlLower: ["never", "a few times a year", "monthly", "weekly", "daily"],
       qKp: "If you were away for a month, what would stall because only you know how — or whom to ask?",
       qKd: "Which activities or decisions depend on one or two people who know how to navigate the organization?",
       qKw: "Is that knowledge written down anywhere?",
       kwOpts: ["Yes", "Partly", "No", "Not sure"],
-      yInv: "Your invisible work",
-      yInvP: "About <b>{r}</b> per week goes to helping others navigate the organization.",
-      yInvRl: "Colleagues from other teams come to you for this: {f}.",
-      yInvNote: "This work stays human and is not counted in the time AI could save. It becomes more valuable as AI takes over routine tasks.",
       cInv: "Invisible coordination work",
       cInvSub: "Time spent helping others navigate the organization — connecting people, explaining who to go to, unblocking problems. It stays human and is not counted in the time AI could save. By group, never by name; team groups under {min} people are pooled.",
       cInvTot: "h per week in total", cInvPer: "h per person per week", cInvOften: "asked at least weekly to help others navigate",
@@ -702,8 +698,6 @@
       cInvQuotesSub: "Answers to “what would stall if you were away” and, for leadership, “which activities depend on one or two people”. Shown only for groups of at least {min} people.",
       cInvDoc: "Leadership: knowledge written down", 
       dInv: "Protect the connectors", dInvP: "{p} of respondents are asked at least weekly to help others navigate the organization, and this invisible work takes about {h} h per week in total.", dInvD: "how to keep this capacity — and recognize it — as roles change?",
-      yTilesP: ["of your tasks: AI agent", "of your tasks: AI assistant", "of your tasks: need a person", "AI could free per week"],
-      sFree: "This could free about {r} per week (AI agents {a}, AI assistants {b}).",
       helpHumanD: "needs a person’s judgement, relationship or responsibility",
       gTilesP: ["of tasks: AI agent", "of tasks: AI assistant", "of tasks: need a person"],
       cOut: "System transformation outlook",
@@ -724,6 +718,8 @@
       vNone: "No answers yet. Share the survey link — the results appear here once people finish.",
       vErr: "Could not reach the Google Sheet. Check that the web app is deployed with access “Anyone”, then try again.",
       vBadLink: "This results link is incomplete. Open it again from your console.",
+      vExtra: "Add answers received by email", vExtraDesc: "Paste response codes received by email (for example, leadership answers). They are added to these results in this browser.",
+      collectReuse: "Your Google Sheet works for every client: each survey has its own code, so each results page shows only its client’s answers. Keep the two links below as they are.",
       fSheet: "Link of the Google Sheet (for the results page)", fSheetPh: "https://docs.google.com/spreadsheets/d/…",
       sheetBad: "This does not look like a Google Sheet link (…/spreadsheets/d/…).",
       resTitle: "Results page", resDesc: "When everyone has finished, open this page and click “Show the latest results”. Keep this link private: it shows all the answers.",
@@ -758,15 +754,8 @@
       helpAgentD: "does the task from start to finish; a person checks the result",
       helpAssistD: "drafts, summarises, searches or analyses; you stay in charge",
       approved: "only with tools approved by {org}",
-      sTitle: "How your work could change with AI",
-      sHero: "<b>{a}</b> of your {n} tasks could be done by an AI agent and <b>{b}</b> with an AI assistant.",
-      sHeroNone: "None of the work you described looks ready for AI: it needs your judgement or carries serious consequences.",
-      sShare: "That is {p} of the time you described ({h} h per week).",
-      sSplit: "AI agents", sSplit2: "AI assistants",
-      sOf: "of {h} h",
       sSaves: "saves {r}",
       sMethod: "How it is estimated: each task is placed from the person’s answers about it. Work with serious consequences if an error slips in stays human; work done the same way each time goes to an AI agent, with a person checking the result; everything else goes to an AI assistant, with the person in charge. Confidential data does not change the category; it requires approved tools. Percentages are shares of the tasks described. Time freed is weighted by each task’s weekly hours: an AI agent 50–70 % of the task’s time, an AI assistant 10–50 % depending on how repetitive it is. Estimates to validate during the pilot.",
-      yTilesS: "AI could save you, per week",
       gTileS: "Time AI could save, per week",
       gPerPerson: "{r} per person",
       cSave: "Time AI could free, by group",
@@ -777,18 +766,9 @@
       catAuto: "AI agent", catAug: "AI assistant", catAugData: "AI assistant — approved tools only", catHum: "Stays human",
       catAutoS: "AI agent", catAugS: "AI assistant", catHumS: "Stays human",
 
-      yEyebrow: "Your results",
-      yTitle: "Your activity profile",
-      yLede: "Here is how your work could change with AI, based on your answers and the same rules MR5 applies to the whole group. These are proposals — they will be validated with you and your team.",
-      yTiles: ["Hours per week described", "Where AI could help", "Activities described"],
-      yHelp: "About {h} h of your week ({p} %) goes to activities where AI could help — by automating them or by assisting you.",
-      yHelpNone: "None of the activities you described is a clear candidate for AI: they rely on judgement or carry serious consequences.",
-      yWeek: "Your week, by proposed category",
-      yActs: "Your activities",
-      yPrio: "Your priorities for freed time",
-      yNext: "What happens next",
-      yNextText: "MR5 combines everyone’s answers by group (never fewer than {min} people), checks the proposals with you during the on-site day, and presents the group results to leadership.",
-      yNextTextD: "MR5 combines leadership and team answers, and will go over these proposals with you in the interview.",
+      tTitle: "Thank you!",
+      yNextText: "MR5 combines everyone’s answers by group (never fewer than {min} people), and presents the group results to leadership. No one sees your individual answers.",
+      yNextTextD: "MR5 combines leadership and team answers, and will go over the results with you.",
       hpw: "h/wk", nPeople: "{n} people",
 
       codeIntro: "<strong>One last step:</strong> send this response code to MR5 InnovAction. It contains your answers and no name; your answers count in the group results once MR5 adds it.",
@@ -868,7 +848,7 @@
       sessLive: "Live session", sessClosed: "Session closed",
       respCount: "{t} team · {d} leadership answers",
       shareTeam: "Team questionnaire — anonymous", shareLead: "Leadership questionnaire",
-      shareDesc: "Participants scan the code or open the link — no account needed. When they finish they see their own results and send their code to you.",
+      shareDesc: "Participants scan the code or open the link — no account needed. When they finish, their answers go to you; they do not see any results.",
       copyLink: "Copy link", present: "Present QR", saveQr: "Download QR",
       qrLong: "This link is too long for a QR code — shorten the organization or role-group names. The link itself still works.",
       scan: "Scan to begin · Balayez pour commencer",
@@ -903,7 +883,7 @@
         "Ne joignez aucun document : nous les recueillerons au besoin lors du diagnostic."
       ],
       start: "Commencer", resume: "Reprendre où j’en étais", restart: "Recommencer",
-      back: "Retour", next: "Suivant", finish: "Voir mes résultats",
+      back: "Retour", next: "Suivant", finish: "Envoyer mes réponses",
       stepOf: "Étape {n} sur {t}",
       required: "Répondez aux questions marquées d’un * pour continuer.",
       optional: "(facultatif)",
@@ -993,15 +973,10 @@
       nvOpts: ["Aucune", "Moins de 1 h", "1 à 3 h", "3 à 5 h", "5 à 10 h", "Plus de 10 h"],
       qRl: "À quelle fréquence des collègues d’autres équipes viennent-ils vous voir pour savoir à qui s’adresser ou comment faire avancer quelque chose?",
       rlOpts: ["Jamais", "Quelques fois par année", "Chaque mois", "Chaque semaine", "Chaque jour"],
-      rlLower: ["jamais", "quelques fois par année", "chaque mois", "chaque semaine", "chaque jour"],
       qKp: "Si vous étiez absent un mois, qu’est-ce qui serait bloqué parce que vous seul savez comment faire — ou à qui demander?",
       qKd: "Quelles activités ou décisions dépendent d’une ou deux personnes qui savent naviguer dans l’organisation?",
       qKw: "Ce savoir est-il consigné quelque part?",
       kwOpts: ["Oui", "En partie", "Non", "Je ne sais pas"],
-      yInv: "Votre travail invisible",
-      yInvP: "Environ <b>{r}</b> par semaine vont à aider les autres à s’y retrouver dans l’organisation.",
-      yInvRl: "Des collègues d’autres équipes viennent vous voir pour cela : {f}.",
-      yInvNote: "Ce travail reste humain et n’est pas compté dans le temps que l’IA pourrait faire gagner. Il prend de la valeur à mesure que l’IA prend en charge les tâches routinières.",
       cInv: "Travail de coordination invisible",
       cInvSub: "Temps consacré à aider les autres à s’y retrouver dans l’organisation — mettre les gens en contact, expliquer à qui s’adresser, débloquer des problèmes. Il reste humain et n’est pas compté dans le temps que l’IA pourrait faire gagner. Par groupe, jamais par nom; les groupes de moins de {min} personnes sont regroupés.",
       cInvTot: "h par semaine au total", cInvPer: "h par personne par semaine", cInvOften: "sollicités au moins chaque semaine pour aider les autres à s’y retrouver",
@@ -1010,8 +985,6 @@
       cInvQuotesSub: "Réponses à « qu’est-ce qui serait bloqué si vous étiez absent » et, pour la direction, « quelles activités dépendent d’une ou deux personnes ». Affichées seulement pour les groupes d’au moins {min} personnes.",
       cInvDoc: "Direction : savoir consigné",
       dInv: "Protéger les connecteurs", dInvP: "{p} des répondants sont sollicités au moins chaque semaine pour aider les autres à s’y retrouver dans l’organisation, et ce travail invisible représente environ {h} h par semaine au total.", dInvD: "comment préserver cette capacité — et la reconnaître — à mesure que les rôles évoluent?",
-      yTilesP: ["de vos tâches : agent IA", "de vos tâches : assistant IA", "de vos tâches : demandent une personne", "que l’IA pourrait libérer par semaine"],
-      sFree: "Cela pourrait libérer environ {r} par semaine (agents IA {a}, assistants IA {b}).",
       helpHumanD: "demande le jugement, la relation ou la responsabilité d’une personne",
       gTilesP: ["des tâches : agent IA", "des tâches : assistant IA", "des tâches : demandent une personne"],
       cOut: "Perspectives de transformation",
@@ -1032,6 +1005,8 @@
       vNone: "Aucune réponse pour l’instant. Partagez le lien du questionnaire — les résultats s’affichent ici dès que les gens terminent.",
       vErr: "Impossible de joindre le Google Sheet. Vérifiez que l’application Web est déployée avec l’accès « Tout le monde », puis réessayez.",
       vBadLink: "Ce lien de résultats est incomplet. Ouvrez-le de nouveau à partir de votre console.",
+      vExtra: "Ajouter des réponses reçues par courriel", vExtraDesc: "Collez les codes de réponse reçus par courriel (par exemple, les réponses de la direction). Ils sont ajoutés à ces résultats dans ce navigateur.",
+      collectReuse: "Votre Google Sheet sert pour tous les clients : chaque questionnaire a son propre code, donc chaque page de résultats ne montre que les réponses de son client. Gardez les deux liens ci-dessous tels quels.",
       fSheet: "Lien du Google Sheet (pour la page de résultats)", fSheetPh: "https://docs.google.com/spreadsheets/d/…",
       sheetBad: "Ce lien ne ressemble pas à un Google Sheet (…/spreadsheets/d/…).",
       resTitle: "Page de résultats", resDesc: "Quand tout le monde a terminé, ouvrez cette page et cliquez sur « Afficher les derniers résultats ». Gardez ce lien privé : il montre toutes les réponses.",
@@ -1066,15 +1041,8 @@
       helpAgentD: "réalise la tâche du début à la fin; une personne vérifie le résultat",
       helpAssistD: "rédige, résume, cherche ou analyse; vous restez responsable",
       approved: "seulement avec des outils approuvés par {org}",
-      sTitle: "Comment votre travail pourrait changer avec l’IA",
-      sHero: "<b>{a}</b> de vos {n} tâches pourraient être faites par un agent IA et <b>{b}</b> avec un assistant IA.",
-      sHeroNone: "Aucune des activités décrites ne semble prête pour l’IA : elles demandent votre jugement ou comportent des conséquences importantes.",
-      sShare: "C’est {p} du temps décrit ({h} h par semaine).",
-      sSplit: "Agents IA", sSplit2: "Assistants IA",
-      sOf: "sur {h} h",
       sSaves: "économise {r}",
       sMethod: "Méthode : chaque tâche est classée à partir des réponses de la personne. Le travail où une erreur aurait des conséquences importantes reste humain; le travail toujours fait de la même façon va à un agent IA, une personne vérifiant le résultat; tout le reste va à un assistant IA, la personne restant responsable. Les données confidentielles ne changent pas la catégorie; elles exigent des outils approuvés. Les pourcentages sont des parts des tâches décrites. Le temps libéré tient compte des heures hebdomadaires de chaque tâche : agent IA 50 à 70 % du temps de la tâche, assistant IA 10 à 50 % selon le caractère répétitif. Estimations à valider pendant l’essai.",
-      yTilesS: "Temps que l’IA pourrait vous faire gagner, par semaine",
       gTileS: "Temps que l’IA pourrait libérer, par semaine",
       gPerPerson: "{r} par personne",
       cSave: "Temps que l’IA pourrait libérer, par groupe",
@@ -1085,18 +1053,9 @@
       catAuto: "Agent IA", catAug: "Assistant IA", catAugData: "Assistant IA — outils approuvés seulement", catHum: "Reste humain",
       catAutoS: "Agent IA", catAugS: "Assistant IA", catHumS: "Reste humain",
 
-      yEyebrow: "Vos résultats",
-      yTitle: "Votre profil d’activités",
-      yLede: "Voici comment votre travail pourrait changer avec l’IA, selon vos réponses et les mêmes règles que MR5 applique à l’ensemble du groupe. Ce sont des propositions : elles seront validées avec vous et votre équipe.",
-      yTiles: ["Heures par semaine décrites", "Là où l’IA pourrait aider", "Activités décrites"],
-      yHelp: "Environ {h} h de votre semaine ({p} %) vont à des activités où l’IA pourrait aider — en les automatisant ou en vous assistant.",
-      yHelpNone: "Aucune des activités décrites n’est un candidat évident pour l’IA : elles demandent du jugement ou comportent des conséquences importantes.",
-      yWeek: "Votre semaine, par catégorie proposée",
-      yActs: "Vos activités",
-      yPrio: "Vos priorités pour le temps libéré",
-      yNext: "La suite",
-      yNextText: "MR5 regroupe les réponses de tous par groupe (jamais moins de {min} personnes), valide les propositions avec vous lors du diagnostic sur place, puis présente les résultats de groupe à la direction.",
-      yNextTextD: "MR5 regroupe les réponses de la direction et des équipes, et reviendra sur ces propositions avec vous en entrevue.",
+      tTitle: "Merci!",
+      yNextText: "MR5 regroupe les réponses de tous par groupe (jamais moins de {min} personnes), puis présente les résultats de groupe à la direction. Personne ne voit vos réponses individuelles.",
+      yNextTextD: "MR5 regroupe les réponses de la direction et des équipes, et reviendra sur les résultats avec vous.",
       hpw: "h/sem.", nPeople: "{n} personnes",
 
       codeIntro: "<strong>Une dernière étape :</strong> envoyez ce code de réponse à MR5 InnovAction. Il contient vos réponses et aucun nom; vos réponses comptent dans les résultats de groupe dès que MR5 l’ajoute.",
@@ -1176,7 +1135,7 @@
       sessLive: "Session en cours", sessClosed: "Session fermée",
       respCount: "{t} réponses équipes · {d} direction",
       shareTeam: "Questionnaire Équipes — anonyme", shareLead: "Questionnaire Direction",
-      shareDesc: "Les participants balaient le code ou ouvrent le lien — aucun compte requis. À la fin, ils voient leurs propres résultats et vous envoient leur code.",
+      shareDesc: "Les participants balaient le code ou ouvrent le lien — aucun compte requis. À la fin, leurs réponses vous parviennent; ils ne voient aucun résultat.",
       copyLink: "Copier le lien", present: "Présenter le code QR", saveQr: "Télécharger le code QR",
       qrLong: "Ce lien est trop long pour un code QR — raccourcissez le nom de l’organisation ou des groupes. Le lien lui-même fonctionne.",
       scan: "Balayez pour commencer · Scan to begin",
@@ -1232,9 +1191,9 @@
 
   // Survey settings: from the session in the artifact, from the link on the public page.
   function cfg() {
-    if (STANDALONE) return { org: P.org, roles: P.roles, min: P.min, to: P.to, collect: P.collect };
-    if (SESSION) return { org: SESSION.org, roles: SESSION.roles || [], min: SESSION.min || 5, to: SESSION.email || DEFAULT_TO, collect: collectorUrl(SESSION.collect) };
-    return { org: "", roles: [], min: 5, to: DEFAULT_TO, collect: "" };
+    if (STANDALONE) return { org: P.org, roles: P.roles, min: P.min, to: P.to, collect: P.collect, sid: P.sid };
+    if (SESSION) return { org: SESSION.org, roles: SESSION.roles || [], min: SESSION.min || 5, to: SESSION.email || DEFAULT_TO, collect: collectorUrl(SESSION.collect), sid: SESSION.sid || "" };
+    return { org: "", roles: [], min: 5, to: DEFAULT_TO, collect: "", sid: "" };
   }
   function orgName() { return cfg().org || T("ourOrg"); }
   function roles() { var r = cfg().roles; return r.length ? r : DEFAULT_ROLES; }
@@ -1321,14 +1280,15 @@
   var view = "intro", mode = STANDALONE ? "standalone" : "solo";
   var FORM = STANDALONE ? P.form : "t";
   var state = null;            // { id, step, a }
-  var lastPayload = null;      // the answers shown on the personal results screen
-  var submitHTML = "";         // status banner under personal results
+  var lastPayload = null;      // the answers just sent (for the backup code)
+  var submitHTML = "";         // status banner on the thank-you screen
   var LIVE_SRC = null;         // null = current session; otherwise an archived session
   var compiled = [];           // responses compiled from codes on the public facilitator view
   var closeArmed = false;
   var codeMsg = "";            // result of the last "add codes", shown again after the reload
   var ROI_IN = null;           // ROI assumptions; saved with the session in the artifact
   var resMsg = "", resLoaded = false; // results page: status line, and whether the Sheet answered
+  var resSheet = [];                  // results page: every code the Sheet returned
   var roiCtx = null;           // the group data the ROI card was last drawn from
 
   function draftKey() { return "aia-draft:" + FORM + ":" + (cfg().org || ""); }
@@ -1394,11 +1354,7 @@
   }
   var HELP_VAR = { agent: "--c-auto", assistant: "--c-aug" };
   var HELP_LABEL = { agent: "helpAgent", assistant: "helpAssist", human: "helpHuman" };
-  function helpChip(x) {
-    var t = helpType(x);
-    return '<span class="chip">' + (t === "human" ? sw("--c-hum") : sw(HELP_VAR[t])) + esc(T(HELP_LABEL[t])) + "</span>" +
-      (t !== "human" && (x.c === 0 || x.c === 2) ? '<span>' + tx("approved") + "</span>" : "");
-  }
+
   function helpLegend() {
     return '<div class="legend"><span class="key">' + sw("--c-auto") + "<span><b>" + esc(T("helpAgent")) + "</b> — " + esc(T("helpAgentD")) + "</span></span>" +
       '<span class="key">' + sw("--c-aug") + "<span><b>" + esc(T("helpAssist")) + "</b> — " + esc(T("helpAssistD")) + "</span></span></div>";
@@ -1578,6 +1534,7 @@
   // ============ response payload / code ============
   function buildPayload() {
     var a = state.a, out = { v: 1, f: FORM, id: state.id, d: new Date().toISOString().slice(0, 10), l: lang };
+    if (cfg().sid) out.s = cfg().sid;   // the session (client survey) the answers belong to
     if (cfg().org) out.org = cfg().org;
     if (FORM === "t" && a.role != null) {
       var rl = roles();
@@ -1648,60 +1605,18 @@
   function chip(c) { return '<span class="chip">' + sw(CAT_VAR[bucket(c)]) + esc(T(CAT_LABEL[c])) + "</span>"; }
 
   // ============ personal results ============
-  function renderPersonal() {
-    var p = lastPayload, sv = savingsOf(p.acts), sp = splitOf(p.acts);
-    var prio = (p.re || []).map(function (i) { return i < T("reinvest").length ? T("reinvest")[i] : (p.reo || T("other")); });
+  // ============ end of the survey: a thank-you screen (results are for the facilitator only) ============
+  function renderThanks() {
     var back = mode === "respond" || mode === "solo";
-    return '<section class="screen" id="report-root">' +
-      '<p class="eyebrow"><span class="mark">MR5</span> · ' + esc(T("yEyebrow")) + "</p>" +
-      "<h1>" + esc(T("yTitle")) + "</h1>" +
-      '<p class="org-line">' + (cfg().org ? "<strong>" + esc(cfg().org) + '</strong><span class="sep">·</span>' : "") +
-      (p.role ? esc(p.role) + '<span class="sep">·</span>' : "") + esc(dateStr()) + "</p>" +
-      '<p class="lede">' + esc(T("yLede")) + "</p>" +
-      '<div class="tiles">' + KINDS.map(function (k, i) {
-        return '<div class="tile"><div class="v"' + (k === "human" ? "" : ' style="color:var(--accent)"') + ">" + pct(sp.c[k]) + '</div><div class="l">' + esc(T("yTilesP")[i]) + "</div></div>";
-      }).join("") +
-      '<div class="tile"><div class="v">' + hr(sv.total) + '</div><div class="l">' + esc(T("yTilesP")[3]) + "</div></div></div>" +
-      personalSavings(p, sv, sp) +
-      personalInvisible(p) +
-      (prio.length ? '<div class="card"><h3>' + esc(T("yPrio")) + '</h3><ul class="points" style="margin-top:0.4rem">' +
-        prio.map(function (x) { return "<li>" + esc(x) + "</li>"; }).join("") + "</ul></div>" : "") +
-      '<div class="card dashed"><h3>' + esc(T("yNext")) + '</h3><p class="sub" style="margin:0.3rem 0 0">' +
-        esc(fmt(T(p.f === "d" ? "yNextTextD" : "yNextText"), { min: cfg().min })) + "</p></div>" +
-      '<div id="submit-status" class="no-pdf">' + submitHTML + "</div>" +
-      '<div class="nav-row no-pdf" style="justify-content:flex-start;gap:0.8rem">' +
-      '<button class="btn ghost" data-act="report">' + esc(T("btnReport")) + "</button>" +
+    return '<section class="screen">' +
+      '<p class="eyebrow"><span class="mark">MR5</span> · ' + esc(T(FORM === "t" ? "eyebrowT" : "eyebrowD")) + (cfg().org ? " · " + esc(cfg().org) : "") + "</p>" +
+      "<h1>" + esc(T("tTitle")) + "</h1>" +
+      '<p class="lede">' + esc(fmt(T(FORM === "d" ? "yNextTextD" : "yNextText"), { min: cfg().min })) + "</p>" +
+      '<div id="submit-status">' + submitHTML + "</div>" +
+      '<div class="nav-row" style="justify-content:flex-start;gap:0.8rem">' +
       (back ? '<button class="btn ghost" data-act="to-intro">' + esc(T("btnBackConsole")) + "</button>"
             : '<button class="linklike" data-act="edit">' + esc(T("editAgain")) + "</button>") +
       "</div></section>";
-  }
-
-  function personalSavings(p, sv, sp) {
-    var rows = p.acts.slice().sort(function (m, n) { return savedOf(n)[1] - savedOf(m)[1] || (HOURS_MID[n.h] || 0) - (HOURS_MID[m.h] || 0); });
-    var max = 0; rows.forEach(function (x) { max = Math.max(max, HOURS_MID[x.h] || 0); });
-    return '<div class="card"><h3>' + esc(T("sTitle")) + "</h3>" +
-      (sp.agent + sp.assistant > 0
-        ? '<p class="save-hero" style="font-size:clamp(1.3rem,3.6vw,1.8rem)">' + fmt(T("sHero"), { a: sp.cnt.agent, b: sp.cnt.assistant, n: sp.n }) + "</p>"
-        : '<p class="sub">' + esc(T("sHeroNone")) + "</p>") +
-      splitLegend() + '<div class="bars">' + splitRow("", "", sp) + "</div>" +
-      (sv.total[1] > 0 ? '<p class="sub" style="margin:1rem 0 1.2rem">' + esc(fmt(T("sFree"), { r: hr(sv.total), a: hr(sv.agent), b: hr(sv.assistant) })) + "</p>" : "") +
-      '<div class="bars">' + rows.map(function (x) {
-        var t = helpType(x), v = savedOf(x), hrs = HOURS_MID[x.h] || 0;
-        var parts = t === "human" ? [] : [{ lo: v[0], hi: v[1], v: HELP_VAR[t], tip: T(HELP_LABEL[t]) + " · " + fmt(T("sSaves"), { r: hr(v, true) }) }];
-        return '<div class="bar-row"><div class="name">' + esc(x.n) + '<small class="a-m" style="display:flex;gap:0.6rem;flex-wrap:wrap">' + helpChip(x) + "</small></div>" +
-          '<div class="bar-line">' + saveBar(parts, hrs, max) + '<span class="val">' + (t === "human" ? "–" : esc(hr(v))) + "</span></div>" +
-          '<div class="breakdown"><span>' + esc(t === "human" ? T("helpHuman") : fmt(T("sSaves"), { r: hr(v, true) })) + "</span><span>" + esc(fmt(T("sOf"), { h: h1(hrs) })) + "</span></div></div>";
-      }).join("") + "</div>" +
-      '<p class="method">' + esc(T("sMethod")) + "</p></div>";
-  }
-
-  function personalInvisible(p) {
-    if (p.nv == null && p.rl == null) return "";
-    var h = p.nv != null ? NV_MID[p.nv] : 0;
-    return '<div class="card"><h3>' + esc(T("yInv")) + "</h3>" +
-      (h > 0 ? '<p class="save-hero" style="font-size:clamp(1.3rem,3.6vw,1.7rem)">' + fmt(T("yInvP"), { r: esc(T("nvOpts")[p.nv]) }) + "</p>" : "") +
-      (p.rl != null ? '<p class="sub" style="margin-bottom:0.4rem">' + esc(fmt(T("yInvRl"), { f: T("rlLower")[p.rl] })) + "</p>" : "") +
-      '<p class="method" style="margin-top:0.6rem">' + esc(T("yInvNote")) + "</p></div>";
   }
 
   function codeBlock(p) {
@@ -2182,6 +2097,7 @@
     if (form === "t" && sess.roles && sess.roles.length) p.set("roles", sess.roles.join("|"));
     if (sess.min && sess.min !== 5) p.set("min", sess.min);
     if (sess.email && sess.email !== DEFAULT_TO) p.set("to", sess.email);
+    if (sess.sid) p.set("s", sess.sid);
     if (collectorId(sess.collect)) p.set("c", collectorId(sess.collect));
     p.set("lang", sess.lang || "en");
     p.set("form", form === "d" ? "direction" : "team");
@@ -2192,6 +2108,7 @@
     if (!collectorId(sess.collect) || !sess.sheet) return "";
     var p = new URLSearchParams();
     p.set("view", "results"); p.set("c", collectorId(sess.collect)); p.set("k", sess.sheet);
+    if (sess.sid) p.set("s", sess.sid);
     if (sess.org) p.set("org", sess.org);
     if (sess.roles && sess.roles.length) p.set("roles", sess.roles.join("|"));
     p.set("min", sess.min || 5); p.set("lang", sess.lang || "en");
@@ -2246,14 +2163,16 @@
         '<p class="msg" id="admin-msg" role="status"></p></div>';
     } else {
       var langOpts = '<option value="en"' + (lang === "en" ? " selected" : "") + '>English</option><option value="fr"' + (lang === "fr" ? " selected" : "") + ">Français</option>";
+      var prevSess = SESSION || ARCHIVE[ARCHIVE.length - 1] || {};
       html += '<div class="card dashed"><h3>' + esc(T("newSession")) + "</h3>" +
         '<div class="field" style="margin-top:0.9rem"><label for="n-org">' + esc(T("fOrg")) + '</label><input type="text" id="n-org" maxlength="80"></div>' +
         '<div class="field"><label for="n-roles">' + esc(T("fRoles")) + '</label><textarea id="n-roles" rows="5">' + esc(DEFAULT_ROLES.join("\n")) + "</textarea></div>" +
         '<div class="field"><label for="n-min">' + esc(T("fMin")) + '</label><input type="text" id="n-min" inputmode="numeric" value="5"></div>' +
         '<div class="field"><label for="n-to">' + esc(T("fTo")) + '</label><input type="text" id="n-to" inputmode="email" value="' + esc(DEFAULT_TO) + '"></div>' +
         '<div class="field"><label for="n-lang">' + esc(T("fLang")) + '</label><select id="n-lang">' + langOpts + "</select></div>" +
-        '<div class="field"><label for="n-col">' + esc(T("fCollect")) + '</label><input type="text" id="n-col" placeholder="' + esc(T("fCollectPh")) + '"></div>' +
-        '<div class="field"><label for="n-sheet">' + esc(T("fSheet")) + '</label><input type="text" id="n-sheet" placeholder="' + esc(T("fSheetPh")) + '"></div>' +
+        '<p class="sub" style="margin:0.6rem 0 0.5rem">' + esc(T("collectReuse")) + "</p>" +
+        '<div class="field"><label for="n-col">' + esc(T("fCollect")) + '</label><input type="text" id="n-col" placeholder="' + esc(T("fCollectPh")) + '" value="' + esc(collectorUrl(prevSess.collect)) + '"></div>' +
+        '<div class="field"><label for="n-sheet">' + esc(T("fSheet")) + '</label><input type="text" id="n-sheet" placeholder="' + esc(T("fSheetPh")) + '" value="' + esc(prevSess.sheet ? "https://docs.google.com/spreadsheets/d/" + prevSess.sheet + "/edit" : "") + '"></div>' +
         (ART ? '<div class="btn-row"><button class="btn" data-act="create" id="btn-create" disabled>' + esc(T("btnCreate")) + "</button></div>"
              : '<p class="sub" style="margin:0.4rem 0 0">' + esc(T("needArt")) + "</p>") +
         '<p class="msg" id="create-msg" role="status"></p></div>';
@@ -2321,6 +2240,10 @@
       (org ? '<p class="org-line"><strong>' + esc(org) + "</strong></p>" : "") +
       '<p class="lede">' + esc(T("vLede")) + "</p>" +
       '<div class="btn-row" style="margin-top:1.4rem"><button class="btn" data-act="r-load">' + esc(T("vBtn")) + '</button><span class="msg" id="r-msg" role="status" style="margin:0">' + esc(resMsg) + "</span></div>" +
+      '<details style="margin-top:1rem"><summary style="cursor:pointer;font-size:0.88rem;color:var(--ink-2)">' + esc(T("vExtra")) + "</summary>" +
+      '<p class="sub" style="margin:0.5rem 0">' + esc(T("vExtraDesc")) + "</p>" +
+      '<textarea id="r-extra" rows="3" aria-label="' + esc(T("addCodePh")) + '" placeholder="' + esc(T("addCodePh")) + '" style="font-family:\'IBM Plex Mono\',ui-monospace,monospace;font-size:0.78rem"></textarea>' +
+      '<div class="btn-row"><button class="btn ghost small" data-act="r-extra">' + esc(T("btnAddCode")) + "</button></div></details>" +
       (compiled.length
         ? '<div id="report-root"><p class="eyebrow" style="margin-top:2.4rem"><span class="mark">MR5</span> · ' + esc(T("gEyebrow")) + "</p>" +
           "<h1>" + esc(T("gTitle")) + '</h1><p class="org-line">' + (org ? "<strong>" + esc(org) + '</strong><span class="sep">·</span>' : "") + esc(dateStr()) + "</p>" +
@@ -2330,15 +2253,24 @@
         : (resLoaded ? '<div class="status-banner">' + esc(T("vNone")) + "</div>" : "")) +
       "</section>";
   }
+  // This survey's answers from the Sheet (one Sheet serves every client), plus codes the
+  // facilitator added from emails, kept in this browser.
+  function extraKey() { return "aia-extra:" + (P.sid || P.key); }
+  function resultsCompile() {
+    // A survey with a session code shows only its answers; one from before session codes
+    // (no code) shows only answers without one, so other clients' answers never mix in.
+    var fromSheet = parseCodes(resSheet.join(" "), []).valid.filter(function (r) { return P.sid ? r.s === P.sid : !r.s; });
+    compiled = fromSheet.concat(parseCodes((lsGet(extraKey()) || []).join(" "), fromSheet).valid);
+    resMsg = fmt(T("vCount"), { n: compiled.length, t: new Date().toLocaleTimeString(lang === "fr" ? "fr-CA" : "en-CA", { hour: "2-digit", minute: "2-digit" }) });
+  }
   function loadResults() {
     if (!P.collect || !P.key) { resMsg = T("vBadLink"); render(); return; }
     resMsg = T("vLoading");
     var m = $("r-msg"); if (m) m.textContent = resMsg;
     fetch(P.collect + "?k=" + encodeURIComponent(P.key)).then(function (r) { return r.json(); }).then(function (d) {
       if (!d || !d.ok || !Array.isArray(d.codes)) throw new Error("bad reply");
-      compiled = parseCodes(d.codes.join(" "), []).valid;
-      resLoaded = true;
-      resMsg = fmt(T("vCount"), { n: compiled.length, t: new Date().toLocaleTimeString(lang === "fr" ? "fr-CA" : "en-CA", { hour: "2-digit", minute: "2-digit" }) });
+      resSheet = d.codes; resLoaded = true;
+      resultsCompile();
       render();
     }).catch(function () { resMsg = T("vErr"); render(); });
   }
@@ -2347,7 +2279,7 @@
   function render() {
     var html;
     if (view === "survey") html = renderStep();
-    else if (view === "personal") html = renderPersonal();
+    else if (view === "thanks") html = renderThanks();
     else if (view === "group") html = renderGroup();
     else if (view === "facilitator") html = renderFacilitator();
     else if (view === "results") html = renderResultsView();
@@ -2427,10 +2359,10 @@
         if (mode === "standalone") {
           state.done = true; state.sent = false; saveDraft();
           if (!sendToCollector(lastPayload)) submitHTML = standaloneCodeHTML(lastPayload);
-          go("personal");
+          go("thanks");
         }
-        else if (mode === "respond") { submitToSession(lastPayload); go("personal"); }
-        else { submitHTML = ""; go("personal"); }
+        else if (mode === "respond") { submitToSession(lastPayload); go("thanks"); }
+        else { submitHTML = ""; go("thanks"); }
         break;
       case "add":
         state.a.acts.push({}); saveDraft(); render();
@@ -2505,6 +2437,10 @@
       // public facilitator view
       case "r-load":
         loadResults(); break;
+      case "r-extra":
+        var added = String($("r-extra").value || "").match(/AIA1\.[A-Za-z0-9_-]+/g) || [];
+        lsSet(extraKey(), (lsGet(extraKey()) || []).concat(added));
+        resultsCompile(); render(); break;
       case "f-read":
         var res = parseCodes($("f-codes").value, compiled);
         compiled = compiled.concat(res.valid);
@@ -2585,7 +2521,7 @@
       lang: $("n-lang").value === "fr" ? "fr" : "en",
       collect: collectorId($("n-col").value),
       sheet: sheetId($("n-sheet").value),
-      createdAt: Date.now(), responses: []
+      sid: rid(), createdAt: Date.now(), responses: []
     };
     if ($("n-col").value.trim() && !sess.collect) { $("create-msg").textContent = T("collectBad"); return; }
     if ($("n-sheet").value.trim() && !sess.sheet) { $("create-msg").textContent = T("sheetBad"); return; }
@@ -2758,7 +2694,7 @@
           pdf.text((i + 1) + " / " + slices.length, pw - margin, ph - margin / 2 - 4, { align: "right" });
         });
         pdf.setProperties({ title: org + " — AI Activity Diagnostic", author: "MR5 InnovAction" });
-        var kind = view === "personal" ? "my-results" : "group-results";
+        var kind = "group-results";
         return { pdf: pdf, filename: "ai-activities-" + kind + "-" + slug(org) + ".pdf" };
       });
     }).catch(function (e) { restore(); throw e; });
@@ -2810,13 +2746,13 @@
     // Return to where the facilitator or respondent was before the publish-triggered reload.
     var pv = ssGet("aia-personal");
     if (pv && SESSION && SESSION.responses.some(function (r) { return r.id === pv.id; })) {
-      lastPayload = pv; FORM = pv.f; mode = "respond"; submitHTML = '<div class="status-banner">' + T("submitOk") + "</div>"; view = "personal";
+      lastPayload = pv; FORM = pv.f; mode = "respond"; submitHTML = '<div class="status-banner">' + T("submitOk") + "</div>"; view = "thanks";
     } else if (ssGet("aia-view") === "group" && SESSION) {
       view = "group";
     }
   } else if (!P.view) {
     var dr = lsGet(draftKey());
-    if (dr && dr.done && dr.a) { state = dr; lastPayload = buildPayload(); submitHTML = dr.sent ? sentHTML(lastPayload) : standaloneCodeHTML(lastPayload); view = "personal"; }
+    if (dr && dr.done && dr.a) { state = dr; lastPayload = buildPayload(); submitHTML = dr.sent ? sentHTML(lastPayload) : standaloneCodeHTML(lastPayload); view = "thanks"; }
   }
   codeMsg = ssGet("aia-code-msg") || "";
   ssDel("aia-code-msg");

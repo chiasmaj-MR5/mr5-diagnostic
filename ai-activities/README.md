@@ -7,17 +7,18 @@ private Claude artifact holding the same file).
 
 Respondents describe their main activities (time per week, how repetitive,
 value, consequence of an error, confidential data, wish to lighten) and answer a
-few questions on day-to-day work and attitudes to AI. When they finish they see
-their own results right away, then send a response code. No account, no backend.
+few questions on day-to-day work and attitudes to AI. When they finish they see a
+thank-you screen (no results: those are for the facilitator) and their answers are
+sent, or they email a response code. No account, no backend.
 
 ```
-…/ai-activities/?org=Organization&form=team&roles=Role A|Role B&lang=fr        # anonymous team questionnaire
+…/ai-activities/?org=Organization&form=team&roles=Role A|Role B&s=<code>&lang=fr # anonymous team questionnaire
 …/ai-activities/?org=Organization&form=direction&lang=fr                       # leadership questionnaire
 …/ai-activities/?view=facilitator                                              # links, QR codes + code compiler
 ```
 
-The organization, role groups and minimum reporting group size travel in the
-link, so the page itself names no client.
+The organization, role groups, minimum reporting group size and survey code (`s`)
+travel in the link, so the page itself names no client.
 
 ## Facilitator console (Claude artifact)
 
@@ -32,11 +33,16 @@ the conditions for success (where freed time should go, concerns, training,
 readiness). Codes are added there; CSV exports and a PDF report are available;
 sessions close and move to the archive.
 
-Each activity is placed by the respondent's own answer to "What could AI do with
-this activity?", except that work with serious consequences or where every case is
-different is not handed fully to an agent. Without that answer the criteria decide
-(serious consequences: human; done the same way each time: agent; otherwise:
-assistant). Confidential data is flagged "approved tools only". Groups under the
+**A new client:** close the current session, click **New session**, enter the client's
+name, role groups and language. The Google Sheet links are filled in from the previous
+session: one Sheet serves every client. Each session gets its own survey code (`s`),
+carried by its links, its answers and its results page, so each results page shows only
+its own client's answers. (Sessions created before survey codes existed show only
+answers without one.)
+
+Each activity is placed by the analysis from how it is described: serious
+consequences if an error slips in: human; done the same way each time: agent, a person
+checking the result; otherwise: assistant. Confidential data is flagged "approved tools only". Groups under the
 minimum size are pooled, and activity descriptions are only shown for groups that
 reach it. All figures are proposals to validate.
 
@@ -53,6 +59,7 @@ questionnaire sends its code to a Google Sheet; the code stays on screen as a ba
    (`https://docs.google.com/spreadsheets/d/…`) in **Link of the Google Sheet**, then save
    (new session form or live session card). The survey links and QR codes then carry the collector; share those.
 6. The console then shows a **results page** link. When everyone has finished, open it and click
-   **Show the latest results**: it reads every code from the Sheet and shows the group results, ROI and PDF.
+   **Show the latest results**: it reads this survey's codes from the Sheet and shows the group results, ROI and PDF.
+   Codes received by email can be added under **Add answers received by email** (kept in that browser).
    The link contains the Sheet's id, which is what allows reading the answers: keep it private.
    Codes can still be pasted into the console's **Add response codes** (the Sheet's Code column works too).
