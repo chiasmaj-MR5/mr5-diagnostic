@@ -305,18 +305,21 @@
   // Public no-login respondent page; per-session links add ?org=…&roles=…
   var HOSTED_URL = "https://chiasmaj-mr5.github.io/mr5-diagnostic/ai-activities/";
 
-  // ============ QR encoder (byte mode, EC level M, v1-15) ============
+  // ============ QR encoder (byte mode, EC level M, v1-20) ============
   var QR = (function () {
     var SPEC = {
       1: [26, 10, 1, 16, 0, 0], 2: [44, 16, 1, 28, 0, 0], 3: [70, 26, 1, 44, 0, 0],
       4: [100, 18, 2, 32, 0, 0], 5: [134, 24, 2, 43, 0, 0], 6: [172, 16, 4, 27, 0, 0],
       7: [196, 18, 4, 31, 0, 0], 8: [242, 22, 2, 38, 2, 39], 9: [292, 22, 3, 36, 2, 37],
       10: [346, 26, 4, 43, 1, 44], 11: [404, 30, 1, 50, 4, 51], 12: [466, 22, 6, 36, 2, 37],
-      13: [532, 22, 8, 37, 1, 38], 14: [581, 24, 4, 40, 5, 41], 15: [655, 24, 5, 41, 5, 42]
+      13: [532, 22, 8, 37, 1, 38], 14: [581, 24, 4, 40, 5, 41], 15: [655, 24, 5, 41, 5, 42],
+      16: [733, 28, 7, 45, 3, 46], 17: [815, 28, 10, 46, 1, 47], 18: [901, 26, 9, 43, 4, 44],
+      19: [991, 26, 3, 44, 11, 45], 20: [1085, 26, 3, 41, 13, 42]
     };
     var ALIGN = { 1: [], 2: [6, 18], 3: [6, 22], 4: [6, 26], 5: [6, 30], 6: [6, 34],
       7: [6, 22, 38], 8: [6, 24, 42], 9: [6, 26, 46], 10: [6, 28, 50],
-      11: [6, 30, 54], 12: [6, 32, 58], 13: [6, 34, 62], 14: [6, 26, 46, 66], 15: [6, 26, 48, 70] };
+      11: [6, 30, 54], 12: [6, 32, 58], 13: [6, 34, 62], 14: [6, 26, 46, 66], 15: [6, 26, 48, 70],
+      16: [6, 26, 50, 74], 17: [6, 30, 54, 78], 18: [6, 30, 56, 82], 19: [6, 30, 58, 86], 20: [6, 34, 62, 90] };
     var EXP = new Array(512), LOG = new Array(256);
     (function () {
       var x = 1;
@@ -347,7 +350,7 @@
       var enc = unescape(encodeURIComponent(text));
       for (var i = 0; i < enc.length; i++) bytes.push(enc.charCodeAt(i));
       var version = null;
-      for (var v = 1; v <= 15; v++) {
+      for (var v = 1; v <= 20; v++) {
         var sv = SPEC[v];
         var dcw = sv[0] - sv[1] * (sv[2] + sv[4]);
         var cb = v <= 9 ? 8 : 16;
@@ -859,7 +862,7 @@
       cTitle: "AI Activity Diagnostic",
       cLede: "Create a group session, show the QR code, and watch the group results build as people finish — then discuss the directions together.",
       newSession: "New group session",
-      fOrg: "Organization name", fRoles: "Role groups (one per line — each should reach the minimum group size)",
+      fOrg: "Organization name", fRoles: "Role groups — one per line, each should reach the minimum group size. For both languages write: Français / English",
       fMin: "Minimum group size", fTo: "Email address that receives response codes", fLang: "Questionnaire language",
       btnCreate: "Create group session", creating: "Creating…",
       needArt: "Group sessions work when this page is opened as your Claude artifact. On the public link, use the facilitator view to build links and compile codes.",
@@ -1169,7 +1172,7 @@
       cTitle: "Diagnostic IA des activités",
       cLede: "Créez une session de groupe, affichez le code QR et suivez les résultats de groupe à mesure que les gens terminent — puis discutez ensemble des pistes.",
       newSession: "Nouvelle session de groupe",
-      fOrg: "Nom de l’organisation", fRoles: "Groupes de fonctions (un par ligne — chacun devrait atteindre la taille minimale)",
+      fOrg: "Nom de l’organisation", fRoles: "Groupes de fonctions — un par ligne, chacun devrait atteindre la taille minimale. Pour les deux langues, écrivez : Français / English",
       fMin: "Taille minimale d’un groupe", fTo: "Adresse courriel qui reçoit les codes", fLang: "Langue du questionnaire",
       btnCreate: "Créer la session de groupe", creating: "Création…",
       needArt: "Les sessions de groupe fonctionnent lorsque cette page est ouverte comme votre artefact Claude. Sur le lien public, utilisez la vue d’animation pour créer les liens et compiler les codes.",
@@ -1194,10 +1197,8 @@
     }
   };
 
-  var DEFAULT_ROLES = {
-    en: ["Client service", "Operations", "Administration and finance", "Sales and business development", "Management"],
-    fr: ["Service à la clientèle", "Opérations", "Administration et finances", "Ventes et développement des affaires", "Gestion"]
-  };
+  var DEFAULT_ROLES = ["Service à la clientèle / Client service", "Opérations / Operations", "Administration et finances / Administration and finance",
+    "Ventes et développement des affaires / Sales and business development", "Gestion / Management"];
 
   // ============ helpers ============
   function $(id) { return document.getElementById(id); }
@@ -1240,7 +1241,15 @@
     return { org: "", roles: [], min: 5, to: DEFAULT_TO, collect: "" };
   }
   function orgName() { return cfg().org || T("ourOrg"); }
-  function roles() { var r = cfg().roles; return r.length ? r : DEFAULT_ROLES[lang]; }
+  function roles() { var r = cfg().roles; return r.length ? r : DEFAULT_ROLES; }
+  // A role group written "Français / English" shows in the survey's language; answers are
+  // grouped under the French name, so both languages land in the same group.
+  function roleParts(line) { var i = line.indexOf(" / "); return i < 0 ? [line, line] : [line.slice(0, i).trim(), line.slice(i + 3).trim()]; }
+  function roleShow(line) { return roleParts(line)[lang === "fr" ? 0 : 1]; }
+  function roleName(key) {
+    var line = roles().filter(function (l) { return roleParts(l)[0] === key; })[0];
+    return line ? roleShow(line) : key;
+  }
   function tx(k, o) { return fmt(T(k), Object.assign({ org: esc(orgName()), min: cfg().min }, o || {})); }
 
   // ============ form definition ============
@@ -1469,7 +1478,7 @@
     var v = a[q.k], body = "";
     switch (q.type) {
       case "role":
-        body = choiceGroup(q.k, roles().concat([T("prefNot")]), v, false, { stack: true });
+        body = choiceGroup(q.k, roles().map(roleShow).concat([T("prefNot")]), v, false, { stack: true });
         break;
       case "one":
         body = choiceGroup(q.k, T(q.o), v, false, { stack: q.stack });
@@ -1582,7 +1591,7 @@
     if (cfg().org) out.org = cfg().org;
     if (FORM === "t" && a.role != null) {
       var rl = roles();
-      out.role = a.role < rl.length ? rl[a.role] : "";
+      out.role = a.role < rl.length ? roleParts(rl[a.role])[0] : "";
     }
     Object.keys(a).forEach(function (k) {
       if (k === "role" || k === "acts") return;
@@ -1767,7 +1776,7 @@
       groups[g].push(r);
     });
     var rows = [], pooled = [];
-    order.forEach(function (g) { (groups[g].length >= min ? rows : pooled).push({ name: g, list: groups[g] }); });
+    order.forEach(function (g) { (groups[g].length >= min ? rows : pooled).push({ name: roleName(g), list: groups[g] }); });
     if (pooled.length) {
       var all = []; pooled.forEach(function (p) { all = all.concat(p.list); });
       rows.push({ name: fmt(T("cPooled"), { min: min }), list: all, pooled: true });
@@ -2184,8 +2193,9 @@
     var p = new URLSearchParams();
     p.set("view", "results"); p.set("c", collectorId(sess.collect)); p.set("k", sess.sheet);
     if (sess.org) p.set("org", sess.org);
+    if (sess.roles && sess.roles.length) p.set("roles", sess.roles.join("|"));
     p.set("min", sess.min || 5); p.set("lang", sess.lang || "en");
-    return HOSTED_URL + "?" + p.toString();
+    return HOSTED_URL + "?" + p.toString().replace(/%7C/g, "|");
   }
   function qrSvg(url) { try { return QR.toSVG(QR.encode(url), 4, 4); } catch (e) { return ""; } }
 
@@ -2238,7 +2248,7 @@
       var langOpts = '<option value="en"' + (lang === "en" ? " selected" : "") + '>English</option><option value="fr"' + (lang === "fr" ? " selected" : "") + ">Français</option>";
       html += '<div class="card dashed"><h3>' + esc(T("newSession")) + "</h3>" +
         '<div class="field" style="margin-top:0.9rem"><label for="n-org">' + esc(T("fOrg")) + '</label><input type="text" id="n-org" maxlength="80"></div>' +
-        '<div class="field"><label for="n-roles">' + esc(T("fRoles")) + '</label><textarea id="n-roles" rows="5">' + esc(DEFAULT_ROLES[lang].join("\n")) + "</textarea></div>" +
+        '<div class="field"><label for="n-roles">' + esc(T("fRoles")) + '</label><textarea id="n-roles" rows="5">' + esc(DEFAULT_ROLES.join("\n")) + "</textarea></div>" +
         '<div class="field"><label for="n-min">' + esc(T("fMin")) + '</label><input type="text" id="n-min" inputmode="numeric" value="5"></div>' +
         '<div class="field"><label for="n-to">' + esc(T("fTo")) + '</label><input type="text" id="n-to" inputmode="email" value="' + esc(DEFAULT_TO) + '"></div>' +
         '<div class="field"><label for="n-lang">' + esc(T("fLang")) + '</label><select id="n-lang">' + langOpts + "</select></div>" +
