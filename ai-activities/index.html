@@ -2183,7 +2183,10 @@
         var nt2 = a.responses.filter(function (r) { return r.f === "t"; }).length;
         return '<div class="archive-row"><div><div class="a-org">' + esc(a.org) + '</div><div class="a-meta">' +
           esc(dateStr(a.createdAt)) + " · " + esc(fmt(T("respCount"), { t: nt2, d: a.responses.length - nt2 })) + "</div></div>" +
-          '<button class="btn ghost small" data-act="archive" data-i="' + i + '">' + esc(T("btnView")) + "</button></div>";
+          '<div class="btn-row" style="margin-top:0">' +
+          // A closed session's answers keep arriving in the Sheet: its results page stays one click away.
+          (resultsUrl(a) ? '<a class="btn ghost small" href="' + esc(resultsUrl(a)) + '" target="_blank" rel="noopener">' + esc(T("resTitle")) + "</a>" : "") +
+          '<button class="btn ghost small" data-act="archive" data-i="' + i + '">' + esc(T("btnView")) + "</button></div></div>";
       }).join("") + "</div>";
     }
     return html + "</section>";
