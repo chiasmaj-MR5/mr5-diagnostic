@@ -1,3 +1,5 @@
+/** @OnlyCurrentDoc  Limits the script's access to the Sheet it is bound to. */
+
 // AI Activity Diagnostic — response collector.
 //
 // A Google Apps Script bound to a Google Sheet. Each finished questionnaire sends its
