@@ -225,6 +225,9 @@
   .save-hero b { color: var(--accent); }
   .split { display: flex; flex-wrap: wrap; gap: 0.5rem 1.4rem; font-size: 0.88rem; color: var(--ink-2); margin: 0.4rem 0 1rem; }
   .split strong { color: var(--ink); font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 0.84rem; }
+  .roi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0 1rem; margin: 0.4rem 0 0.6rem; }
+  .roi-grid .field label { font-weight: 500; font-size: 0.8rem; }
+  .rt td small { display: block; color: var(--ink-3); font-size: 0.76rem; font-family: "Instrument Sans", Arial, sans-serif; }
   .method { font-size: 0.8rem; color: var(--ink-3); margin-top: 1rem; max-width: 66ch; }
 
   .chip { display: inline-flex; align-items: center; gap: 0.35em; font-size: 0.74rem; font-weight: 600; color: var(--ink-2); white-space: nowrap; }
@@ -691,26 +694,38 @@
       aAi: "What could AI do with this activity?",
       aAiHelp: "An AI agent does the task from start to finish and you check the result; an AI assistant helps you while you stay in charge.",
       aiOpts: ["Do it for me — I’d check the result", "Help me do it faster", "Nothing — it needs me", "Not sure"],
-      yTilesP: ["of your work: AI agent", "of your work: AI assistant", "of your work: stays human", "AI could free per week"],
+      yTilesP: ["of your tasks: AI agent", "of your tasks: AI assistant", "of your tasks: need a person", "AI could free per week"],
       sFree: "This could free about {r} per week (AI agents {a}, AI assistants {b}).",
       helpHumanD: "needs a person’s judgement, relationship or responsibility",
-      gTilesP: ["of the work: AI agent", "of the work: AI assistant", "of the work: stays human"],
+      gTilesP: ["of tasks: AI agent", "of tasks: AI assistant", "of tasks: need a person"],
       cOut: "System transformation outlook",
-      cOutP: "Across {n} people, about <b>{a}</b> of the work described could be done by AI agents, <b>{b}</b> with AI assistants, and <b>{c}</b> stays human.",
+      cOutP: "Based on all the data received ({n}, {t} tasks): <b>{a}</b> of tasks could be done by an AI agent, <b>{b}</b> with an AI assistant, and <b>{c}</b> need a person.",
+      cOutHours: "Measured in time: {a} of the hours described could go to AI agents, {b} to AI assistants, and {c} stays with people.",
       cOutFree: "This represents about {r} per week that could be freed ({pp} per person).",
       cOutCov: "Team members say the activities they described cover about {p} of their week.",
       cOutView: "{p} of activities were placed by people’s own view of what AI could do; the rest by the criteria.",
-      cOutSub: "Share of the weekly hours described, by group. Team groups under {min} people are pooled.",
+      cOutSub: "Share of tasks, by group. Team groups under {min} people are pooled.",
       nPpl: "{n} people", nPpl1: "1 person",
       cAllActs: "All activities, by category",
       cAllActsSub: "Every activity described, grouped by who could do the work. The same activity named by several people is combined. Listed only for groups of at least {min} people.",
-      cAllHead: "{k} — {p} of the work ({h} h per week)",
+      cAllHead: "{k} — {n} tasks ({p} of tasks · {h} h per week)",
       cAllMore: "Show {n} more",
       cAllHidden: "{n} activities from groups under {min} people are counted in the percentages but not listed.",
+      cRoi: "Return on investment (ROI)",
+      cRoiSub: "Estimated first-year return of AI agents and AI assistants, from the time freed in the survey and your assumptions. Change any assumption and the figures update.",
+      rRate: "Average hourly cost of an employee (salary + benefits)", rWeeks: "Working weeks per year", rCapture: "Share of the estimated time actually captured (%)",
+      rHead: "Number of people to extrapolate to", rASetup: "AI agents — setup cost (one-time)", rAMonthly: "AI agents — running cost per month",
+      rLicence: "AI assistant — licence per person per month", rTraining: "Training per person (one-time)", rCur: "Currency",
+      rHeadPh: "default: respondents", rCat: "Category", rHours: "Hours freed per year", rValue: "Value per year", rCost: "Cost, year 1", rRoiH: "ROI, year 1", rPayback: "Payback",
+      rTotal: "Total AI", rHumanNote: "hours per year that stay with people — where freed time is reinvested",
+      rNeedRate: "Enter an average hourly cost to see the value and the ROI.", rNoCost: "Add the costs to calculate the ROI and the payback.",
+      rMonths: "{n} months", rLess1: "under 1 month", rByGroup: "By group", rPeople: "People",
+      rMethod: "Method: hours freed per year = weekly hours AI could free (low–high) × working weeks × share captured, extrapolated from the respondents to the number of people entered. Value = hours × hourly cost. Year-1 cost = AI agent setup + 12 months of running costs + assistant licences for everyone + training (split between agents and assistants by time freed). Only the activities described are counted, so this is a conservative base. Estimates to validate during the pilot.",
+      btnSaveRoi: "Save assumptions", rLocal: "Assumptions are not saved on this page.",
       cStart: "Where to start", cStartSub: "Activities where AI could free the most time, most first. Shown only for groups of at least {min} people.",
       cStartAgent: "Hand to AI agents", cStartAssist: "Equip with AI assistants",
       cCond: "Conditions for success", cCondSub: "What leadership needs to put in place for the transformation to work.",
-      dOut: "Transformation outlook", dOutP: "About {a} of the work described could be done by AI agents and {b} with AI assistants — about {r} per week ({pp} per person).", dOutD: "which roles change first, and what does each role become?",
+      dOut: "Transformation outlook", dOutP: "{a} of tasks could go to AI agents and {b} to AI assistants — about {r} per week ({pp} per person).", dOutD: "which roles change first, and what does each role become?",
       sentPending: "Sending your answers…",
       sentOk: "<strong>Your answers were sent to MR5.</strong> Nothing else to do — thank you!",
       sentBackup: "Backup: you can also send your response code by email",
@@ -725,13 +740,13 @@
       helpAssistD: "drafts, summarises, searches or analyses; you stay in charge",
       approved: "only with tools approved by {org}",
       sTitle: "How your work could change with AI",
-      sHero: "About <b>{a}</b> of your work could be done by AI agents and <b>{b}</b> with an AI assistant.",
+      sHero: "<b>{a}</b> of your {n} tasks could be done by an AI agent and <b>{b}</b> with an AI assistant.",
       sHeroNone: "None of the work you described looks ready for AI: it needs your judgement or carries serious consequences.",
       sShare: "That is {p} of the time you described ({h} h per week).",
       sSplit: "AI agents", sSplit2: "AI assistants",
       sOf: "of {h} h",
       sSaves: "saves {r}",
-      sMethod: "How it is estimated: each activity is placed by the person’s own answer to “What could AI do with this activity?”, with two limits — work with serious consequences, or where every case is different, is not handed fully to an agent. When the person is not sure, the criteria decide: serious consequences → stays human; done the same way each time → AI agent (a person checks); otherwise → AI assistant. Confidential data does not change the category; it requires approved tools. Percentages are shares of the weekly hours described. Time freed: an AI agent 50–70 % of the activity’s time, an AI assistant 10–50 % depending on how repetitive it is. Estimates to validate during the pilot.",
+      sMethod: "How it is estimated: each activity is placed by the person’s own answer to “What could AI do with this activity?”, with two limits — work with serious consequences, or where every case is different, is not handed fully to an agent. When the person is not sure, the criteria decide: serious consequences → stays human; done the same way each time → AI agent (a person checks); otherwise → AI assistant. Confidential data does not change the category; it requires approved tools. Percentages are shares of the tasks described; time freed is weighted by each task’s weekly hours. Time freed: an AI agent 50–70 % of the activity’s time, an AI assistant 10–50 % depending on how repetitive it is. Estimates to validate during the pilot.",
       yTilesS: "AI could save you, per week",
       gTileS: "Time AI could save, per week",
       gPerPerson: "{r} per person",
@@ -979,26 +994,38 @@
       aAi: "Que pourrait faire l’IA avec cette activité?",
       aAiHelp: "Un agent IA réalise la tâche du début à la fin et vous vérifiez le résultat; un assistant IA vous aide pendant que vous restez responsable.",
       aiOpts: ["La faire pour moi — je vérifierais le résultat", "M’aider à la faire plus vite", "Rien — elle a besoin de moi", "Je ne sais pas"],
-      yTilesP: ["de votre travail : agent IA", "de votre travail : assistant IA", "de votre travail : reste humain", "que l’IA pourrait libérer par semaine"],
+      yTilesP: ["de vos tâches : agent IA", "de vos tâches : assistant IA", "de vos tâches : demandent une personne", "que l’IA pourrait libérer par semaine"],
       sFree: "Cela pourrait libérer environ {r} par semaine (agents IA {a}, assistants IA {b}).",
       helpHumanD: "demande le jugement, la relation ou la responsabilité d’une personne",
-      gTilesP: ["du travail : agent IA", "du travail : assistant IA", "du travail : reste humain"],
+      gTilesP: ["des tâches : agent IA", "des tâches : assistant IA", "des tâches : demandent une personne"],
       cOut: "Perspectives de transformation",
-      cOutP: "Pour {n} personnes, environ <b>{a}</b> du travail décrit pourrait être fait par des agents IA, <b>{b}</b> avec des assistants IA, et <b>{c}</b> reste humain.",
+      cOutP: "Selon l’ensemble des données reçues ({n}, {t} tâches) : <b>{a}</b> des tâches pourraient être faites par un agent IA, <b>{b}</b> avec un assistant IA, et <b>{c}</b> demandent une personne.",
+      cOutHours: "En temps : {a} des heures décrites pourraient aller à des agents IA, {b} à des assistants IA, et {c} reste aux personnes.",
       cOutFree: "Cela représente environ {r} par semaine qui pourraient être libérées ({pp} par personne).",
       cOutCov: "Les membres des équipes disent que les activités décrites couvrent environ {p} de leur semaine.",
       cOutView: "{p} des activités ont été classées selon l’avis des personnes sur ce que l’IA pourrait faire; les autres, selon les critères.",
-      cOutSub: "Part des heures hebdomadaires décrites, par groupe. Les groupes de moins de {min} personnes sont regroupés.",
+      cOutSub: "Part des tâches, par groupe. Les groupes de moins de {min} personnes sont regroupés.",
       nPpl: "{n} personnes", nPpl1: "1 personne",
       cAllActs: "Toutes les activités, par catégorie",
       cAllActsSub: "Chaque activité décrite, regroupée selon qui pourrait faire le travail. La même activité nommée par plusieurs personnes est combinée. Affichées seulement pour les groupes d’au moins {min} personnes.",
-      cAllHead: "{k} — {p} du travail ({h} h par semaine)",
+      cAllHead: "{k} — {n} tâches ({p} des tâches · {h} h par semaine)",
       cAllMore: "Afficher {n} de plus",
       cAllHidden: "{n} activités de groupes de moins de {min} personnes sont comptées dans les pourcentages, mais ne sont pas affichées.",
+      cRoi: "Retour sur investissement (RSI)",
+      cRoiSub: "Rendement estimé la première année des agents et assistants IA, à partir du temps libéré dans le sondage et de vos hypothèses. Modifiez une hypothèse et les chiffres se mettent à jour.",
+      rRate: "Coût horaire moyen d’un employé (salaire + avantages)", rWeeks: "Semaines travaillées par année", rCapture: "Part du temps estimé réellement récupérée (%)",
+      rHead: "Nombre de personnes visées (extrapolation)", rASetup: "Agents IA — coût de mise en place (unique)", rAMonthly: "Agents IA — coût d’exploitation par mois",
+      rLicence: "Assistant IA — licence par personne par mois", rTraining: "Formation par personne (unique)", rCur: "Devise",
+      rHeadPh: "par défaut : répondants", rCat: "Catégorie", rHours: "Heures libérées par année", rValue: "Valeur par année", rCost: "Coût, année 1", rRoiH: "RSI, année 1", rPayback: "Retour",
+      rTotal: "Total IA", rHumanNote: "heures par année qui restent aux personnes — là où le temps libéré est réinvesti",
+      rNeedRate: "Inscrivez un coût horaire moyen pour voir la valeur et le RSI.", rNoCost: "Ajoutez les coûts pour calculer le RSI et le délai de retour.",
+      rMonths: "{n} mois", rLess1: "moins de 1 mois", rByGroup: "Par groupe", rPeople: "Personnes",
+      rMethod: "Méthode : heures libérées par année = heures hebdomadaires que l’IA pourrait libérer (basse–haute) × semaines travaillées × part récupérée, extrapolées des répondants au nombre de personnes inscrit. Valeur = heures × coût horaire. Coût de l’année 1 = mise en place des agents IA + 12 mois d’exploitation + licences d’assistant pour tous + formation (répartie entre agents et assistants selon le temps libéré). Seules les activités décrites sont comptées : c’est une base prudente. Estimations à valider pendant l’essai.",
+      btnSaveRoi: "Enregistrer les hypothèses", rLocal: "Les hypothèses ne sont pas enregistrées sur cette page.",
       cStart: "Par où commencer", cStartSub: "Activités où l’IA pourrait libérer le plus de temps, les plus importantes d’abord. Affichées seulement pour les groupes d’au moins {min} personnes.",
       cStartAgent: "Confier à des agents IA", cStartAssist: "Outiller avec des assistants IA",
       cCond: "Conditions de réussite", cCondSub: "Ce que la direction doit mettre en place pour que la transformation fonctionne.",
-      dOut: "Perspectives de transformation", dOutP: "Environ {a} du travail décrit pourrait être fait par des agents IA et {b} avec des assistants IA — environ {r} par semaine ({pp} par personne).", dOutD: "quels rôles changent en premier, et que devient chaque rôle?",
+      dOut: "Perspectives de transformation", dOutP: "{a} des tâches pourraient aller à des agents IA et {b} à des assistants IA — environ {r} par semaine ({pp} par personne).", dOutD: "quels rôles changent en premier, et que devient chaque rôle?",
       sentPending: "Envoi de vos réponses…",
       sentOk: "<strong>Vos réponses ont été envoyées à MR5.</strong> Vous n’avez rien d’autre à faire — merci!",
       sentBackup: "Copie de sécurité : vous pouvez aussi envoyer votre code de réponse par courriel",
@@ -1013,13 +1040,13 @@
       helpAssistD: "rédige, résume, cherche ou analyse; vous restez responsable",
       approved: "seulement avec des outils approuvés par {org}",
       sTitle: "Comment votre travail pourrait changer avec l’IA",
-      sHero: "Environ <b>{a}</b> de votre travail pourrait être fait par des agents IA et <b>{b}</b> avec un assistant IA.",
+      sHero: "<b>{a}</b> de vos {n} tâches pourraient être faites par un agent IA et <b>{b}</b> avec un assistant IA.",
       sHeroNone: "Aucune des activités décrites ne semble prête pour l’IA : elles demandent votre jugement ou comportent des conséquences importantes.",
       sShare: "C’est {p} du temps décrit ({h} h par semaine).",
       sSplit: "Agents IA", sSplit2: "Assistants IA",
       sOf: "sur {h} h",
       sSaves: "économise {r}",
-      sMethod: "Méthode : chaque activité est classée selon la réponse de la personne à « Que pourrait faire l’IA avec cette activité? », avec deux limites — le travail aux conséquences importantes, ou dont chaque cas est différent, n’est pas confié entièrement à un agent. Quand la personne ne sait pas, les critères décident : conséquences importantes → reste humain; toujours fait de la même façon → agent IA (une personne vérifie); sinon → assistant IA. Les données confidentielles ne changent pas la catégorie; elles exigent des outils approuvés. Les pourcentages sont des parts des heures hebdomadaires décrites. Temps libéré : agent IA 50 à 70 % du temps de l’activité, assistant IA 10 à 50 % selon le caractère répétitif. Estimations à valider pendant l’essai.",
+      sMethod: "Méthode : chaque activité est classée selon la réponse de la personne à « Que pourrait faire l’IA avec cette activité? », avec deux limites — le travail aux conséquences importantes, ou dont chaque cas est différent, n’est pas confié entièrement à un agent. Quand la personne ne sait pas, les critères décident : conséquences importantes → reste humain; toujours fait de la même façon → agent IA (une personne vérifie); sinon → assistant IA. Les données confidentielles ne changent pas la catégorie; elles exigent des outils approuvés. Les pourcentages sont des parts des tâches décrites; le temps libéré tient compte des heures hebdomadaires de chaque tâche. Temps libéré : agent IA 50 à 70 % du temps de l’activité, assistant IA 10 à 50 % selon le caractère répétitif. Estimations à valider pendant l’essai.",
       yTilesS: "Temps que l’IA pourrait vous faire gagner, par semaine",
       gTileS: "Temps que l’IA pourrait libérer, par semaine",
       gPerPerson: "{r} par personne",
@@ -1268,6 +1295,8 @@
   var compiled = [];           // responses compiled from codes on the public facilitator view
   var closeArmed = false;
   var codeMsg = "";            // result of the last "add codes", shown again after the reload
+  var ROI_IN = null;           // ROI assumptions; saved with the session in the artifact
+  var roiCtx = null;           // the group data the ROI card was last drawn from
 
   function draftKey() { return "aia-draft:" + FORM + ":" + (cfg().org || ""); }
   function freshState() {
@@ -1360,28 +1389,27 @@
   var KINDS = ["agent", "assistant", "human"];
   var KIND_VAR = { agent: "--c-auto", assistant: "--c-aug", human: "--c-hum" };
   function splitOf(acts) {
-    var sp = { agent: 0, assistant: 0, human: 0, total: 0, n: acts.length, byView: 0, p: {} };
+    // c: share of tasks (the headline); p: share of the weekly hours described.
+    var sp = { agent: 0, assistant: 0, human: 0, total: 0, n: acts.length, byView: 0, p: {}, cnt: { agent: 0, assistant: 0, human: 0 }, c: {} };
     acts.forEach(function (x) {
-      var v = HOURS_MID[x.h] || 0;
-      sp[helpType(x)] += v; sp.total += v;
+      var v = HOURS_MID[x.h] || 0, t = helpType(x);
+      sp[t] += v; sp.total += v; sp.cnt[t]++;
       if (x.a === 0 || x.a === 1 || x.a === 2) sp.byView++;
     });
-    // Whole percents that always add up to 100 (largest remainder).
-    var raw = KINDS.map(function (k) { return sp.total ? 100 * sp[k] / sp.total : 0; });
-    var whole = raw.map(Math.floor), left = sp.total ? 100 - whole.reduce(function (a, b) { return a + b; }, 0) : 0;
-    raw.map(function (v, i) { return { i: i, r: v - whole[i] }; }).sort(function (a, b) { return b.r - a.r; })
-      .slice(0, left).forEach(function (o) { whole[o.i]++; });
-    KINDS.forEach(function (k, i) { sp.p[k] = whole[i]; });
+    KINDS.forEach(function (k) {
+      sp.p[k] = sp.total ? 100 * sp[k] / sp.total : 0;
+      sp.c[k] = sp.n ? 100 * sp.cnt[k] / sp.n : 0;
+    });
     return sp;
   }
   function splitRow(name, sub, sp) {
-    var segs = KINDS.filter(function (k) { return sp.p[k] > 0; }).map(function (k) {
-      return '<div class="fill" style="width:' + sp.p[k].toFixed(2) + '%;background:var(' + KIND_VAR[k] + ')" data-tip="' +
-        esc(T(HELP_LABEL[k]) + " · " + pct(sp.p[k]) + " · " + h1(sp[k]) + " " + T("hpw")) + '"></div>';
+    var segs = KINDS.filter(function (k) { return sp.c[k] > 0; }).map(function (k) {
+      return '<div class="fill" style="width:' + sp.c[k].toFixed(2) + '%;background:var(' + KIND_VAR[k] + ')" data-tip="' +
+        esc(T(HELP_LABEL[k]) + " · " + sp.cnt[k] + " · " + pct(sp.c[k]) + " · " + h1(sp[k]) + " " + T("hpw")) + '"></div>';
     }).join("");
     return '<div class="bar-row' + (name ? "" : " solo") + '">' + (name ? '<div class="name">' + esc(name) + (sub ? "<small>" + esc(sub) + "</small>" : "") + "</div>" : "") +
       '<div class="bar-line"><div class="track">' + segs + "</div></div>" +
-      '<div class="breakdown">' + KINDS.map(function (k) { return "<span>" + esc(T(HELP_LABEL[k])) + " " + pct(sp.p[k]) + "</span>"; }).join("") + "</div></div>";
+      '<div class="breakdown">' + KINDS.map(function (k) { return "<span>" + esc(T(HELP_LABEL[k])) + " " + pct(sp.c[k]) + " (" + sp.cnt[k] + ")</span>"; }).join("") + "</div></div>";
   }
   function splitLegend() {
     return helpLegend().replace(/<\/div>$/, '<span class="key">' + sw("--c-hum") + "<span><b>" + esc(T("helpHuman")) + "</b> — " + esc(T("helpHumanD")) + "</span></span></div>");
@@ -1603,7 +1631,7 @@
       (p.role ? esc(p.role) + '<span class="sep">·</span>' : "") + esc(dateStr()) + "</p>" +
       '<p class="lede">' + esc(T("yLede")) + "</p>" +
       '<div class="tiles">' + KINDS.map(function (k, i) {
-        return '<div class="tile"><div class="v"' + (k === "human" ? "" : ' style="color:var(--accent)"') + ">" + pct(sp.p[k]) + '</div><div class="l">' + esc(T("yTilesP")[i]) + "</div></div>";
+        return '<div class="tile"><div class="v"' + (k === "human" ? "" : ' style="color:var(--accent)"') + ">" + pct(sp.c[k]) + '</div><div class="l">' + esc(T("yTilesP")[i]) + "</div></div>";
       }).join("") +
       '<div class="tile"><div class="v">' + hr(sv.total) + '</div><div class="l">' + esc(T("yTilesP")[3]) + "</div></div></div>" +
       personalSavings(p, sv, sp) +
@@ -1625,7 +1653,7 @@
     var max = 0; rows.forEach(function (x) { max = Math.max(max, HOURS_MID[x.h] || 0); });
     return '<div class="card"><h3>' + esc(T("sTitle")) + "</h3>" +
       (sp.agent + sp.assistant > 0
-        ? '<p class="save-hero" style="font-size:clamp(1.3rem,3.6vw,1.8rem)">' + fmt(T("sHero"), { a: pct(sp.p.agent), b: pct(sp.p.assistant) }) + "</p>"
+        ? '<p class="save-hero" style="font-size:clamp(1.3rem,3.6vw,1.8rem)">' + fmt(T("sHero"), { a: sp.cnt.agent, b: sp.cnt.assistant, n: sp.n }) + "</p>"
         : '<p class="sub">' + esc(T("sHeroNone")) + "</p>") +
       splitLegend() + '<div class="bars">' + splitRow("", "", sp) + "</div>" +
       (sv.total[1] > 0 ? '<p class="sub" style="margin:1rem 0 1.2rem">' + esc(fmt(T("sFree"), { r: hr(sv.total), a: hr(sv.agent), b: hr(sv.assistant) })) + "</p>" : "") +
@@ -1787,7 +1815,7 @@
     var autoItems = agents;
     var INV = invisibleOf(G.teams.concat(G.dirs));
     var perPerson = hr([SV.total[0] / responses.length, SV.total[1] / responses.length]);
-    if (SP.agent + SP.assistant > 0) lever(T("dOut"), fmt(T("dOutP"), { a: pct(SP.p.agent), b: pct(SP.p.assistant), r: hr(SV.total), pp: perPerson }), T("dOutD"));
+    if (SP.agent + SP.assistant > 0) lever(T("dOut"), fmt(T("dOutP"), { a: pct(SP.c.agent), b: pct(SP.c.assistant), r: hr(SV.total), pp: perPerson }), T("dOutD"));
     if (H.auto > 0) lever(T("dQuick"), fmt(T("dQuickP"), { h: h1(H.auto), list: autoItems.slice(0, 3).map(function (m) { return (lang === "fr" ? "« " : "“") + m.x.n + (lang === "fr" ? " »" : "”"); }).join(", ") || "—" }), T("dQuickD"));
     if (H.aug > 0) lever(T("dAug"), fmt(T("dAugP"), { h: h1(H.aug) }), T("dAugD"));
     if (INV.often != null && INV.often > 0) lever(T("dInv"), fmt(T("dInvP"), { p: pct(INV.often), h: h1(INV.h) }), T("dInvD"));
@@ -1809,10 +1837,11 @@
     return '<div class="tiles">' +
       '<div class="tile"><div class="v">' + responses.length + '</div><div class="l">' + esc(T("gTiles")[0]) + " · " + esc(fmt(T("gRespSplit"), { t: nt, d: nd })) + "</div></div>" +
       KINDS.map(function (k, i) {
-        return '<div class="tile"><div class="v"' + (k === "human" ? "" : ' style="color:var(--accent)"') + ">" + pct(SP.p[k]) + '</div><div class="l">' + esc(T("gTilesP")[i]) + "</div></div>";
+        return '<div class="tile"><div class="v"' + (k === "human" ? "" : ' style="color:var(--accent)"') + ">" + pct(SP.c[k]) + '</div><div class="l">' + esc(T("gTilesP")[i]) + "</div></div>";
       }).join("") + "</div>" +
       groupOutlook(G, min, responses, SP, SV) +
       groupAllActivities({ agent: agents, assistant: assists, human: keep }, SP, allActs.length, min) +
+      groupROI(G, min, responses.length, SV, SP) +
       '<div class="card"><h3>' + esc(T("cDirs")) + '</h3><p class="sub">' + esc(T("cDirsSub")) + '</p><div class="levers">' + dirs.join("") + "</div></div>" +
       groupSavings(G, min, responses.length) +
       groupInvisible(G, min) +
@@ -1821,6 +1850,104 @@
       '<div class="card"><h3>' + esc(T("cConc")) + '</h3><p class="sub">' + esc(T("cShareSub")) + "</p>" + audienceLegend(nt, nd) + pairRows(T("concerns"), coT, coD, nd > 0) + "</div>" +
       (nt ? '<div class="card"><h3>' + esc(T("cTrain")) + '</h3><p class="sub">' + esc(T("cTrainSub")) + "</p>" + pairRows(T("train"), trT, [], false) + "</div>" : "") +
       '<div class="card"><h3>' + esc(T("cReady")) + '</h3><div style="overflow-x:auto">' + ready + "</div></div>";
+  }
+
+  // ============ ROI ============
+  var ROI_FIELDS = [["rate", "rRate"], ["weeks", "rWeeks"], ["capture", "rCapture"], ["head", "rHead"],
+    ["aSetup", "rASetup"], ["aMonthly", "rAMonthly"], ["licence", "rLicence"], ["training", "rTraining"], ["cur", "rCur"]];
+  function roiInputs() {
+    if (!ROI_IN) ROI_IN = Object.assign({ weeks: "46", capture: "70", cur: "$" }, (liveSession() && liveSession().roi) || {});
+    return ROI_IN;
+  }
+  function num(v) {
+    var n = parseFloat(String(v == null ? "" : v).replace(/[\s\u00a0]/g, "").replace(",", "."));
+    return isFinite(n) && n >= 0 ? n : null;
+  }
+  function money(v) {
+    var s = Math.round(v).toLocaleString(lang === "fr" ? "fr-CA" : "en-CA"), c = roiInputs().cur || "$";
+    return lang === "fr" ? s + " " + c : c + s;
+  }
+  // A low–high pair as HTML, each end kept on one line.
+  function range(r, f) {
+    var a = f(r[0]), b = f(r[1]), nw = function (t) { return '<span style="white-space:nowrap">' + esc(t) + "</span>"; };
+    return a === b ? nw(a) : nw(a) + "–<wbr>" + nw(b);
+  }
+  function whole(v) { return Math.round(v).toLocaleString(lang === "fr" ? "fr-CA" : "en-CA"); }
+
+  function groupROI(G, min, n, SV, SP) {
+    var rows = [];
+    G.rows.forEach(function (row) { if (row.list.length >= min) rows.push({ name: row.name, list: row.list }); });
+    if (G.dirs.length >= min) rows.push({ name: T("cLead"), list: G.dirs });
+    roiCtx = { n: n, SV: SV, SP: SP, rows: rows.map(function (row) {
+      var acts = []; row.list.forEach(function (r) { acts = acts.concat(r.acts); });
+      return { name: row.name, n: row.list.length, s: savingsOf(acts) };
+    }) };
+    var I = roiInputs();
+    var fields = ROI_FIELDS.map(function (f) {
+      return '<div class="field"><label for="roi-' + f[0] + '">' + esc(T(f[1])) + '</label><input type="text" inputmode="' + (f[0] === "cur" ? "text" : "decimal") +
+        '" id="roi-' + f[0] + '" data-roi="' + f[0] + '" value="' + esc(I[f[0]] == null ? "" : I[f[0]]) + '"' + (f[0] === "head" ? ' placeholder="' + esc(T("rHeadPh")) + " (" + n + ')"' : "") + "></div>";
+    }).join("");
+    var canSave = ART && SESSION && !LIVE_SRC && view === "group";
+    return '<div class="card"><h3>' + esc(T("cRoi")) + '</h3><p class="sub">' + esc(T("cRoiSub")) + "</p>" +
+      '<div class="roi-grid">' + fields + "</div>" +
+      (canSave ? '<div class="btn-row no-pdf" style="margin-top:0"><button class="btn ghost small" data-act="save-roi">' + esc(T("btnSaveRoi")) + '</button><span class="msg" id="roi-msg" role="status"></span></div>'
+               : '<p class="msg no-pdf">' + esc(T("rLocal")) + "</p>") +
+      '<div id="roi-out">' + roiOut() + "</div></div>";
+  }
+
+  function roiOut() {
+    var C = roiCtx;
+    if (!C) return "";
+    var I = roiInputs();
+    var rate = num(I.rate), weeks = num(I.weeks) || 0, cap = num(I.capture);
+    cap = cap == null ? 1 : Math.min(cap, 100) / 100;
+    var head = num(I.head) || C.n, scale = head / C.n;
+    function yearly(w) { return [w[0] * scale * weeks * cap, w[1] * scale * weeks * cap]; }
+    var setup = num(I.aSetup) || 0, monthly = num(I.aMonthly) || 0, lic = num(I.licence) || 0, train = num(I.training) || 0;
+    var hA = yearly(C.SV.agent), hB = yearly(C.SV.assistant), hT = [hA[0] + hB[0], hA[1] + hB[1]];
+    var mA = hA[0] + hA[1], mB = hB[0] + hB[1], shareA = mA + mB ? mA / (mA + mB) : 0.5;
+    var cA = setup + monthly * 12 + train * head * shareA, cB = lic * 12 * head + train * head * (1 - shareA), cT = cA + cB;
+    function value(h) { return rate == null ? null : [h[0] * rate, h[1] * rate]; }
+    function roiTxt(v, c) {
+      if (v == null || !c) return "–";
+      return range([(v[0] - c) / c * 100, (v[1] - c) / c * 100], function (x) { return whole(x) + " %"; });
+    }
+    function paybackTxt(v, c) {
+      if (v == null || !c || !v[1]) return "–";
+      var fast = c / (v[1] / 12), slow = v[0] ? c / (v[0] / 12) : null;
+      if (slow != null && slow < 1) return T("rLess1");
+      return esc(fmt(T("rMonths"), { n: slow == null ? "> " + Math.ceil(fast) : (Math.max(1, Math.round(fast)) === Math.round(slow) ? Math.round(slow) : Math.max(1, Math.round(fast)) + "–" + Math.round(slow)) }));
+    }
+    function row(label, note, h, c, k) {
+      var v = value(h);
+      return "<tr><td>" + (k ? sw(KIND_VAR[k]) + " " : "") + esc(label) + (note ? "<small>" + esc(note) + "</small>" : "") + "</td>" +
+        '<td class="num">' + range(h, whole) + '</td><td class="num">' + (v ? range(v, money) : "–") + "</td>" +
+        '<td class="num">' + (c ? range([c, c], money) : "–") + '</td><td class="num">' + roiTxt(v, c) + '</td><td class="num">' + paybackTxt(v, c) + "</td></tr>";
+    }
+    var head6 = "<tr><th>" + esc(T("rCat")) + '</th><th class="num">' + esc(T("rHours")) + '</th><th class="num">' + esc(T("rValue")) +
+      '</th><th class="num">' + esc(T("rCost")) + '</th><th class="num">' + esc(T("rRoiH")) + '</th><th class="num">' + esc(T("rPayback")) + "</th></tr>";
+    var humanYr = C.SP.human * scale * weeks;
+    var main = '<div style="overflow-x:auto"><table class="rt"><thead>' + head6 + "</thead><tbody>" +
+      row(T("helpAgent"), "", hA, cA, "agent") + row(T("helpAssist"), "", hB, cB, "assistant") +
+      '<tr style="font-weight:600">' + row(T("rTotal"), "", hT, cT).slice(4) +
+      "<tr><td>" + sw(KIND_VAR.human) + " " + esc(T("helpHuman")) + "<small>" + esc(T("rHumanNote")) + '</small></td><td class="num">' + whole(humanYr) +
+      '</td><td class="num">–</td><td class="num">–</td><td class="num">–</td><td class="num">–</td></tr></tbody></table></div>';
+    var groups = "";
+    if (C.rows.length) {
+      var agentAll = (C.SV.agent[0] + C.SV.agent[1]) || 1;
+      groups = '<h4 style="margin-top:1.4rem">' + esc(T("rByGroup")) + '</h4><div style="overflow-x:auto"><table class="rt"><thead>' +
+        head6.replace(esc(T("rCat")), esc(T("rByGroup"))) + "</thead><tbody>" +
+        C.rows.map(function (g) {
+          var people = g.n * scale, h = yearly(g.s.total);
+          var c = (lic * 12 + train) * people + (setup + monthly * 12) * ((g.s.agent[0] + g.s.agent[1]) / agentAll);
+          return row(g.name, whole(people) + " " + T("rPeople").toLowerCase(), h, c);
+        }).join("") + "</tbody></table></div>";
+    }
+    var notes = [];
+    if (rate == null) notes.push(T("rNeedRate"));
+    else if (!cT) notes.push(T("rNoCost"));
+    return (notes.length ? '<div class="status-banner" style="margin-top:0.6rem">' + esc(notes.join(" ")) + "</div>" : "") + main + groups +
+      '<p class="method">' + esc(T("rMethod")) + "</p>";
   }
 
   function ppl(n) { return n === 1 ? T("nPpl1") : fmt(T("nPpl"), { n: n }); }
@@ -1835,12 +1962,12 @@
       }).join("");
     var covs = G.teams.map(function (r) { return r.cov; }).filter(function (c) { return c != null; });
     var cov = covs.length ? covs.reduce(function (t, c) { return t + [12.5, 37.5, 62.5, 87.5][c]; }, 0) / covs.length : null;
-    var notes = [];
+    var notes = [fmt(T("cOutHours"), { a: pct(SP.p.agent), b: pct(SP.p.assistant), c: pct(SP.p.human) })];
     if (SV.total[1] > 0) notes.push(fmt(T("cOutFree"), { r: hr(SV.total), pp: hr([SV.total[0] / responses.length, SV.total[1] / responses.length]) }));
     if (cov != null) notes.push(fmt(T("cOutCov"), { p: pct(cov) }));
     if (SP.n) notes.push(fmt(T("cOutView"), { p: pct(100 * SP.byView / SP.n) }));
     return '<div class="card live"><h3>' + esc(T("cOut")) + "</h3>" +
-      '<p class="save-hero" style="font-size:clamp(1.2rem,3.2vw,1.6rem)">' + fmt(T("cOutP"), { n: responses.length, a: pct(SP.p.agent), b: pct(SP.p.assistant), c: pct(SP.p.human) }) + "</p>" +
+      '<p class="save-hero" style="font-size:clamp(1.2rem,3.2vw,1.6rem)">' + fmt(T("cOutP"), { n: ppl(responses.length), t: SP.n, a: pct(SP.c.agent), b: pct(SP.c.assistant), c: pct(SP.c.human) }) + "</p>" +
       '<p class="sub">' + esc(fmt(T("cOutSub"), { min: min })) + "</p>" + splitLegend() +
       '<div class="bars">' + bars + "</div>" +
       (notes.length ? '<ul class="points" style="margin-top:1.2rem;font-size:0.92rem">' + notes.map(function (t) { return "<li>" + esc(t) + "</li>"; }).join("") + "</ul>" : "") +
@@ -1859,7 +1986,7 @@
     var html = KINDS.map(function (k) {
       var items = byKind[k];
       items.forEach(function (m) { listed += m.n; });
-      var head = fmt(T("cAllHead"), { k: T(HELP_LABEL[k]), p: pct(SP.p[k]), h: h1(SP[k]) });
+      var head = fmt(T("cAllHead"), { k: T(HELP_LABEL[k]), n: SP.cnt[k], p: pct(SP.c[k]), h: h1(SP[k]) });
       var first = items.slice(0, 12).map(function (m) { return item(m, k); }).join("");
       var rest = items.slice(12).map(function (m) { return item(m, k); }).join("");
       return '<h4 style="margin-top:1.4rem">' + sw(KIND_VAR[k]) + " " + esc(head) + "</h4>" +
@@ -2240,9 +2367,9 @@
         mode = t.getAttribute("data-solo") || !(SESSION && !SESSION.closed) ? "solo" : "respond";
         state = freshState(); go("survey"); break;
       case "live":
-        LIVE_SRC = null; ssSet("aia-view", "group"); go("group"); break;
+        LIVE_SRC = null; ROI_IN = null; ssSet("aia-view", "group"); go("group"); break;
       case "archive":
-        LIVE_SRC = ARCHIVE[+t.getAttribute("data-i")]; go("group"); break;
+        LIVE_SRC = ARCHIVE[+t.getAttribute("data-i")]; ROI_IN = null; go("group"); break;
       case "create":
         createSession(); break;
       case "new-session":
@@ -2261,6 +2388,11 @@
         break;
       case "add-codes":
         addCodes(); break;
+      case "save-roi":
+        var nroi = copyJSON(SESSION); nroi.roi = copyJSON(roiInputs());
+        $("roi-msg").textContent = "…";
+        publishSession(nroi).catch(function () { $("roi-msg").textContent = T("saveErr"); });
+        break;
       case "save-collect":
         var cv = $("s-col").value.trim(), cid = collectorId(cv);
         if (cv && !cid) { $("col-msg").textContent = T("collectBad"); break; }
@@ -2299,6 +2431,11 @@
 
   function onChange(e) {
     var el = e.target;
+    if (el.hasAttribute && el.hasAttribute("data-roi")) {
+      roiInputs()[el.getAttribute("data-roi")] = el.value;
+      var out = $("roi-out"); if (out) out.innerHTML = roiOut();
+      return;
+    }
     if (view === "facilitator") { if (el.closest("#f-links")) updateFacilitatorLinks(); return; }
     if (view === "intro") { syncCreate(); return; }
     if (view !== "survey") return;
