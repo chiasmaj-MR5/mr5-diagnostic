@@ -730,14 +730,16 @@
       btnOpenRes: "Open the results page", rSavedHere: "Assumptions are saved in this browser.",
       cRoi: "Return on investment (ROI)",
       cRoiSub: "Estimated first-year return of AI agents and AI assistants, from the time freed in the survey and your assumptions. Change any assumption and the figures update.",
-      rRate: "Average hourly cost of an employee (salary + benefits)", rWeeks: "Working weeks per year", rCapture: "Share of the estimated time actually captured (%)",
+      rRate: "Average hourly cost of an employee (salary + benefits)", rWeeks: "Working weeks per year", rFte: "Full-time hours per week", rCapture: "Share of the estimated time actually captured (%)",
       rHead: "Number of people to extrapolate to", rASetup: "AI agents — setup cost (one-time)", rAMonthly: "AI agents — running cost per month",
       rLicence: "AI assistant — licence per person per month", rTraining: "Training per person (one-time)", rCur: "Currency",
       rHeadPh: "default: respondents", rCat: "Category", rHours: "Hours freed per year", rValue: "Value per year", rCost: "Cost, year 1", rRoiH: "ROI, year 1", rPayback: "Payback",
       rTotal: "Total AI", rHumanNote: "hours per year that stay with people — where freed time is reinvested",
       rNeedRate: "Enter an average hourly cost to see the value and the ROI.", rNoCost: "Add the costs to calculate the ROI and the payback.",
       rMonths: "{n} months", rLess1: "under 1 month", rByGroup: "By group", rPeople: "People",
-      rMethod: "Method: hours freed per year = weekly hours AI could free (low–high) × working weeks × share captured, extrapolated from the respondents to the number of people entered. Value = hours × hourly cost. Year-1 cost = AI agent setup + 12 months of running costs + assistant licences for everyone + training (split between agents and assistants by time freed). Only the activities described are counted, so this is a conservative base. Estimates to validate during the pilot.",
+      rProd: "Productivity gained and return",
+      rCap: "of the time described freed for other work", rFteT: "full-time equivalents freed per year", rFteH: "Full-time equivalents",
+      rMethod: "Method: hours freed per year = weekly hours AI could free (low–high) × working weeks × share captured, extrapolated from the respondents to the number of people entered. Value = hours × hourly cost. Year-1 cost = AI agent setup + 12 months of running costs + assistant licences for everyone + training (split between agents and assistants by time freed). Full-time equivalents = hours freed per year ÷ (full-time hours per week × working weeks). Capacity freed = time freed (after the share captured) ÷ time described. Only the activities described are counted, so this is a conservative base. Estimates to validate during the pilot.",
       btnSaveRoi: "Save assumptions", rLocal: "Assumptions are not saved on this page.",
       cStart: "Where to start", cStartSub: "Activities where AI could free the most time, most first. Shown only for groups of at least {min} people.",
       cStartAgent: "Hand to AI agents", cStartAssist: "Equip with AI assistants",
@@ -1036,14 +1038,16 @@
       btnOpenRes: "Ouvrir la page de résultats", rSavedHere: "Les hypothèses sont enregistrées dans ce navigateur.",
       cRoi: "Retour sur investissement (RSI)",
       cRoiSub: "Rendement estimé la première année des agents et assistants IA, à partir du temps libéré dans le sondage et de vos hypothèses. Modifiez une hypothèse et les chiffres se mettent à jour.",
-      rRate: "Coût horaire moyen d’un employé (salaire + avantages)", rWeeks: "Semaines travaillées par année", rCapture: "Part du temps estimé réellement récupérée (%)",
+      rRate: "Coût horaire moyen d’un employé (salaire + avantages)", rWeeks: "Semaines travaillées par année", rFte: "Heures par semaine à temps plein", rCapture: "Part du temps estimé réellement récupérée (%)",
       rHead: "Nombre de personnes visées (extrapolation)", rASetup: "Agents IA — coût de mise en place (unique)", rAMonthly: "Agents IA — coût d’exploitation par mois",
       rLicence: "Assistant IA — licence par personne par mois", rTraining: "Formation par personne (unique)", rCur: "Devise",
       rHeadPh: "par défaut : répondants", rCat: "Catégorie", rHours: "Heures libérées par année", rValue: "Valeur par année", rCost: "Coût, année 1", rRoiH: "RSI, année 1", rPayback: "Retour",
       rTotal: "Total IA", rHumanNote: "heures par année qui restent aux personnes — là où le temps libéré est réinvesti",
       rNeedRate: "Inscrivez un coût horaire moyen pour voir la valeur et le RSI.", rNoCost: "Ajoutez les coûts pour calculer le RSI et le délai de retour.",
       rMonths: "{n} mois", rLess1: "moins de 1 mois", rByGroup: "Par groupe", rPeople: "Personnes",
-      rMethod: "Méthode : heures libérées par année = heures hebdomadaires que l’IA pourrait libérer (basse–haute) × semaines travaillées × part récupérée, extrapolées des répondants au nombre de personnes inscrit. Valeur = heures × coût horaire. Coût de l’année 1 = mise en place des agents IA + 12 mois d’exploitation + licences d’assistant pour tous + formation (répartie entre agents et assistants selon le temps libéré). Seules les activités décrites sont comptées : c’est une base prudente. Estimations à valider pendant l’essai.",
+      rProd: "Productivité gagnée et rendement",
+      rCap: "du temps décrit libéré pour d’autres tâches", rFteT: "équivalents temps plein libérés par année", rFteH: "Équivalents temps plein",
+      rMethod: "Méthode : heures libérées par année = heures hebdomadaires que l’IA pourrait libérer (basse–haute) × semaines travaillées × part récupérée, extrapolées des répondants au nombre de personnes inscrit. Valeur = heures × coût horaire. Coût de l’année 1 = mise en place des agents IA + 12 mois d’exploitation + licences d’assistant pour tous + formation (répartie entre agents et assistants selon le temps libéré). Équivalents temps plein = heures libérées par année ÷ (heures à temps plein par semaine × semaines travaillées). Part du temps libéré = temps libéré (après la part récupérée) ÷ temps décrit. Seules les activités décrites sont comptées : c’est une base prudente. Estimations à valider pendant l’essai.",
       btnSaveRoi: "Enregistrer les hypothèses", rLocal: "Les hypothèses ne sont pas enregistrées sur cette page.",
       cStart: "Par où commencer", cStartSub: "Activités où l’IA pourrait libérer le plus de temps, les plus importantes d’abord. Affichées seulement pour les groupes d’au moins {min} personnes.",
       cStartAgent: "Confier à des agents IA", cStartAssist: "Outiller avec des assistants IA",
@@ -1877,10 +1881,10 @@
   }
 
   // ============ ROI ============
-  var ROI_FIELDS = [["rate", "rRate"], ["weeks", "rWeeks"], ["capture", "rCapture"], ["head", "rHead"],
+  var ROI_FIELDS = [["rate", "rRate"], ["weeks", "rWeeks"], ["fte", "rFte"], ["capture", "rCapture"], ["head", "rHead"],
     ["aSetup", "rASetup"], ["aMonthly", "rAMonthly"], ["licence", "rLicence"], ["training", "rTraining"], ["cur", "rCur"]];
   function roiInputs() {
-    if (!ROI_IN) ROI_IN = Object.assign({ weeks: "46", capture: "70", cur: "$" },
+    if (!ROI_IN) ROI_IN = Object.assign({ weeks: "46", fte: "35", capture: "70", cur: "$" },
       (view === "results" && lsGet("aia-roi:" + P.key)) || (liveSession() && liveSession().roi) || {});
     return ROI_IN;
   }
@@ -1933,6 +1937,9 @@
     var mA = hA[0] + hA[1], mB = hB[0] + hB[1], shareA = mA + mB ? mA / (mA + mB) : 0.5;
     var cA = setup + monthly * 12 + train * head * shareA, cB = lic * 12 * head + train * head * (1 - shareA), cT = cA + cB;
     function value(h) { return rate == null ? null : [h[0] * rate, h[1] * rate]; }
+    var fteYear = (num(I.fte) || 35) * weeks;
+    function one(v) { return (Math.round(v * 10) / 10).toLocaleString(lang === "fr" ? "fr-CA" : "en-CA"); }
+    function fteTxt(h) { return fteYear ? range([h[0] / fteYear, h[1] / fteYear], one) : "–"; }
     function roiTxt(v, c) {
       if (v == null || !c) return "–";
       return range([(v[0] - c) / c * 100, (v[1] - c) / c * 100], function (x) { return whole(x) + " %"; });
@@ -1946,17 +1953,25 @@
     function row(label, note, h, c, k) {
       var v = value(h);
       return "<tr><td>" + (k ? sw(KIND_VAR[k]) + " " : "") + esc(label) + (note ? "<small>" + esc(note) + "</small>" : "") + "</td>" +
-        '<td class="num">' + range(h, whole) + '</td><td class="num">' + (v ? range(v, money) : "–") + "</td>" +
+        '<td class="num">' + range(h, whole) + '</td><td class="num">' + fteTxt(h) + '</td><td class="num">' + (v ? range(v, money) : "–") + "</td>" +
         '<td class="num">' + (c ? range([c, c], money) : "–") + '</td><td class="num">' + roiTxt(v, c) + '</td><td class="num">' + paybackTxt(v, c) + "</td></tr>";
     }
-    var head6 = "<tr><th>" + esc(T("rCat")) + '</th><th class="num">' + esc(T("rHours")) + '</th><th class="num">' + esc(T("rValue")) +
+    var head6 = "<tr><th>" + esc(T("rCat")) + '</th><th class="num">' + esc(T("rHours")) + '</th><th class="num">' + esc(T("rFteH")) + '</th><th class="num">' + esc(T("rValue")) +
       '</th><th class="num">' + esc(T("rCost")) + '</th><th class="num">' + esc(T("rRoiH")) + '</th><th class="num">' + esc(T("rPayback")) + "</th></tr>";
     var humanYr = C.SP.human * scale * weeks;
     var main = '<div style="overflow-x:auto"><table class="rt"><thead>' + head6 + "</thead><tbody>" +
       row(T("helpAgent"), "", hA, cA, "agent") + row(T("helpAssist"), "", hB, cB, "assistant") +
       '<tr style="font-weight:600">' + row(T("rTotal"), "", hT, cT).slice(4) +
-      "<tr><td>" + sw(KIND_VAR.human) + " " + esc(T("helpHuman")) + "<small>" + esc(T("rHumanNote")) + '</small></td><td class="num">' + whole(humanYr) +
+      "<tr><td>" + sw(KIND_VAR.human) + " " + esc(T("helpHuman")) + "<small>" + esc(T("rHumanNote")) + '</small></td><td class="num">' + whole(humanYr) + '</td><td class="num">' + fteTxt([humanYr, humanYr]) +
       '</td><td class="num">–</td><td class="num">–</td><td class="num">–</td><td class="num">–</td></tr></tbody></table></div>';
+    // Productivity gained next to its return, for the whole group.
+    var capP = C.SP.total ? [100 * C.SV.total[0] * cap / C.SP.total, 100 * C.SV.total[1] * cap / C.SP.total] : [0, 0];
+    var vT = value(hT);
+    var tiles = '<h4 style="margin-top:1rem">' + esc(T("rProd")) + '</h4><div class="tiles" style="margin-top:0.6rem;margin-bottom:1rem">' +
+      '<div class="tile"><div class="v accent">' + range(capP, function (x) { return whole(x) + " %"; }) + '</div><div class="l">' + esc(T("rCap")) + "</div></div>" +
+      '<div class="tile"><div class="v accent">' + fteTxt(hT) + '</div><div class="l">' + esc(T("rFteT")) + "</div></div>" +
+      (vT && cT ? '<div class="tile"><div class="v">' + roiTxt(vT, cT) + '</div><div class="l">' + esc(T("rRoiH")) + "</div></div>" +
+        '<div class="tile"><div class="v">' + paybackTxt(vT, cT) + '</div><div class="l">' + esc(T("rPayback")) + "</div></div>" : "") + "</div>";
     var groups = "";
     if (C.rows.length) {
       var agentAll = (C.SV.agent[0] + C.SV.agent[1]) || 1;
@@ -1971,7 +1986,7 @@
     var notes = [];
     if (rate == null) notes.push(T("rNeedRate"));
     else if (!cT) notes.push(T("rNoCost"));
-    return (notes.length ? '<div class="status-banner" style="margin-top:0.6rem">' + esc(notes.join(" ")) + "</div>" : "") + main + groups +
+    return tiles + (notes.length ? '<div class="status-banner" style="margin-top:0.6rem">' + esc(notes.join(" ")) + "</div>" : "") + main + groups +
       '<p class="method">' + esc(T("rMethod")) + "</p>";
   }
 
