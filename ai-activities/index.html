@@ -547,6 +547,13 @@
     return /^[A-Za-z0-9_-]{20,200}$/.test(v) ? v : "";
   }
   function collectorUrl(v) { var id = collectorId(v); return id ? "https://script.google.com/macros/s/" + id + "/exec" : ""; }
+  // The Sheet's id is the key of the results page: only someone with the Sheet's link can read the answers.
+  function sheetId(v) {
+    v = String(v || "").trim();
+    var m = v.match(/\/spreadsheets\/d\/([A-Za-z0-9_-]{20,200})/);
+    if (m) return m[1];
+    return /^[A-Za-z0-9_-]{20,200}$/.test(v) ? v : "";
+  }
   var DEFAULT_TO = "chiasmaj@gmail.com";
   var P = {
     org: (qp.get("org") || "").trim(),
@@ -554,7 +561,8 @@
     roles: (qp.get("roles") || "").split("|").map(function (s) { return s.trim(); }).filter(Boolean),
     min: Math.max(2, parseInt(qp.get("min"), 10) || 5),
     to: (qp.get("to") || DEFAULT_TO).trim(),
-    view: qp.get("view") === "facilitator" ? "facilitator" : "",
+    view: qp.get("view") === "facilitator" ? "facilitator" : qp.get("view") === "results" ? "results" : "",
+    key: sheetId(qp.get("k")),
     collect: collectorUrl(qp.get("c"))
   };
   var CODE_PREFIX = "AIA1.";
@@ -711,6 +719,16 @@
       cAllHead: "{k} — {n} tasks ({p} of tasks · {h} h per week)",
       cAllMore: "Show {n} more",
       cAllHidden: "{n} activities from groups under {min} people are counted in the percentages but not listed.",
+      vTitle: "Results",
+      vLede: "Answers arrive automatically in your Google Sheet. When everyone has finished, click the button to see all the results.",
+      vBtn: "Show the latest results", vLoading: "Loading the answers…", vCount: "{n} answers · updated at {t}",
+      vNone: "No answers yet. Share the survey link — the results appear here once people finish.",
+      vErr: "Could not reach the Google Sheet. Check that the web app is deployed with access “Anyone”, then try again.",
+      vBadLink: "This results link is incomplete. Open it again from your console.",
+      fSheet: "Link of the Google Sheet (for the results page)", fSheetPh: "https://docs.google.com/spreadsheets/d/…",
+      sheetBad: "This does not look like a Google Sheet link (…/spreadsheets/d/…).",
+      resTitle: "Results page", resDesc: "When everyone has finished, open this page and click “Show the latest results”. Keep this link private: it shows all the answers.",
+      btnOpenRes: "Open the results page", rSavedHere: "Assumptions are saved in this browser.",
       cRoi: "Return on investment (ROI)",
       cRoiSub: "Estimated first-year return of AI agents and AI assistants, from the time freed in the survey and your assumptions. Change any assumption and the figures update.",
       rRate: "Average hourly cost of an employee (salary + benefits)", rWeeks: "Working weeks per year", rCapture: "Share of the estimated time actually captured (%)",
@@ -1011,6 +1029,16 @@
       cAllHead: "{k} — {n} tâches ({p} des tâches · {h} h par semaine)",
       cAllMore: "Afficher {n} de plus",
       cAllHidden: "{n} activités de groupes de moins de {min} personnes sont comptées dans les pourcentages, mais ne sont pas affichées.",
+      vTitle: "Résultats",
+      vLede: "Les réponses arrivent automatiquement dans votre Google Sheet. Quand tout le monde a terminé, cliquez sur le bouton pour voir tous les résultats.",
+      vBtn: "Afficher les derniers résultats", vLoading: "Chargement des réponses…", vCount: "{n} réponses · mis à jour à {t}",
+      vNone: "Aucune réponse pour l’instant. Partagez le lien du questionnaire — les résultats s’affichent ici dès que les gens terminent.",
+      vErr: "Impossible de joindre le Google Sheet. Vérifiez que l’application Web est déployée avec l’accès « Tout le monde », puis réessayez.",
+      vBadLink: "Ce lien de résultats est incomplet. Ouvrez-le de nouveau à partir de votre console.",
+      fSheet: "Lien du Google Sheet (pour la page de résultats)", fSheetPh: "https://docs.google.com/spreadsheets/d/…",
+      sheetBad: "Ce lien ne ressemble pas à un Google Sheet (…/spreadsheets/d/…).",
+      resTitle: "Page de résultats", resDesc: "Quand tout le monde a terminé, ouvrez cette page et cliquez sur « Afficher les derniers résultats ». Gardez ce lien privé : il montre toutes les réponses.",
+      btnOpenRes: "Ouvrir la page de résultats", rSavedHere: "Les hypothèses sont enregistrées dans ce navigateur.",
       cRoi: "Retour sur investissement (RSI)",
       cRoiSub: "Rendement estimé la première année des agents et assistants IA, à partir du temps libéré dans le sondage et de vos hypothèses. Modifiez une hypothèse et les chiffres se mettent à jour.",
       rRate: "Coût horaire moyen d’un employé (salaire + avantages)", rWeeks: "Semaines travaillées par année", rCapture: "Part du temps estimé réellement récupérée (%)",
@@ -1296,6 +1324,7 @@
   var closeArmed = false;
   var codeMsg = "";            // result of the last "add codes", shown again after the reload
   var ROI_IN = null;           // ROI assumptions; saved with the session in the artifact
+  var resMsg = "", resLoaded = false; // results page: status line, and whether the Sheet answered
   var roiCtx = null;           // the group data the ROI card was last drawn from
 
   function draftKey() { return "aia-draft:" + FORM + ":" + (cfg().org || ""); }
@@ -1856,7 +1885,8 @@
   var ROI_FIELDS = [["rate", "rRate"], ["weeks", "rWeeks"], ["capture", "rCapture"], ["head", "rHead"],
     ["aSetup", "rASetup"], ["aMonthly", "rAMonthly"], ["licence", "rLicence"], ["training", "rTraining"], ["cur", "rCur"]];
   function roiInputs() {
-    if (!ROI_IN) ROI_IN = Object.assign({ weeks: "46", capture: "70", cur: "$" }, (liveSession() && liveSession().roi) || {});
+    if (!ROI_IN) ROI_IN = Object.assign({ weeks: "46", capture: "70", cur: "$" },
+      (view === "results" && lsGet("aia-roi:" + P.key)) || (liveSession() && liveSession().roi) || {});
     return ROI_IN;
   }
   function num(v) {
@@ -1891,7 +1921,7 @@
     return '<div class="card"><h3>' + esc(T("cRoi")) + '</h3><p class="sub">' + esc(T("cRoiSub")) + "</p>" +
       '<div class="roi-grid">' + fields + "</div>" +
       (canSave ? '<div class="btn-row no-pdf" style="margin-top:0"><button class="btn ghost small" data-act="save-roi">' + esc(T("btnSaveRoi")) + '</button><span class="msg" id="roi-msg" role="status"></span></div>'
-               : '<p class="msg no-pdf">' + esc(T("rLocal")) + "</p>") +
+               : '<p class="msg no-pdf">' + esc(T(view === "results" ? "rSavedHere" : "rLocal")) + "</p>") +
       '<div id="roi-out">' + roiOut() + "</div></div>";
   }
 
@@ -2149,6 +2179,14 @@
     // Keep "|" readable: shorter links make smaller, easier-to-scan QR codes.
     return HOSTED_URL + "?" + p.toString().replace(/%7C/g, "|");
   }
+  function resultsUrl(sess) {
+    if (!collectorId(sess.collect) || !sess.sheet) return "";
+    var p = new URLSearchParams();
+    p.set("view", "results"); p.set("c", collectorId(sess.collect)); p.set("k", sess.sheet);
+    if (sess.org) p.set("org", sess.org);
+    p.set("min", sess.min || 5); p.set("lang", sess.lang || "en");
+    return HOSTED_URL + "?" + p.toString();
+  }
   function qrSvg(url) { try { return QR.toSVG(QR.encode(url), 4, 4); } catch (e) { return ""; } }
 
   function sharePanel(k, title, url, small) {
@@ -2176,9 +2214,15 @@
         sharePanel("t", T("shareTeam"), shareUrl("t")) +
         sharePanel("d", T("shareLead"), shareUrl("d"), true) +
         '<div class="share-block"><h4>' + esc(T("fCollect")) + '</h4><p class="sub" style="margin:0 0 0.5rem">' + esc(T(SESSION.collect ? "collectOn" : "collectOff")) + " " + esc(T("collectNote")) + "</p>" +
-        '<div style="display:flex;gap:0.6rem;flex-wrap:wrap"><input type="text" id="s-col" style="flex:1;min-width:200px" placeholder="' + esc(T("fCollectPh")) + '" value="' + esc(collectorUrl(SESSION.collect)) + '">' +
-        (ART ? '<button class="btn ghost small" data-act="save-collect">' + esc(T("btnSaveCollect")) + "</button>" : "") + "</div>" +
+        '<input type="text" id="s-col" placeholder="' + esc(T("fCollectPh")) + '" value="' + esc(collectorUrl(SESSION.collect)) + '">' +
+        '<label for="s-sheet" style="display:block;font-size:0.82rem;font-weight:600;color:var(--ink-2);margin:0.8rem 0 0.3rem">' + esc(T("fSheet")) + "</label>" +
+        '<input type="text" id="s-sheet" placeholder="' + esc(T("fSheetPh")) + '" value="' + esc(SESSION.sheet ? "https://docs.google.com/spreadsheets/d/" + SESSION.sheet + "/edit" : "") + '">' +
+        (ART ? '<div class="btn-row"><button class="btn ghost small" data-act="save-collect">' + esc(T("btnSaveCollect")) + "</button></div>" : "") +
         '<p class="msg" id="col-msg" role="status"></p></div>' +
+        (resultsUrl(SESSION) ? '<div class="share-block"><h4>' + esc(T("resTitle")) + '</h4><p class="sub" style="margin:0 0 0.5rem">' + esc(T("resDesc")) + "</p>" +
+          '<div class="code-box" id="link-r">' + esc(resultsUrl(SESSION)) + "</div>" +
+          '<div class="btn-row"><a class="btn small" href="' + esc(resultsUrl(SESSION)) + '" target="_blank" rel="noopener">' + esc(T("btnOpenRes")) + "</a>" +
+          '<button class="btn ghost small" data-act="copy-link" data-k="r">' + esc(T("copyLink")) + '</button></div><p class="msg" id="msg-r" role="status"></p></div>' : "") +
         '<div class="btn-row"><button class="btn" data-act="live">' + esc(T("btnLive")) + "</button>" +
         '<button class="btn ghost" data-act="answer" data-f="t">' + esc(T("btnAnswerT")) + "</button>" +
         '<button class="btn ghost" data-act="answer" data-f="d">' + esc(T("btnAnswerD")) + "</button></div></div>";
@@ -2199,6 +2243,7 @@
         '<div class="field"><label for="n-to">' + esc(T("fTo")) + '</label><input type="text" id="n-to" inputmode="email" value="' + esc(DEFAULT_TO) + '"></div>' +
         '<div class="field"><label for="n-lang">' + esc(T("fLang")) + '</label><select id="n-lang">' + langOpts + "</select></div>" +
         '<div class="field"><label for="n-col">' + esc(T("fCollect")) + '</label><input type="text" id="n-col" placeholder="' + esc(T("fCollectPh")) + '"></div>' +
+        '<div class="field"><label for="n-sheet">' + esc(T("fSheet")) + '</label><input type="text" id="n-sheet" placeholder="' + esc(T("fSheetPh")) + '"></div>' +
         (ART ? '<div class="btn-row"><button class="btn" data-act="create" id="btn-create" disabled>' + esc(T("btnCreate")) + "</button></div>"
              : '<p class="sub" style="margin:0.4rem 0 0">' + esc(T("needArt")) + "</p>") +
         '<p class="msg" id="create-msg" role="status"></p></div>';
@@ -2257,6 +2302,37 @@
     $("f-share").innerHTML = sharePanel("t", T("shareTeam"), shareUrl("t", s)) + sharePanel("d", T("shareLead"), shareUrl("d", s), true);
   }
 
+  // ============ results page (answers read from the Google Sheet) ============
+  function renderResultsView() {
+    var org = P.org || (compiled[0] && compiled[0].org) || "";
+    return '<section class="screen">' +
+      '<p class="eyebrow"><span class="mark">MR5</span> · ' + esc(T("gEyebrow")) + "</p>" +
+      "<h1>" + esc(T("vTitle")) + "</h1>" +
+      (org ? '<p class="org-line"><strong>' + esc(org) + "</strong></p>" : "") +
+      '<p class="lede">' + esc(T("vLede")) + "</p>" +
+      '<div class="btn-row" style="margin-top:1.4rem"><button class="btn" data-act="r-load">' + esc(T("vBtn")) + '</button><span class="msg" id="r-msg" role="status" style="margin:0">' + esc(resMsg) + "</span></div>" +
+      (compiled.length
+        ? '<div id="report-root"><p class="eyebrow" style="margin-top:2.4rem"><span class="mark">MR5</span> · ' + esc(T("gEyebrow")) + "</p>" +
+          "<h1>" + esc(T("gTitle")) + '</h1><p class="org-line">' + (org ? "<strong>" + esc(org) + '</strong><span class="sep">·</span>' : "") + esc(dateStr()) + "</p>" +
+          renderGroupBody(compiled, P.min) + "</div>" +
+          '<div class="nav-row no-pdf" style="justify-content:flex-start;gap:0.8rem"><button class="btn ghost" data-act="report">' + esc(T("btnReport")) + "</button>" +
+          '<button class="btn ghost small" data-act="csv-r">' + esc(T("btnCsvR")) + '</button><button class="btn ghost small" data-act="csv-a">' + esc(T("btnCsvA")) + "</button></div>"
+        : (resLoaded ? '<div class="status-banner">' + esc(T("vNone")) + "</div>" : "")) +
+      "</section>";
+  }
+  function loadResults() {
+    if (!P.collect || !P.key) { resMsg = T("vBadLink"); render(); return; }
+    resMsg = T("vLoading");
+    var m = $("r-msg"); if (m) m.textContent = resMsg;
+    fetch(P.collect + "?k=" + encodeURIComponent(P.key)).then(function (r) { return r.json(); }).then(function (d) {
+      if (!d || !d.ok || !Array.isArray(d.codes)) throw new Error("bad reply");
+      compiled = parseCodes(d.codes.join(" "), []).valid;
+      resLoaded = true;
+      resMsg = fmt(T("vCount"), { n: compiled.length, t: new Date().toLocaleTimeString(lang === "fr" ? "fr-CA" : "en-CA", { hour: "2-digit", minute: "2-digit" }) });
+      render();
+    }).catch(function () { resMsg = T("vErr"); render(); });
+  }
+
   // ============ render dispatch ============
   function render() {
     var html;
@@ -2264,6 +2340,7 @@
     else if (view === "personal") html = renderPersonal();
     else if (view === "group") html = renderGroup();
     else if (view === "facilitator") html = renderFacilitator();
+    else if (view === "results") html = renderResultsView();
     else html = STANDALONE ? renderSurveyIntro() : renderConsole();
     $("app").innerHTML = html;
     $("foot").textContent = T("footer");
@@ -2394,9 +2471,10 @@
         publishSession(nroi).catch(function () { $("roi-msg").textContent = T("saveErr"); });
         break;
       case "save-collect":
-        var cv = $("s-col").value.trim(), cid = collectorId(cv);
+        var cv = $("s-col").value.trim(), cid = collectorId(cv), sv = $("s-sheet").value.trim(), sid = sheetId(sv);
         if (cv && !cid) { $("col-msg").textContent = T("collectBad"); break; }
-        var nsc = copyJSON(SESSION); nsc.collect = cid;
+        if (sv && !sid) { $("col-msg").textContent = T("sheetBad"); break; }
+        var nsc = copyJSON(SESSION); nsc.collect = cid; nsc.sheet = sid;
         $("col-msg").textContent = "…";
         publishSession(nsc).catch(function () { $("col-msg").textContent = T("saveErr"); });
         break;
@@ -2415,6 +2493,8 @@
         saveFile("activities.csv", "﻿" + activitiesCsv(currentResponses()), "text/csv;charset=utf-8"); break;
 
       // public facilitator view
+      case "r-load":
+        loadResults(); break;
       case "f-read":
         var res = parseCodes($("f-codes").value, compiled);
         compiled = compiled.concat(res.valid);
@@ -2427,12 +2507,13 @@
     }
   }
 
-  function currentResponses() { return view === "facilitator" ? compiled : (liveSession() ? liveSession().responses : []); }
+  function currentResponses() { return view === "facilitator" || view === "results" ? compiled : (liveSession() ? liveSession().responses : []); }
 
   function onChange(e) {
     var el = e.target;
     if (el.hasAttribute && el.hasAttribute("data-roi")) {
       roiInputs()[el.getAttribute("data-roi")] = el.value;
+      if (view === "results") lsSet("aia-roi:" + P.key, ROI_IN);
       var out = $("roi-out"); if (out) out.innerHTML = roiOut();
       return;
     }
@@ -2493,9 +2574,11 @@
       email: $("n-to").value.trim() || DEFAULT_TO,
       lang: $("n-lang").value === "fr" ? "fr" : "en",
       collect: collectorId($("n-col").value),
+      sheet: sheetId($("n-sheet").value),
       createdAt: Date.now(), responses: []
     };
     if ($("n-col").value.trim() && !sess.collect) { $("create-msg").textContent = T("collectBad"); return; }
+    if ($("n-sheet").value.trim() && !sess.sheet) { $("create-msg").textContent = T("sheetBad"); return; }
     $("create-msg").textContent = T("creating");
     publishSession(sess).catch(function () { $("create-msg").textContent = T("saveErr"); });
   }
@@ -2651,7 +2734,7 @@
           slices.push([start, end]); start = end;
         }
         if (total - start > 2) slices.push([start, total]);
-        var org = view === "facilitator" ? P.org : (cfg().org || (liveSession() && liveSession().org) || "");
+        var org = view === "facilitator" || view === "results" ? P.org : (cfg().org || (liveSession() && liveSession().org) || "");
         slices.forEach(function (sl, i) {
           var hgt = sl[1] - sl[0], c = document.createElement("canvas");
           c.width = canvas.width; c.height = hgt;
@@ -2712,7 +2795,7 @@
   document.addEventListener("input", function (e) { if (e.target.matches("input[type=text], textarea")) onChange(e); });
 
   // ============ start ============
-  if (STANDALONE && P.view === "facilitator") view = "facilitator";
+  if (STANDALONE && P.view) view = P.view;
   if (!STANDALONE) {
     // Return to where the facilitator or respondent was before the publish-triggered reload.
     var pv = ssGet("aia-personal");
@@ -2721,7 +2804,7 @@
     } else if (ssGet("aia-view") === "group" && SESSION) {
       view = "group";
     }
-  } else if (view !== "facilitator") {
+  } else if (!P.view) {
     var dr = lsGet(draftKey());
     if (dr && dr.done && dr.a) { state = dr; lastPayload = buildPayload(); submitHTML = dr.sent ? sentHTML(lastPayload) : standaloneCodeHTML(lastPayload); view = "personal"; }
   }
@@ -2730,6 +2813,8 @@
   setLang(lang);
   var pres = ssGet("aia-present");
   if (pres && SESSION && !SESSION.closed) openPresent(pres);
+
+  if (view === "results") loadResults();
 
   // Resolve the artifact capabilities (they arrive after the first run; null when absent).
   if (!STANDALONE && window.claude && typeof window.claude.use === "function") {
