@@ -24,8 +24,15 @@ function doPost(e) {
   return reply({ ok: true });
 }
 
-// Opening the web app link in a browser shows that the collector is running.
-function doGet() {
+// With ?k=<this Sheet's id> (the facilitator's results link), returns every code received.
+// Without it, opening the web app link only shows that the collector is running.
+function doGet(e) {
+  var k = e && e.parameter && e.parameter.k;
+  if (k && k === SpreadsheetApp.getActiveSpreadsheet().getId()) {
+    var sh = sheet(), n = sh.getLastRow();
+    var codes = n > 1 ? sh.getRange(2, 6, n - 1, 1).getValues().map(function (r) { return String(r[0]); }) : [];
+    return reply({ ok: true, codes: codes });
+  }
   return reply({ ok: true, service: "AI Activity Diagnostic collector" });
 }
 

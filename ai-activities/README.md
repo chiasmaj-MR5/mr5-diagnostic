@@ -49,7 +49,10 @@ questionnaire sends its code to a Google Sheet; the code stays on screen as a ba
 2. In the Sheet: **Extensions → Apps Script**. Replace the code with `collector/Code.gs`, then **Save**.
 3. **Deploy → New deployment → Select type: Web app**. Execute as: **Me**. Who has access: **Anyone**. **Deploy**, then authorize.
 4. Copy the **Web app URL** (`https://script.google.com/macros/s/…/exec`).
-5. In the facilitator console, paste it in **Automatic collection** (new session form or live session card) and save.
-   The links and QR codes then carry the collector; share those.
-6. To add answers to the results, copy the **Code** column of the "Responses" tab into **Add response codes**.
-   Codes already added are skipped, so pasting the whole column again is safe.
+5. In the facilitator console, paste the Web app URL in **Automatic collection** and the Sheet's own link
+   (`https://docs.google.com/spreadsheets/d/…`) in **Link of the Google Sheet**, then save
+   (new session form or live session card). The survey links and QR codes then carry the collector; share those.
+6. The console then shows a **results page** link. When everyone has finished, open it and click
+   **Show the latest results**: it reads every code from the Sheet and shows the group results, ROI and PDF.
+   The link contains the Sheet's id, which is what allows reading the answers: keep it private.
+   Codes can still be pasted into the console's **Add response codes** (the Sheet's Code column works too).
