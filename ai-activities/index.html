@@ -833,6 +833,10 @@
       btnAddCode: "Add to results",
       addCodeRes: "{n} added · {bad} unreadable · {dup} already in",
       btnCsvR: "Download respondents (CSV)", btnCsvA: "Download activities (CSV)",
+      btnDelete: "Delete", btnDeleteConfirm: "Click again to delete",
+      sRolesT: "Role groups", btnSaveRoles: "Save the role groups", rolesNone: "Enter at least one role group.",
+      sRolesNote: "Saving changes the team link and QR code: share the new one. The old link still works, with the old list.",
+      deleteNote: "Deleting removes this survey from your console. Answers already in the Google Sheet stay there; delete those rows in the Sheet if needed.",
       btnClose: "Close session", btnCloseConfirm: "Click again to close", btnReopen: "Reopen session",
       saveErr: "Could not save — try again.",
 
@@ -840,7 +844,7 @@
       cTitle: "AI Activity Diagnostic",
       cLede: "Create a group session, show the QR code, and watch the group results build as people finish — then discuss the directions together.",
       newSession: "New group session",
-      fOrg: "Organization name", fRoles: "Role groups — one per line, each should reach the minimum group size. For both languages write: Français / English",
+      fOrg: "Organization name", fRoles: "Role groups — one per line, each should reach the minimum group size. For both languages write: Français / English — with spaces around “ / ” only there (e.g. TI/SI / IS/IT)",
       fMin: "Minimum group size", fTo: "Email address that receives response codes", fLang: "Questionnaire language",
       btnCreate: "Create group session", creating: "Creating…",
       needArt: "Group sessions work when this page is opened as your Claude artifact. On the public link, use the facilitator view to build links and compile codes.",
@@ -1120,6 +1124,10 @@
       btnAddCode: "Ajouter aux résultats",
       addCodeRes: "{n} ajouté(s) · {bad} illisible(s) · {dup} déjà présent(s)",
       btnCsvR: "Télécharger les répondants (CSV)", btnCsvA: "Télécharger les activités (CSV)",
+      btnDelete: "Supprimer", btnDeleteConfirm: "Cliquez de nouveau pour supprimer",
+      sRolesT: "Groupes de fonctions", btnSaveRoles: "Enregistrer les groupes", rolesNone: "Inscrivez au moins un groupe de fonctions.",
+      sRolesNote: "L’enregistrement change le lien et le code QR des équipes : partagez le nouveau. L’ancien lien fonctionne toujours, avec l’ancienne liste.",
+      deleteNote: "La suppression retire ce questionnaire de votre console. Les réponses déjà dans le Google Sheet y restent; supprimez ces lignes dans le Sheet au besoin.",
       btnClose: "Fermer la session", btnCloseConfirm: "Cliquez de nouveau pour fermer", btnReopen: "Rouvrir la session",
       saveErr: "Enregistrement impossible — réessayez.",
 
@@ -1127,7 +1135,7 @@
       cTitle: "Diagnostic IA des activités",
       cLede: "Créez une session de groupe, affichez le code QR et suivez les résultats de groupe à mesure que les gens terminent — puis discutez ensemble des pistes.",
       newSession: "Nouvelle session de groupe",
-      fOrg: "Nom de l’organisation", fRoles: "Groupes de fonctions — un par ligne, chacun devrait atteindre la taille minimale. Pour les deux langues, écrivez : Français / English",
+      fOrg: "Nom de l’organisation", fRoles: "Groupes de fonctions — un par ligne, chacun devrait atteindre la taille minimale. Pour les deux langues, écrivez : Français / English — avec des espaces autour de « / » seulement à cet endroit (p. ex. TI/SI / IS/IT)",
       fMin: "Taille minimale d’un groupe", fTo: "Adresse courriel qui reçoit les codes", fLang: "Langue du questionnaire",
       btnCreate: "Créer la session de groupe", creating: "Création…",
       needArt: "Les sessions de groupe fonctionnent lorsque cette page est ouverte comme votre artefact Claude. Sur le lien public, utilisez la vue d’animation pour créer les liens et compiler les codes.",
@@ -1153,7 +1161,8 @@
   };
 
   var DEFAULT_ROLES = ["Service à la clientèle / Client service", "Opérations / Operations", "Administration et finances / Administration and finance",
-    "Ventes et développement des affaires / Sales and business development", "Gestion / Management"];
+    "Ventes et développement des affaires / Sales and business development", "Gestion / Management", "Marketing",
+    "Ressources humaines / Human resources", "TI/SI / IS/IT"];
 
   // ============ helpers ============
   function $(id) { return document.getElementById(id); }
@@ -1285,6 +1294,7 @@
   var LIVE_SRC = null;         // null = current session; otherwise an archived session
   var compiled = [];           // responses compiled from codes on the public facilitator view
   var closeArmed = false;
+  var delArmed = -1;           // past session waiting for the second click on "Delete"
   var codeMsg = "";            // result of the last "add codes", shown again after the reload
   var ROI_IN = null;           // ROI assumptions; saved with the session in the artifact
   var resMsg = "", resLoaded = false; // results page: status line, and whether the Sheet answered
@@ -2140,6 +2150,10 @@
         '<p class="sub" style="margin:0.8rem 0 0">' + esc(T("shareDesc")) + "</p>" +
         sharePanel("t", T("shareTeam"), shareUrl("t")) +
         sharePanel("d", T("shareLead"), shareUrl("d"), true) +
+        '<div class="share-block"><h4>' + esc(T("sRolesT")) + '</h4><p class="sub" style="margin:0 0 0.5rem">' + esc(T("fRoles")) + ". " + esc(T("sRolesNote")) + "</p>" +
+        '<textarea id="s-roles" rows="6" aria-label="' + esc(T("sRolesT")) + '">' + esc((SESSION.roles || []).join("\n")) + "</textarea>" +
+        (ART ? '<div class="btn-row"><button class="btn ghost small" data-act="save-roles">' + esc(T("btnSaveRoles")) + "</button></div>" : "") +
+        '<p class="msg" id="roles-msg" role="status"></p></div>' +
         '<div class="share-block"><h4>' + esc(T("fCollect")) + '</h4><p class="sub" style="margin:0 0 0.5rem">' + esc(T(SESSION.collect ? "collectOn" : "collectOff")) + " " + esc(T("collectNote")) + "</p>" +
         '<input type="text" id="s-col" placeholder="' + esc(T("fCollectPh")) + '" value="' + esc(collectorUrl(SESSION.collect)) + '">' +
         '<label for="s-sheet" style="display:block;font-size:0.82rem;font-weight:600;color:var(--ink-2);margin:0.8rem 0 0.3rem">' + esc(T("fSheet")) + "</label>" +
@@ -2179,6 +2193,7 @@
     }
     html += '<p style="margin-top:1.2rem"><button class="linklike" data-act="answer" data-f="t" data-solo="1">' + esc(T("tryIt")) + "</button></p>";
     if (ARCHIVE.length) {
+      delArmed = -1;   // buttons are redrawn unarmed, so the next click arms again
       html += '<div class="card"><h3>' + esc(T("pastTitle")) + "</h3>" + ARCHIVE.map(function (a, i) {
         var nt2 = a.responses.filter(function (r) { return r.f === "t"; }).length;
         return '<div class="archive-row"><div><div class="a-org">' + esc(a.org) + '</div><div class="a-meta">' +
@@ -2186,8 +2201,9 @@
           '<div class="btn-row" style="margin-top:0">' +
           // A closed session's answers keep arriving in the Sheet: its results page stays one click away.
           (resultsUrl(a) ? '<a class="btn ghost small" href="' + esc(resultsUrl(a)) + '" target="_blank" rel="noopener">' + esc(T("resTitle")) + "</a>" : "") +
-          '<button class="btn ghost small" data-act="archive" data-i="' + i + '">' + esc(T("btnView")) + "</button></div></div>";
-      }).join("") + "</div>";
+          '<button class="btn ghost small" data-act="archive" data-i="' + i + '">' + esc(T("btnView")) + "</button>" +
+          '<button class="btn ghost small" data-act="del-archive" data-i="' + i + '">' + esc(T("btnDelete")) + "</button></div></div>";
+      }).join("") + '<p class="msg" id="past-msg" role="status"></p></div>';
     }
     return html + "</section>";
   }
@@ -2392,6 +2408,18 @@
         LIVE_SRC = null; ROI_IN = null; ssSet("aia-view", "group"); go("group"); break;
       case "archive":
         LIVE_SRC = ARCHIVE[+t.getAttribute("data-i")]; ROI_IN = null; go("group"); break;
+      case "del-archive":
+        // Two clicks: the first arms this row and explains what is (not) deleted.
+        var di = +t.getAttribute("data-i");
+        if (delArmed !== di) {
+          Array.prototype.forEach.call(document.querySelectorAll('[data-act="del-archive"]'), function (b) { b.textContent = T("btnDelete"); });
+          delArmed = di; t.textContent = T("btnDeleteConfirm"); $("past-msg").textContent = T("deleteNote"); break;
+        }
+        delArmed = -1; t.disabled = true;
+        publishStore({ v: 1, session: SESSION, archive: ARCHIVE.filter(function (a, j) { return j !== di; }) }).catch(function () {
+          t.disabled = false; $("past-msg").textContent = T("saveErr");
+        });
+        break;
       case "create":
         createSession(); break;
       case "new-session":
@@ -2414,6 +2442,13 @@
         var nroi = copyJSON(SESSION); nroi.roi = copyJSON(roiInputs());
         $("roi-msg").textContent = "…";
         publishSession(nroi).catch(function () { $("roi-msg").textContent = T("saveErr"); });
+        break;
+      case "save-roles":
+        var nrl = copyJSON(SESSION);
+        nrl.roles = splitRoles($("s-roles").value);
+        if (!nrl.roles.length) { $("roles-msg").textContent = T("rolesNone"); break; }
+        $("roles-msg").textContent = "…";
+        publishSession(nrl).catch(function () { $("roles-msg").textContent = T("saveErr"); });
         break;
       case "save-collect":
         var cv = $("s-col").value.trim(), cid = collectorId(cv), sv = $("s-sheet").value.trim(), sid = sheetId(sv);
@@ -2513,12 +2548,15 @@
     if (b) b.disabled = !($("n-org") && $("n-org").value.trim());
   }
 
+  function splitRoles(v) {
+    return String(v || "").split("\n").map(function (s) { return s.replace(/\|/g, "/").replace(/\s+/g, " ").trim(); }).filter(Boolean);
+  }
   function createSession() {
     var org = $("n-org").value.trim();
     if (!org || !ART) return;
     var sess = {
       active: true, closed: false, org: org,
-      roles: $("n-roles").value.split("\n").map(function (s) { return s.trim(); }).filter(Boolean),
+      roles: splitRoles($("n-roles").value),
       min: Math.max(2, parseInt($("n-min").value, 10) || 5),
       email: $("n-to").value.trim() || DEFAULT_TO,
       lang: $("n-lang").value === "fr" ? "fr" : "en",
