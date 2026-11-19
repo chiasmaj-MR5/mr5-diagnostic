@@ -535,6 +535,15 @@
   //   ?org=Name&form=team|direction&lang=en|fr&roles=Role A|Role B&min=5&to=facilitator@example.com
   //   ?view=facilitator — links and code compiler without the Claude artifact
   var qp = new URLSearchParams(location.search);
+  // Automatic collection: a Google Apps Script web app (see collector/Code.gs). Links carry
+  // only its deployment id, to keep them short enough for a QR code.
+  function collectorId(v) {
+    v = String(v || "").trim();
+    var m = v.match(/^https:\/\/script\.google\.com\/macros\/s\/([A-Za-z0-9_-]{20,200})\/exec\/?$/);
+    if (m) return m[1];
+    return /^[A-Za-z0-9_-]{20,200}$/.test(v) ? v : "";
+  }
+  function collectorUrl(v) { var id = collectorId(v); return id ? "https://script.google.com/macros/s/" + id + "/exec" : ""; }
   var DEFAULT_TO = "chiasmaj@gmail.com";
   var P = {
     org: (qp.get("org") || "").trim(),
@@ -542,7 +551,8 @@
     roles: (qp.get("roles") || "").split("|").map(function (s) { return s.trim(); }).filter(Boolean),
     min: Math.max(2, parseInt(qp.get("min"), 10) || 5),
     to: (qp.get("to") || DEFAULT_TO).trim(),
-    view: qp.get("view") === "facilitator" ? "facilitator" : ""
+    view: qp.get("view") === "facilitator" ? "facilitator" : "",
+    collect: collectorUrl(qp.get("c"))
   };
   var CODE_PREFIX = "AIA1.";
   var lang = STANDALONE ? (qp.get("lang") === "fr" ? "fr" : "en") : ((SESSION && SESSION.lang) || "en");
@@ -678,32 +688,64 @@
       cInvQuotesSub: "Answers to “what would stall if you were away” and, for leadership, “which activities depend on one or two people”. Shown only for groups of at least {min} people.",
       cInvDoc: "Leadership: knowledge written down", 
       dInv: "Protect the connectors", dInvP: "{p} of respondents are asked at least weekly to help others navigate the organization, and this invisible work takes about {h} h per week in total.", dInvD: "how to keep this capacity — and recognize it — as roles change?",
-      helpAgent: "AI agent", helpAssist: "AI assistant", helpHuman: "Keep human",
+      aAi: "What could AI do with this activity?",
+      aAiHelp: "An AI agent does the task from start to finish and you check the result; an AI assistant helps you while you stay in charge.",
+      aiOpts: ["Do it for me — I’d check the result", "Help me do it faster", "Nothing — it needs me", "Not sure"],
+      yTilesP: ["of your work: AI agent", "of your work: AI assistant", "of your work: stays human", "AI could free per week"],
+      sFree: "This could free about {r} per week (AI agents {a}, AI assistants {b}).",
+      helpHumanD: "needs a person’s judgement, relationship or responsibility",
+      gTilesP: ["of the work: AI agent", "of the work: AI assistant", "of the work: stays human"],
+      cOut: "System transformation outlook",
+      cOutP: "Across {n} people, about <b>{a}</b> of the work described could be done by AI agents, <b>{b}</b> with AI assistants, and <b>{c}</b> stays human.",
+      cOutFree: "This represents about {r} per week that could be freed ({pp} per person).",
+      cOutCov: "Team members say the activities they described cover about {p} of their week.",
+      cOutView: "{p} of activities were placed by people’s own view of what AI could do; the rest by the criteria.",
+      cOutSub: "Share of the weekly hours described, by group. Team groups under {min} people are pooled.",
+      nPpl: "{n} people", nPpl1: "1 person",
+      cAllActs: "All activities, by category",
+      cAllActsSub: "Every activity described, grouped by who could do the work. The same activity named by several people is combined. Listed only for groups of at least {min} people.",
+      cAllHead: "{k} — {p} of the work ({h} h per week)",
+      cAllMore: "Show {n} more",
+      cAllHidden: "{n} activities from groups under {min} people are counted in the percentages but not listed.",
+      cStart: "Where to start", cStartSub: "Activities where AI could free the most time, most first. Shown only for groups of at least {min} people.",
+      cStartAgent: "Hand to AI agents", cStartAssist: "Equip with AI assistants",
+      cCond: "Conditions for success", cCondSub: "What leadership needs to put in place for the transformation to work.",
+      dOut: "Transformation outlook", dOutP: "About {a} of the work described could be done by AI agents and {b} with AI assistants — about {r} per week ({pp} per person).", dOutD: "which roles change first, and what does each role become?",
+      sentPending: "Sending your answers…",
+      sentOk: "<strong>Your answers were sent to MR5.</strong> Nothing else to do — thank you!",
+      sentBackup: "Backup: you can also send your response code by email",
+      fCollect: "Automatic collection (optional): link of your Google Apps Script web app",
+      fCollectPh: "https://script.google.com/macros/s/…/exec",
+      collectOn: "Automatic collection is on: answers go to your Google Sheet. Copy its Code column into “Add response codes”.",
+      collectOff: "Automatic collection is off: participants send their response code by email.",
+      collectNote: "Turning it on changes the links and QR codes — share the new ones.",
+      btnSaveCollect: "Save", collectBad: "This does not look like a Google Apps Script web app link (…/macros/s/…/exec).",
+      helpAgent: "AI agent", helpAssist: "AI assistant", helpHuman: "Stays human",
       helpAgentD: "does the task from start to finish; a person checks the result",
       helpAssistD: "drafts, summarises, searches or analyses; you stay in charge",
       approved: "only with tools approved by {org}",
-      sTitle: "How AI could save you time",
-      sHero: "About <b>{r}</b> per week",
-      sHeroNone: "No clear time savings from AI in the activities you described.",
+      sTitle: "How your work could change with AI",
+      sHero: "About <b>{a}</b> of your work could be done by AI agents and <b>{b}</b> with an AI assistant.",
+      sHeroNone: "None of the work you described looks ready for AI: it needs your judgement or carries serious consequences.",
       sShare: "That is {p} of the time you described ({h} h per week).",
       sSplit: "AI agents", sSplit2: "AI assistants",
       sOf: "of {h} h",
       sSaves: "saves {r}",
-      sMethod: "Estimates from your answers, to be validated during the pilot: an AI agent saves 50–70 % of an activity’s time (results are still checked); an AI assistant saves 30–50 % when the activity is always done the same way, 20–40 % when partly, 10–25 % when every case is different. Activities with serious consequences stay human.",
+      sMethod: "How it is estimated: each activity is placed by the person’s own answer to “What could AI do with this activity?”, with two limits — work with serious consequences, or where every case is different, is not handed fully to an agent. When the person is not sure, the criteria decide: serious consequences → stays human; done the same way each time → AI agent (a person checks); otherwise → AI assistant. Confidential data does not change the category; it requires approved tools. Percentages are shares of the weekly hours described. Time freed: an AI agent 50–70 % of the activity’s time, an AI assistant 10–50 % depending on how repetitive it is. Estimates to validate during the pilot.",
       yTilesS: "AI could save you, per week",
       gTileS: "Time AI could save, per week",
       gPerPerson: "{r} per person",
-      cSave: "How AI could save time",
+      cSave: "Time AI could free, by group",
       cSaveSub: "Estimated hours per week AI agents and assistants could free, by group. Solid = low estimate; light = up to the high estimate. Team groups under {min} people are pooled.",
       cSaveTop: "Biggest time savers",
       cSaveTopSub: "Activities where AI could free the most time — where to start. Shown only for groups of at least {min} people.",
       dSave: "Time to gain", dSaveP: "AI could free about {r} per week across respondents ({pp} per person): AI agents {a}, AI assistants {b}.", dSaveD: "where should that time go, and how will the pilot measure it?",
-      catAuto: "Automatable by AI", catAug: "Augmented by AI", catAugData: "Augmented — check data rules", catHum: "Human to keep",
-      catAutoS: "Automatable", catAugS: "Augmented", catHumS: "Human to keep",
+      catAuto: "AI agent", catAug: "AI assistant", catAugData: "AI assistant — approved tools only", catHum: "Stays human",
+      catAutoS: "AI agent", catAugS: "AI assistant", catHumS: "Stays human",
 
       yEyebrow: "Your results",
       yTitle: "Your activity profile",
-      yLede: "Here is how your week breaks down, using the same rules MR5 applies to the whole group. These are proposals — they will be validated with you and your team.",
+      yLede: "Here is how your work could change with AI, based on your answers and the same rules MR5 applies to the whole group. These are proposals — they will be validated with you and your team.",
       yTiles: ["Hours per week described", "Where AI could help", "Activities described"],
       yHelp: "About {h} h of your week ({p} %) goes to activities where AI could help — by automating them or by assisting you.",
       yHelpNone: "None of the activities you described is a clear candidate for AI: they rely on judgement or carry serious consequences.",
@@ -740,11 +782,11 @@
       cAll: "All respondents", cPooled: "Pooled (groups under {min})", cLead: "Leadership", cHidden: "Hidden — fewer than {min} people",
       cCand: "Best candidates for AI",
       cCandSub: "Activities where AI could automate or assist and that people would like to lighten — most hours first. Shown only for groups of at least {min} people.",
-      cKeep: "Keep human",
-      cKeepSub: "Activities with serious consequences if an error slips in.",
+      cKeep: "What stays human",
+      cKeepSub: "Activities that need a person’s judgement, relationship or responsibility — freed time should strengthen this work, not shrink it.",
       cNone: "Nothing yet.",
-      cReinv: "Where to reinvest freed time",
-      cConc: "Concerns about AI",
+      cReinv: "Where freed time should go",
+      cConc: "What must be addressed",
       cShareSub: "Share of respondents choosing each option.",
       cTrain: "Training priorities",
       cTrainSub: "Share of team respondents choosing each topic.",
@@ -761,7 +803,7 @@
       cDirs: "Directions to discuss",
       cDirsSub: "Generated from the answers — a starting point for the group’s decisions, to be validated together.",
       decide: "Decide:",
-      dQuick: "Quick wins", dQuickP: "{h} h/week go to activities that look automatable, led by {list}.", dQuickD: "which one or two to pilot during the first four weeks, and who checks the results?",
+      dQuick: "Quick wins", dQuickP: "{h} h/week go to activities AI agents could take on, led by {list}.", dQuickD: "which one or two to pilot during the first four weeks, and who checks the results?",
       dAug: "Assist, don’t replace", dAugP: "{h} h/week go to activities where AI could assist a person who stays in charge.", dAugD: "which tools, and which human check before anything leaves the team?",
       dData: "Data first", dDataP: "{n} activities involve confidential information (or people are not sure).", dDataD: "who confirms what data AI tools may use, before any pilot?",
       dReinvSame: "Freed time", dReinvSameP: "Teams and leadership agree: freed time should go first to “{a}”.", dReinvSameD: "which indicator will show that the time really went there?",
@@ -772,7 +814,7 @@
       dTrain: "First workshop", dTrainP: "The most requested training topic is “{x}”.", dTrainD: "should the first of the three AI workshops focus on it?",
 
       addCodeTitle: "Add response codes",
-      addCodeDesc: "Paste codes from people who answered on the public link (several at once works).",
+      addCodeDesc: "Paste codes from emails or from the Google Sheet’s Code column (several at once works).",
       addCodePh: "Paste response codes here",
       btnAddCode: "Add to results",
       addCodeRes: "{n} added · {bad} unreadable · {dup} already in",
@@ -934,32 +976,64 @@
       cInvQuotesSub: "Réponses à « qu’est-ce qui serait bloqué si vous étiez absent » et, pour la direction, « quelles activités dépendent d’une ou deux personnes ». Affichées seulement pour les groupes d’au moins {min} personnes.",
       cInvDoc: "Direction : savoir consigné",
       dInv: "Protéger les connecteurs", dInvP: "{p} des répondants sont sollicités au moins chaque semaine pour aider les autres à s’y retrouver dans l’organisation, et ce travail invisible représente environ {h} h par semaine au total.", dInvD: "comment préserver cette capacité — et la reconnaître — à mesure que les rôles évoluent?",
-      helpAgent: "Agent IA", helpAssist: "Assistant IA", helpHuman: "Humain à garder",
+      aAi: "Que pourrait faire l’IA avec cette activité?",
+      aAiHelp: "Un agent IA réalise la tâche du début à la fin et vous vérifiez le résultat; un assistant IA vous aide pendant que vous restez responsable.",
+      aiOpts: ["La faire pour moi — je vérifierais le résultat", "M’aider à la faire plus vite", "Rien — elle a besoin de moi", "Je ne sais pas"],
+      yTilesP: ["de votre travail : agent IA", "de votre travail : assistant IA", "de votre travail : reste humain", "que l’IA pourrait libérer par semaine"],
+      sFree: "Cela pourrait libérer environ {r} par semaine (agents IA {a}, assistants IA {b}).",
+      helpHumanD: "demande le jugement, la relation ou la responsabilité d’une personne",
+      gTilesP: ["du travail : agent IA", "du travail : assistant IA", "du travail : reste humain"],
+      cOut: "Perspectives de transformation",
+      cOutP: "Pour {n} personnes, environ <b>{a}</b> du travail décrit pourrait être fait par des agents IA, <b>{b}</b> avec des assistants IA, et <b>{c}</b> reste humain.",
+      cOutFree: "Cela représente environ {r} par semaine qui pourraient être libérées ({pp} par personne).",
+      cOutCov: "Les membres des équipes disent que les activités décrites couvrent environ {p} de leur semaine.",
+      cOutView: "{p} des activités ont été classées selon l’avis des personnes sur ce que l’IA pourrait faire; les autres, selon les critères.",
+      cOutSub: "Part des heures hebdomadaires décrites, par groupe. Les groupes de moins de {min} personnes sont regroupés.",
+      nPpl: "{n} personnes", nPpl1: "1 personne",
+      cAllActs: "Toutes les activités, par catégorie",
+      cAllActsSub: "Chaque activité décrite, regroupée selon qui pourrait faire le travail. La même activité nommée par plusieurs personnes est combinée. Affichées seulement pour les groupes d’au moins {min} personnes.",
+      cAllHead: "{k} — {p} du travail ({h} h par semaine)",
+      cAllMore: "Afficher {n} de plus",
+      cAllHidden: "{n} activités de groupes de moins de {min} personnes sont comptées dans les pourcentages, mais ne sont pas affichées.",
+      cStart: "Par où commencer", cStartSub: "Activités où l’IA pourrait libérer le plus de temps, les plus importantes d’abord. Affichées seulement pour les groupes d’au moins {min} personnes.",
+      cStartAgent: "Confier à des agents IA", cStartAssist: "Outiller avec des assistants IA",
+      cCond: "Conditions de réussite", cCondSub: "Ce que la direction doit mettre en place pour que la transformation fonctionne.",
+      dOut: "Perspectives de transformation", dOutP: "Environ {a} du travail décrit pourrait être fait par des agents IA et {b} avec des assistants IA — environ {r} par semaine ({pp} par personne).", dOutD: "quels rôles changent en premier, et que devient chaque rôle?",
+      sentPending: "Envoi de vos réponses…",
+      sentOk: "<strong>Vos réponses ont été envoyées à MR5.</strong> Vous n’avez rien d’autre à faire — merci!",
+      sentBackup: "Copie de sécurité : vous pouvez aussi envoyer votre code de réponse par courriel",
+      fCollect: "Collecte automatique (facultatif) : lien de votre application Web Google Apps Script",
+      fCollectPh: "https://script.google.com/macros/s/…/exec",
+      collectOn: "La collecte automatique est activée : les réponses arrivent dans votre Google Sheet. Copiez sa colonne Code dans « Ajouter des codes de réponse ».",
+      collectOff: "La collecte automatique est désactivée : les participants envoient leur code de réponse par courriel.",
+      collectNote: "L’activer change les liens et les codes QR — partagez les nouveaux.",
+      btnSaveCollect: "Enregistrer", collectBad: "Ce lien ne ressemble pas à une application Web Google Apps Script (…/macros/s/…/exec).",
+      helpAgent: "Agent IA", helpAssist: "Assistant IA", helpHuman: "Reste humain",
       helpAgentD: "réalise la tâche du début à la fin; une personne vérifie le résultat",
       helpAssistD: "rédige, résume, cherche ou analyse; vous restez responsable",
       approved: "seulement avec des outils approuvés par {org}",
-      sTitle: "Comment l’IA pourrait vous faire gagner du temps",
-      sHero: "Environ <b>{r}</b> par semaine",
-      sHeroNone: "Pas de gain de temps évident grâce à l’IA dans les activités décrites.",
+      sTitle: "Comment votre travail pourrait changer avec l’IA",
+      sHero: "Environ <b>{a}</b> de votre travail pourrait être fait par des agents IA et <b>{b}</b> avec un assistant IA.",
+      sHeroNone: "Aucune des activités décrites ne semble prête pour l’IA : elles demandent votre jugement ou comportent des conséquences importantes.",
       sShare: "C’est {p} du temps décrit ({h} h par semaine).",
       sSplit: "Agents IA", sSplit2: "Assistants IA",
       sOf: "sur {h} h",
       sSaves: "économise {r}",
-      sMethod: "Estimations tirées de vos réponses, à valider pendant l’essai : un agent IA économise de 50 à 70 % du temps d’une activité (les résultats sont tout de même vérifiés); un assistant IA économise de 30 à 50 % quand l’activité se fait toujours de la même façon, de 20 à 40 % quand c’est en partie le cas, de 10 à 25 % quand chaque cas est différent. Les activités aux conséquences importantes restent humaines.",
+      sMethod: "Méthode : chaque activité est classée selon la réponse de la personne à « Que pourrait faire l’IA avec cette activité? », avec deux limites — le travail aux conséquences importantes, ou dont chaque cas est différent, n’est pas confié entièrement à un agent. Quand la personne ne sait pas, les critères décident : conséquences importantes → reste humain; toujours fait de la même façon → agent IA (une personne vérifie); sinon → assistant IA. Les données confidentielles ne changent pas la catégorie; elles exigent des outils approuvés. Les pourcentages sont des parts des heures hebdomadaires décrites. Temps libéré : agent IA 50 à 70 % du temps de l’activité, assistant IA 10 à 50 % selon le caractère répétitif. Estimations à valider pendant l’essai.",
       yTilesS: "Temps que l’IA pourrait vous faire gagner, par semaine",
       gTileS: "Temps que l’IA pourrait libérer, par semaine",
       gPerPerson: "{r} par personne",
-      cSave: "Comment l’IA pourrait faire gagner du temps",
+      cSave: "Temps que l’IA pourrait libérer, par groupe",
       cSaveSub: "Heures par semaine que les agents et assistants IA pourraient libérer, par groupe. Plein = estimation basse; pâle = jusqu’à l’estimation haute. Les groupes de moins de {min} personnes sont regroupés.",
       cSaveTop: "Plus grands gains de temps",
       cSaveTopSub: "Activités où l’IA pourrait libérer le plus de temps — par où commencer. Affichées seulement pour les groupes d’au moins {min} personnes.",
       dSave: "Temps à gagner", dSaveP: "L’IA pourrait libérer environ {r} par semaine pour l’ensemble des répondants ({pp} par personne) : agents IA {a}, assistants IA {b}.", dSaveD: "où ce temps devrait-il aller, et comment l’essai le mesurera-t-il?",
-      catAuto: "Automatisable par l’IA", catAug: "Augmentée par l’IA", catAugData: "Augmentée — vérifier les règles de données", catHum: "Humaine à garder",
-      catAutoS: "Automatisable", catAugS: "Augmentée", catHumS: "Humaine à garder",
+      catAuto: "Agent IA", catAug: "Assistant IA", catAugData: "Assistant IA — outils approuvés seulement", catHum: "Reste humain",
+      catAutoS: "Agent IA", catAugS: "Assistant IA", catHumS: "Reste humain",
 
       yEyebrow: "Vos résultats",
       yTitle: "Votre profil d’activités",
-      yLede: "Voici comment se répartit votre semaine, selon les mêmes règles que MR5 applique à l’ensemble du groupe. Ce sont des propositions : elles seront validées avec vous et votre équipe.",
+      yLede: "Voici comment votre travail pourrait changer avec l’IA, selon vos réponses et les mêmes règles que MR5 applique à l’ensemble du groupe. Ce sont des propositions : elles seront validées avec vous et votre équipe.",
       yTiles: ["Heures par semaine décrites", "Là où l’IA pourrait aider", "Activités décrites"],
       yHelp: "Environ {h} h de votre semaine ({p} %) vont à des activités où l’IA pourrait aider — en les automatisant ou en vous assistant.",
       yHelpNone: "Aucune des activités décrites n’est un candidat évident pour l’IA : elles demandent du jugement ou comportent des conséquences importantes.",
@@ -996,11 +1070,11 @@
       cAll: "Tous les répondants", cPooled: "Regroupés (groupes de moins de {min})", cLead: "Direction", cHidden: "Masqué — moins de {min} personnes",
       cCand: "Meilleurs candidats pour l’IA",
       cCandSub: "Activités que l’IA pourrait automatiser ou assister et que les gens aimeraient alléger — les plus longues d’abord. Affichées seulement pour les groupes d’au moins {min} personnes.",
-      cKeep: "Humain à garder",
-      cKeepSub: "Activités où une erreur aurait des conséquences importantes.",
+      cKeep: "Ce qui reste humain",
+      cKeepSub: "Activités qui demandent le jugement, la relation ou la responsabilité d’une personne — le temps libéré devrait renforcer ce travail, pas le réduire.",
       cNone: "Rien pour l’instant.",
-      cReinv: "Où réinvestir le temps libéré",
-      cConc: "Préoccupations à l’égard de l’IA",
+      cReinv: "Où devrait aller le temps libéré",
+      cConc: "Ce qu’il faut adresser",
       cShareSub: "Part des répondants ayant choisi chaque option.",
       cTrain: "Priorités de formation",
       cTrainSub: "Part des répondants des équipes ayant choisi chaque sujet.",
@@ -1017,7 +1091,7 @@
       cDirs: "Pistes à discuter",
       cDirsSub: "Générées à partir des réponses — un point de départ pour les décisions du groupe, à valider ensemble.",
       decide: "À décider :",
-      dQuick: "Gains rapides", dQuickP: "{h} h/sem. vont à des activités qui semblent automatisables, en tête : {list}.", dQuickD: "lesquelles mettre à l’essai pendant les quatre premières semaines, et qui vérifie les résultats?",
+      dQuick: "Gains rapides", dQuickP: "{h} h/sem. vont à des activités que des agents IA pourraient prendre en charge, en tête : {list}.", dQuickD: "lesquelles mettre à l’essai pendant les quatre premières semaines, et qui vérifie les résultats?",
       dAug: "Assister, pas remplacer", dAugP: "{h} h/sem. vont à des activités où l’IA pourrait assister une personne qui reste responsable.", dAugD: "quels outils, et quelle vérification humaine avant que quoi que ce soit ne sorte de l’équipe?",
       dData: "Les données d’abord", dDataP: "{n} activités touchent des renseignements confidentiels (ou les gens ne sont pas certains).", dDataD: "qui confirme quelles données les outils d’IA peuvent utiliser, avant tout essai?",
       dReinvSame: "Temps libéré", dReinvSameP: "Les équipes et la direction s’entendent : le temps libéré devrait aller d’abord à « {a} ».", dReinvSameD: "quel indicateur montrera que le temps y est vraiment allé?",
@@ -1028,7 +1102,7 @@
       dTrain: "Premier atelier", dTrainP: "Le sujet de formation le plus demandé est « {x} ».", dTrainD: "le premier des trois ateliers sur l’IA devrait-il porter là-dessus?",
 
       addCodeTitle: "Ajouter des codes de réponse",
-      addCodeDesc: "Collez les codes des personnes qui ont répondu par le lien public (plusieurs à la fois fonctionne).",
+      addCodeDesc: "Collez les codes reçus par courriel ou la colonne Code du Google Sheet (plusieurs à la fois fonctionne).",
       addCodePh: "Collez les codes de réponse ici",
       btnAddCode: "Ajouter aux résultats",
       addCodeRes: "{n} ajouté(s) · {bad} illisible(s) · {dup} déjà présent(s)",
@@ -1106,9 +1180,9 @@
 
   // Survey settings: from the session in the artifact, from the link on the public page.
   function cfg() {
-    if (STANDALONE) return { org: P.org, roles: P.roles, min: P.min, to: P.to };
-    if (SESSION) return { org: SESSION.org, roles: SESSION.roles || [], min: SESSION.min || 5, to: SESSION.email || DEFAULT_TO };
-    return { org: "", roles: [], min: 5, to: DEFAULT_TO };
+    if (STANDALONE) return { org: P.org, roles: P.roles, min: P.min, to: P.to, collect: P.collect };
+    if (SESSION) return { org: SESSION.org, roles: SESSION.roles || [], min: SESSION.min || 5, to: SESSION.email || DEFAULT_TO, collect: collectorUrl(SESSION.collect) };
+    return { org: "", roles: [], min: 5, to: DEFAULT_TO, collect: "" };
   }
   function orgName() { return cfg().org || T("ourOrg"); }
   function roles() { var r = cfg().roles; return r.length ? r : DEFAULT_ROLES[lang]; }
@@ -1122,7 +1196,8 @@
     { k: "v", q: "aValue", o: "value" },
     { k: "e", q: "aErr", o: "err" },
     { k: "c", q: "aConf", o: "conf" },
-    { k: "w", q: "aLighten", o: "lighten" }
+    { k: "w", q: "aLighten", o: "lighten" },
+    { k: "a", q: "aAi", o: "aiOpts", help: "aAiHelp", opt: true }
   ];
 
   var STEPS = {
@@ -1203,25 +1278,30 @@
   }
   function saveDraft() { if (mode === "standalone") lsSet(draftKey(), state); }
 
-  // ============ classification (decision tree, section 6.3 — proposals only) ============
-  // 1. serious consequence of an error → human to keep
-  // 2. confidential data (or unsure) → augmented at most, pending data rules
-  // 3. always the same way + minor consequence → automatable
-  // 4. otherwise → augmented
+  // ============ classification (proposals, validated with MR5 and leadership) ============
+  // The person's own view of what AI could do leads, with two limits: work with serious
+  // consequences, or where every case is different, is not handed fully to an agent. Without a
+  // view ("not sure", or answers from before the question existed) the criteria decide: serious
+  // consequences → human; done the same way each time → agent, a person checking; otherwise →
+  // assistant. Confidential data does not change the category; it is flagged "approved tools only".
+  function helpType(x) {
+    if (x.a === 2) return "human";
+    if (x.a === 1) return "assistant";
+    if (x.a === 0) return x.e === 2 || x.s === 0 ? "assistant" : "agent";
+    if (x.e === 2) return "human";
+    return x.s === 2 ? "agent" : "assistant";
+  }
   function classify(x) {
-    if (x.e === 2) return "hum";
-    if (x.c === 0 || x.c === 2) return "augData";
-    if (x.s === 2 && x.e === 0) return "auto";
-    return "aug";
+    var t = helpType(x);
+    return t === "agent" ? "auto" : t === "human" ? "hum" : (x.c === 0 || x.c === 2) ? "augData" : "aug";
   }
   function bucket(c) { return c === "augData" ? "aug" : c; }
   var CAT_LABEL = { auto: "catAuto", aug: "catAug", augData: "catAugData", hum: "catHum" };
   var CAT_SHORT = { auto: "catAutoS", aug: "catAugS", hum: "catHumS" };
   var CAT_VAR = { auto: "--c-auto", aug: "--c-aug", hum: "--c-hum" };
-  // Time AI could save, as a low–high share of the activity's weekly hours (section 7.1
+  // Time AI could free, as a low–high share of the activity's weekly hours (section 7.1
   // hypotheses, to be validated in the pilot): agents for automatable work, assistants
   // scaled by how repetitive the work is, nothing for work that stays human.
-  function helpType(x) { var c = classify(x); return c === "auto" ? "agent" : c === "hum" ? "human" : "assistant"; }
   function saveRate(x) {
     var t = helpType(x);
     if (t === "human") return [0, 0];
@@ -1275,6 +1355,36 @@
     });
     if (hours - used > 0.01) html += '<div class="fill rest" style="width:' + (100 * (hours - used) / max).toFixed(2) + '%"></div>';
     return '<div class="track">' + html + '<span style="width:' + (100 * Math.max(0, max - hours) / max).toFixed(2) + '%"></span></div>';
+  }
+  // Share of the weekly hours described that each kind of help would take.
+  var KINDS = ["agent", "assistant", "human"];
+  var KIND_VAR = { agent: "--c-auto", assistant: "--c-aug", human: "--c-hum" };
+  function splitOf(acts) {
+    var sp = { agent: 0, assistant: 0, human: 0, total: 0, n: acts.length, byView: 0, p: {} };
+    acts.forEach(function (x) {
+      var v = HOURS_MID[x.h] || 0;
+      sp[helpType(x)] += v; sp.total += v;
+      if (x.a === 0 || x.a === 1 || x.a === 2) sp.byView++;
+    });
+    // Whole percents that always add up to 100 (largest remainder).
+    var raw = KINDS.map(function (k) { return sp.total ? 100 * sp[k] / sp.total : 0; });
+    var whole = raw.map(Math.floor), left = sp.total ? 100 - whole.reduce(function (a, b) { return a + b; }, 0) : 0;
+    raw.map(function (v, i) { return { i: i, r: v - whole[i] }; }).sort(function (a, b) { return b.r - a.r; })
+      .slice(0, left).forEach(function (o) { whole[o.i]++; });
+    KINDS.forEach(function (k, i) { sp.p[k] = whole[i]; });
+    return sp;
+  }
+  function splitRow(name, sub, sp) {
+    var segs = KINDS.filter(function (k) { return sp.p[k] > 0; }).map(function (k) {
+      return '<div class="fill" style="width:' + sp.p[k].toFixed(2) + '%;background:var(' + KIND_VAR[k] + ')" data-tip="' +
+        esc(T(HELP_LABEL[k]) + " · " + pct(sp.p[k]) + " · " + h1(sp[k]) + " " + T("hpw")) + '"></div>';
+    }).join("");
+    return '<div class="bar-row' + (name ? "" : " solo") + '">' + (name ? '<div class="name">' + esc(name) + (sub ? "<small>" + esc(sub) + "</small>" : "") + "</div>" : "") +
+      '<div class="bar-line"><div class="track">' + segs + "</div></div>" +
+      '<div class="breakdown">' + KINDS.map(function (k) { return "<span>" + esc(T(HELP_LABEL[k])) + " " + pct(sp.p[k]) + "</span>"; }).join("") + "</div></div>";
+  }
+  function splitLegend() {
+    return helpLegend().replace(/<\/div>$/, '<span class="key">' + sw("--c-hum") + "<span><b>" + esc(T("helpHuman")) + "</b> — " + esc(T("helpHumanD")) + "</span></span></div>");
   }
   function hoursOf(acts) {
     var h = { auto: 0, aug: 0, hum: 0 };
@@ -1341,7 +1451,7 @@
       (canRemove ? '<button class="linklike" data-act="rm" data-i="' + i + '">' + esc(T("remove")) + "</button>" : "") + "</div>" +
       '<div class="q"><p class="stmt" id="lbl-a' + i + '">' + esc(T("aName")) + ' *</p><input type="text" data-act-i="' + i + '" data-k="n" maxlength="160" aria-labelledby="lbl-a' + i + '" placeholder="' + esc(T("aNamePh")) + '" value="' + esc(act.n || "") + '"></div>' +
       ACT_FIELDS.map(function (f) {
-        return '<div class="q"><p class="stmt">' + tx(f.q) + " *</p>" + (f.help ? '<p class="help">' + esc(T(f.help)) + "</p>" : "") +
+        return '<div class="q"><p class="stmt">' + tx(f.q) + " *</p>" + (f.help ? '<p class="help">' + tx(f.help) + "</p>" : "") +
           choiceGroup("a" + i + "_" + f.k, T(f.o), act[f.k], false) + "</div>";
       }).join("") + "</div>";
   }
@@ -1436,7 +1546,11 @@
       var r = JSON.parse(b64urlDecode(c.slice(CODE_PREFIX.length)));
       if (!r || r.v !== 1 || !r.id || (r.f !== "t" && r.f !== "d") || !Array.isArray(r.acts)) return null;
       var okActs = r.acts.every(function (x) {
-        return x && typeof x.n === "string" && ACT_FIELDS.every(function (f) { return typeof x[f.k] === "number" && x[f.k] >= 0 && x[f.k] < T(f.o).length; });
+        return x && typeof x.n === "string" && ACT_FIELDS.every(function (f) {
+          // Optional fields were added later: codes from before them stay valid.
+          if (f.opt && x[f.k] == null) return true;
+          return typeof x[f.k] === "number" && x[f.k] >= 0 && x[f.k] < T(f.o).length;
+        });
       });
       return okActs ? r : null;
     } catch (e) { return null; }
@@ -1445,7 +1559,7 @@
     var raw = String(text || "").match(/AIA1\.[A-Za-z0-9_-]+/g) || [];
     var seen = {}, out = [], bad = 0, dup = 0;
     (existing || []).forEach(function (r) { seen[r.id] = true; });
-    raw.forEach(function (c) {
+    raw.reverse().forEach(function (c) {
       var r = decodeCode(c);
       if (!r) { bad++; return; }
       if (seen[r.id]) { dup++; return; }
@@ -1456,25 +1570,6 @@
 
   // ============ charts (HTML bars; values always printed beside the marks) ============
   function sw(varName) { return '<span class="sw" style="background:var(' + varName + ')"></span>'; }
-  function catLegend() {
-    return '<div class="legend">' + ["auto", "aug", "hum"].map(function (c) {
-      return '<span class="key">' + sw(CAT_VAR[c]) + esc(T(CAT_SHORT[c])) + "</span>";
-    }).join("") + "</div>";
-  }
-  function stackRow(name, sub, h, max) {
-    var segs = ["auto", "aug", "hum"].filter(function (c) { return h[c] > 0; }).map(function (c) {
-      var w = max ? (100 * h[c] / max) : 0;
-      return '<div class="fill" style="width:' + w.toFixed(2) + '%;background:var(' + CAT_VAR[c] + ')" data-tip="' +
-        esc(T(CAT_SHORT[c]) + " · " + h1(h[c]) + " " + T("hpw")) + '"></div>';
-    }).join("");
-    var rest = max ? 100 * (max - h.total) / max : 0;
-    return '<div class="bar-row' + (name ? "" : " solo") + '">' + (name ? '<div class="name">' + esc(name) + (sub ? "<small>" + esc(sub) + "</small>" : "") + "</div>" : "") +
-      '<div class="bar-line"><div class="track">' + segs + '<span style="width:' + rest.toFixed(2) + '%"></span></div>' +
-      '<span class="val">' + h1(h.total) + " h</span></div>" +
-      '<div class="breakdown">' + ["auto", "aug", "hum"].map(function (c) {
-        return "<span>" + esc(T(CAT_SHORT[c])) + " " + h1(h[c]) + " h</span>";
-      }).join("") + "</div></div>";
-  }
   function pairRows(labels, a, b, showB) {
     return '<div class="bars">' + labels.map(function (l, i) {
       function line(v, varName, who) {
@@ -1498,10 +1593,7 @@
 
   // ============ personal results ============
   function renderPersonal() {
-    var p = lastPayload, h = hoursOf(p.acts), sv = savingsOf(p.acts);
-    var help = h.auto + h.aug, hp = h.total ? 100 * help / h.total : 0;
-    var acts = p.acts.map(function (x) { return { x: x, c: classify(x) }; })
-      .sort(function (m, n) { return (HOURS_MID[n.x.h] || 0) - (HOURS_MID[m.x.h] || 0); });
+    var p = lastPayload, sv = savingsOf(p.acts), sp = splitOf(p.acts);
     var prio = (p.re || []).map(function (i) { return i < T("reinvest").length ? T("reinvest")[i] : (p.reo || T("other")); });
     var back = mode === "respond" || mode === "solo";
     return '<section class="screen" id="report-root">' +
@@ -1510,18 +1602,12 @@
       '<p class="org-line">' + (cfg().org ? "<strong>" + esc(cfg().org) + '</strong><span class="sep">·</span>' : "") +
       (p.role ? esc(p.role) + '<span class="sep">·</span>' : "") + esc(dateStr()) + "</p>" +
       '<p class="lede">' + esc(T("yLede")) + "</p>" +
-      '<div class="tiles">' +
-      '<div class="tile"><div class="v">' + h1(h.total) + '</div><div class="l">' + esc(T("yTiles")[0]) + "</div></div>" +
-      '<div class="tile"><div class="v accent">' + hr(sv.total) + '</div><div class="l">' + esc(T("yTilesS")) + "</div></div>" +
-      '<div class="tile"><div class="v">' + p.acts.length + '</div><div class="l">' + esc(T("yTiles")[2]) + "</div></div></div>" +
-      personalSavings(p, sv) +
+      '<div class="tiles">' + KINDS.map(function (k, i) {
+        return '<div class="tile"><div class="v"' + (k === "human" ? "" : ' style="color:var(--accent)"') + ">" + pct(sp.p[k]) + '</div><div class="l">' + esc(T("yTilesP")[i]) + "</div></div>";
+      }).join("") +
+      '<div class="tile"><div class="v">' + hr(sv.total) + '</div><div class="l">' + esc(T("yTilesP")[3]) + "</div></div></div>" +
+      personalSavings(p, sv, sp) +
       personalInvisible(p) +
-      '<div class="card"><h3>' + esc(T("yWeek")) + '</h3><p class="sub">' + esc(help ? fmt(T("yHelp"), { h: h1(help), p: Math.round(hp) }) : T("yHelpNone")) + "</p>" +
-      catLegend() + '<div class="bars">' + stackRow("", "", h, h.total) + "</div></div>" +
-      '<div class="card"><h3>' + esc(T("yActs")) + '</h3><ul class="alist">' + acts.map(function (m) {
-        return '<li><span class="a-n">' + esc(m.x.n) + '</span><span class="a-h">' + esc(T("hours")[m.x.h]) + "</span>" +
-          '<span class="a-m">' + chip(m.c) + "</span></li>";
-      }).join("") + "</ul></div>" +
       (prio.length ? '<div class="card"><h3>' + esc(T("yPrio")) + '</h3><ul class="points" style="margin-top:0.4rem">' +
         prio.map(function (x) { return "<li>" + esc(x) + "</li>"; }).join("") + "</ul></div>" : "") +
       '<div class="card dashed"><h3>' + esc(T("yNext")) + '</h3><p class="sub" style="margin:0.3rem 0 0">' +
@@ -1534,19 +1620,15 @@
       "</div></section>";
   }
 
-  function personalSavings(p, sv) {
+  function personalSavings(p, sv, sp) {
     var rows = p.acts.slice().sort(function (m, n) { return savedOf(n)[1] - savedOf(m)[1] || (HOURS_MID[n.h] || 0) - (HOURS_MID[m.h] || 0); });
     var max = 0; rows.forEach(function (x) { max = Math.max(max, HOURS_MID[x.h] || 0); });
-    var sp = sv.hours ? [100 * sv.total[0] / sv.hours, 100 * sv.total[1] / sv.hours] : [0, 0];
-    var spTxt = Math.round(sp[0]) === Math.round(sp[1]) ? pct(sp[0]) : Math.round(sp[0]) + "–" + pct(sp[1]);
     return '<div class="card"><h3>' + esc(T("sTitle")) + "</h3>" +
-      (sv.total[1] > 0
-        ? '<p class="save-hero">' + fmt(T("sHero"), { r: esc(hr(sv.total)) }) + "</p>" +
-          '<p class="sub" style="margin-bottom:0.4rem">' + esc(fmt(T("sShare"), { p: spTxt, h: h1(sv.hours) })) + "</p>" +
-          '<div class="split"><span>' + sw("--c-auto") + " " + esc(T("sSplit")) + " <strong>" + esc(hr(sv.agent)) + "</strong></span>" +
-          "<span>" + sw("--c-aug") + " " + esc(T("sSplit2")) + " <strong>" + esc(hr(sv.assistant)) + "</strong></span></div>"
+      (sp.agent + sp.assistant > 0
+        ? '<p class="save-hero" style="font-size:clamp(1.3rem,3.6vw,1.8rem)">' + fmt(T("sHero"), { a: pct(sp.p.agent), b: pct(sp.p.assistant) }) + "</p>"
         : '<p class="sub">' + esc(T("sHeroNone")) + "</p>") +
-      helpLegend() +
+      splitLegend() + '<div class="bars">' + splitRow("", "", sp) + "</div>" +
+      (sv.total[1] > 0 ? '<p class="sub" style="margin:1rem 0 1.2rem">' + esc(fmt(T("sFree"), { r: hr(sv.total), a: hr(sv.agent), b: hr(sv.assistant) })) + "</p>" : "") +
       '<div class="bars">' + rows.map(function (x) {
         var t = helpType(x), v = savedOf(x), hrs = HOURS_MID[x.h] || 0;
         var parts = t === "human" ? [] : [{ lo: v[0], hi: v[1], v: HELP_VAR[t], tip: T(HELP_LABEL[t]) + " · " + fmt(T("sSaves"), { r: hr(v, true) }) }];
@@ -1566,17 +1648,40 @@
       '<p class="method" style="margin-top:0.6rem">' + esc(T("yInvNote")) + "</p></div>";
   }
 
-  function standaloneCodeHTML(p) {
+  function codeBlock(p) {
     var code = encodeCode(p);
     var org = cfg().org;
     var body = fmt(T("emailBody"), { org: org ? " (" + org + ")" : "", code: code });
     var mail = "mailto:" + encodeURIComponent(cfg().to) + "?subject=" + encodeURIComponent(T("emailSubject") + (org ? " – " + org : "")) + "&body=" + encodeURIComponent(body);
-    return '<div class="status-banner">' + T("codeIntro") +
-      '<div class="code-box" id="code">' + esc(code) + "</div>" +
+    return '<div class="code-box" id="code">' + esc(code) + "</div>" +
       '<div class="btn-row"><a class="btn small" href="' + esc(mail) + '">' + esc(T("email")) + '</a>' +
       '<button class="btn ghost small" data-act="copy-code">' + esc(T("copy")) + "</button></div>" +
-      '<p class="msg" id="copy-msg" role="status"></p>' +
+      '<p class="msg" id="copy-msg" role="status"></p>';
+  }
+  function standaloneCodeHTML(p) {
+    return '<div class="status-banner">' + T("codeIntro") + codeBlock(p) +
       (p.f === "t" ? '<p style="margin-top:0.6rem;font-size:0.84rem">' + tx("codeAnon") + "</p>" : "") + "</div>";
+  }
+  function sentHTML(p) {
+    return '<div class="status-banner">' + T("sentOk") +
+      '<details style="margin-top:0.7rem"><summary style="cursor:pointer;font-size:0.84rem">' + esc(T("sentBackup")) + "</summary>" + codeBlock(p) + "</details></div>";
+  }
+  // Sends the response code to the collector. The reply is opaque (no-cors), so a network
+  // success counts as sent; the code stays on screen as a backup either way.
+  function sendToCollector(p) {
+    var url = cfg().collect;
+    if (!url || !window.fetch) return false;
+    submitHTML = '<div class="status-banner">' + esc(T("sentPending")) + "</div>";
+    fetch(url, {
+      method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({ code: encodeCode(p), org: p.org || "", form: p.f, role: p.role || "", id: p.id, lang: p.l })
+    }).then(function () {
+      if (state) { state.sent = true; saveDraft(); }
+      submitHTML = sentHTML(p); refreshStatus();
+    }, function () {
+      submitHTML = standaloneCodeHTML(p); refreshStatus();
+    });
+    return true;
   }
 
   // ============ group results ============
@@ -1625,46 +1730,21 @@
     var SV = savingsOf(allActs);
     var helpP = H.total ? 100 * (H.auto + H.aug) / H.total : 0;
 
-    // Where the time goes
-    var timeRows = [];
-    var maxT = 0;
-    var shown = G.rows.map(function (row) {
-      var acts = []; row.list.forEach(function (r) { acts = acts.concat(r.acts); });
-      var h = hoursOf(acts); if (row.list.length >= min && h.total > maxT) maxT = h.total;
-      return { row: row, h: h };
-    });
-    var dh = null;
-    if (G.dirs.length) {
-      var dacts = []; G.dirs.forEach(function (r) { dacts = dacts.concat(r.acts); });
-      dh = hoursOf(dacts); if (dh.total > maxT) maxT = dh.total;
-    }
-    shown.forEach(function (s) {
-      var n = s.row.list.length;
-      if (n >= min) timeRows.push(stackRow(s.row.name, n + " · " + s.row.list.reduce(function (t, r) { return t + r.acts.length; }, 0) + " act.", s.h, maxT));
-      else timeRows.push('<div class="bar-row"><div class="name">' + esc(s.row.name) + "<small>" + n + '</small></div><div class="muted" style="font-size:0.82rem">' + esc(fmt(T("cHidden"), { min: min })) + "</div></div>");
-    });
-    if (dh) timeRows.push(stackRow(T("cLead"), G.dirs.length + "", dh, maxT));
+    var SP = splitOf(allActs);
 
-    // Candidates and keep-human lists (eligible team groups only)
-    var cand = [], keep = [];
+    // Where to start and what stays human (activity text from groups at the minimum size only)
+    var agents = [], assists = [], keep = [];
     G.eligible.forEach(function (e) {
       e.r.acts.forEach(function (x) {
-        var c = classify(x);
-        var item = { x: x, c: c, g: e.g, h: HOURS_MID[x.h] || 0 };
-        if (c !== "hum" && x.w !== 2) cand.push(item);
-        if (c === "hum") keep.push(item);
+        var t = helpType(x), item = { x: x, c: classify(x), g: e.g, h: HOURS_MID[x.h] || 0, v: savedOf(x) };
+        (t === "agent" ? agents : t === "assistant" ? assists : keep).push(item);
       });
     });
-    var byH = function (m, n) { return n.h - m.h || (m.c === "auto" ? -1 : 1); };
-    cand = mergeSame(cand, function (m) { return m.c; }); keep = mergeSame(keep, function (m) { return m.c; });
-    cand.sort(byH); keep.sort(byH);
-    function alist(items) {
-      if (!items.length) return '<p class="muted" style="font-size:0.9rem">' + esc(T("cNone")) + "</p>";
-      return '<ul class="alist">' + items.map(function (m) {
-        return '<li><span class="a-n">' + esc(m.x.n) + '</span><span class="a-h">' + esc(m.n > 1 ? "≈ " + h1(m.h) + " " + T("hpw") : T("hours")[m.x.h]) + "</span>" +
-          '<span class="a-m">' + chip(m.c) + peopleTag(m) + (m.g ? "<span>" + esc(m.g) + "</span>" : "") + "</span></li>";
-      }).join("") + "</ul>";
-    }
+    var byKind = function (m) { return helpType(m.x); };
+    var bySaved = function (a, b) { return b.v[1] - a.v[1] || b.h - a.h; };
+    agents = mergeSame(agents, byKind).sort(bySaved);
+    assists = mergeSame(assists, byKind).sort(bySaved);
+    keep = mergeSame(keep, byKind).sort(function (a, b) { return b.h - a.h; });
 
     // Shares (teams vs leadership)
     var nt = G.teams.length, nd = G.dirs.length;
@@ -1704,12 +1784,13 @@
     // Directions to discuss
     var dirs = [];
     function lever(tag, p, d) { dirs.push('<div class="lever"><span class="l-tag">' + esc(tag) + "</span><p>" + esc(p) + '</p><p class="decide"><b>' + esc(T("decide")) + "</b> " + esc(d) + "</p></div>"); }
-    var autoItems = cand.filter(function (m) { return m.c === "auto"; });
+    var autoItems = agents;
     var INV = invisibleOf(G.teams.concat(G.dirs));
-    if (INV.often != null && INV.often > 0) lever(T("dInv"), fmt(T("dInvP"), { p: pct(INV.often), h: h1(INV.h) }), T("dInvD"));
-    if (SV.total[1] > 0) lever(T("dSave"), fmt(T("dSaveP"), { r: hr(SV.total), pp: hr([SV.total[0] / responses.length, SV.total[1] / responses.length]), a: hr(SV.agent), b: hr(SV.assistant) }), T("dSaveD"));
+    var perPerson = hr([SV.total[0] / responses.length, SV.total[1] / responses.length]);
+    if (SP.agent + SP.assistant > 0) lever(T("dOut"), fmt(T("dOutP"), { a: pct(SP.p.agent), b: pct(SP.p.assistant), r: hr(SV.total), pp: perPerson }), T("dOutD"));
     if (H.auto > 0) lever(T("dQuick"), fmt(T("dQuickP"), { h: h1(H.auto), list: autoItems.slice(0, 3).map(function (m) { return (lang === "fr" ? "« " : "“") + m.x.n + (lang === "fr" ? " »" : "”"); }).join(", ") || "—" }), T("dQuickD"));
     if (H.aug > 0) lever(T("dAug"), fmt(T("dAugP"), { h: h1(H.aug) }), T("dAugD"));
+    if (INV.often != null && INV.often > 0) lever(T("dInv"), fmt(T("dInvP"), { p: pct(INV.often), h: h1(INV.h) }), T("dInvD"));
     var confN = allActs.filter(function (x) { return x.c === 0 || x.c === 2; }).length;
     if (confN) lever(T("dData"), fmt(T("dDataP"), { n: confN }), T("dDataD"));
     function topIdx(arr) { var best = -1, bi = -1; arr.forEach(function (v, i) { if (v != null && v > best) { best = v; bi = i; } }); return best > 0 ? bi : -1; }
@@ -1727,26 +1808,74 @@
 
     return '<div class="tiles">' +
       '<div class="tile"><div class="v">' + responses.length + '</div><div class="l">' + esc(T("gTiles")[0]) + " · " + esc(fmt(T("gRespSplit"), { t: nt, d: nd })) + "</div></div>" +
-      '<div class="tile"><div class="v">' + allActs.length + '</div><div class="l">' + esc(T("gTiles")[1]) + "</div></div>" +
-      '<div class="tile"><div class="v">' + h1(H.total) + '</div><div class="l">' + esc(T("gTiles")[2]) + "</div></div>" +
-      '<div class="tile"><div class="v accent">' + hr(SV.total) + '</div><div class="l">' + esc(T("gTileS")) + " · " + esc(fmt(T("gPerPerson"), { r: hr([SV.total[0] / responses.length, SV.total[1] / responses.length]) })) + "</div></div></div>" +
+      KINDS.map(function (k, i) {
+        return '<div class="tile"><div class="v"' + (k === "human" ? "" : ' style="color:var(--accent)"') + ">" + pct(SP.p[k]) + '</div><div class="l">' + esc(T("gTilesP")[i]) + "</div></div>";
+      }).join("") + "</div>" +
+      groupOutlook(G, min, responses, SP, SV) +
+      groupAllActivities({ agent: agents, assistant: assists, human: keep }, SP, allActs.length, min) +
       '<div class="card"><h3>' + esc(T("cDirs")) + '</h3><p class="sub">' + esc(T("cDirsSub")) + '</p><div class="levers">' + dirs.join("") + "</div></div>" +
       groupSavings(G, min, responses.length) +
       groupInvisible(G, min) +
-      '<div class="card"><h3>' + esc(T("cTime")) + '</h3><p class="sub">' + esc(fmt(T("cTimeSub"), { min: min })) + "</p>" + catLegend() +
-        '<div class="bars">' + timeRows.join("") + "</div></div>" +
-      '<div class="card"><h3>' + esc(T("cCand")) + '</h3><p class="sub">' + esc(fmt(T("cCandSub"), { min: min })) + "</p>" + alist(cand.slice(0, 10)) + "</div>" +
-      '<div class="card"><h3>' + esc(T("cKeep")) + '</h3><p class="sub">' + esc(T("cKeepSub")) + "</p>" + alist(keep.slice(0, 6)) + "</div>" +
+      '<h2 style="margin-top:2.6rem">' + esc(T("cCond")) + '</h2><p class="sub" style="color:var(--ink-3);font-size:0.9rem;margin-top:0.3rem">' + esc(T("cCondSub")) + "</p>" +
       '<div class="card"><h3>' + esc(T("cReinv")) + '</h3><p class="sub">' + esc(T("cShareSub")) + "</p>" + audienceLegend(nt, nd) + pairRows(T("reinvest"), reT, reD, nd > 0) + "</div>" +
       '<div class="card"><h3>' + esc(T("cConc")) + '</h3><p class="sub">' + esc(T("cShareSub")) + "</p>" + audienceLegend(nt, nd) + pairRows(T("concerns"), coT, coD, nd > 0) + "</div>" +
       (nt ? '<div class="card"><h3>' + esc(T("cTrain")) + '</h3><p class="sub">' + esc(T("cTrainSub")) + "</p>" + pairRows(T("train"), trT, [], false) + "</div>" : "") +
       '<div class="card"><h3>' + esc(T("cReady")) + '</h3><div style="overflow-x:auto">' + ready + "</div></div>";
   }
 
+  function ppl(n) { return n === 1 ? T("nPpl1") : fmt(T("nPpl"), { n: n }); }
+  function groupOutlook(G, min, responses, SP, SV) {
+    var rows = [];
+    G.rows.forEach(function (row) { if (row.list.length >= min) rows.push({ name: row.name, list: row.list }); });
+    if (G.dirs.length >= min) rows.push({ name: T("cLead"), list: G.dirs });
+    var bars = (rows.length > 1 ? splitRow(T("cAll"), ppl(responses.length), SP) : "") +
+      rows.map(function (row) {
+        var acts = []; row.list.forEach(function (r) { acts = acts.concat(r.acts); });
+        return splitRow(row.name, ppl(row.list.length), splitOf(acts));
+      }).join("");
+    var covs = G.teams.map(function (r) { return r.cov; }).filter(function (c) { return c != null; });
+    var cov = covs.length ? covs.reduce(function (t, c) { return t + [12.5, 37.5, 62.5, 87.5][c]; }, 0) / covs.length : null;
+    var notes = [];
+    if (SV.total[1] > 0) notes.push(fmt(T("cOutFree"), { r: hr(SV.total), pp: hr([SV.total[0] / responses.length, SV.total[1] / responses.length]) }));
+    if (cov != null) notes.push(fmt(T("cOutCov"), { p: pct(cov) }));
+    if (SP.n) notes.push(fmt(T("cOutView"), { p: pct(100 * SP.byView / SP.n) }));
+    return '<div class="card live"><h3>' + esc(T("cOut")) + "</h3>" +
+      '<p class="save-hero" style="font-size:clamp(1.2rem,3.2vw,1.6rem)">' + fmt(T("cOutP"), { n: responses.length, a: pct(SP.p.agent), b: pct(SP.p.assistant), c: pct(SP.p.human) }) + "</p>" +
+      '<p class="sub">' + esc(fmt(T("cOutSub"), { min: min })) + "</p>" + splitLegend() +
+      '<div class="bars">' + bars + "</div>" +
+      (notes.length ? '<ul class="points" style="margin-top:1.2rem;font-size:0.92rem">' + notes.map(function (t) { return "<li>" + esc(t) + "</li>"; }).join("") + "</ul>" : "") +
+      '<p class="method">' + esc(T("sMethod")) + "</p></div>";
+  }
+
+  // Every listed activity under its category, most time freed first (most hours for human work).
+  function groupAllActivities(byKind, SP, nActs, min) {
+    var listed = 0;
+    function item(m, k) {
+      var right = h1(m.h) + " " + T("hpw") + (k === "human" ? "" : " · " + fmt(T("sSaves"), { r: hr(m.v) }));
+      var flag = k !== "human" && (m.x.c === 0 || m.x.c === 2) ? "<span>" + tx("approved") + "</span>" : "";
+      return '<li><span class="a-n">' + esc(m.x.n) + '</span><span class="a-h">' + esc(right) + "</span>" +
+        '<span class="a-m">' + peopleTag(m) + (m.g ? "<span>" + esc(m.g) + "</span>" : "") + flag + "</span></li>";
+    }
+    var html = KINDS.map(function (k) {
+      var items = byKind[k];
+      items.forEach(function (m) { listed += m.n; });
+      var head = fmt(T("cAllHead"), { k: T(HELP_LABEL[k]), p: pct(SP.p[k]), h: h1(SP[k]) });
+      var first = items.slice(0, 12).map(function (m) { return item(m, k); }).join("");
+      var rest = items.slice(12).map(function (m) { return item(m, k); }).join("");
+      return '<h4 style="margin-top:1.4rem">' + sw(KIND_VAR[k]) + " " + esc(head) + "</h4>" +
+        (items.length ? '<ul class="alist">' + first + "</ul>" +
+          (rest ? '<details><summary style="cursor:pointer;font-size:0.86rem;color:var(--ink-2);margin-top:0.4rem">' + esc(fmt(T("cAllMore"), { n: items.length - 12 })) + '</summary><ul class="alist">' + rest + "</ul></details>" : "")
+          : '<p class="muted" style="font-size:0.9rem">' + esc(T("cNone")) + "</p>");
+    }).join("");
+    var hidden = nActs - listed;
+    return '<div class="card"><h3>' + esc(T("cAllActs")) + '</h3><p class="sub">' + esc(fmt(T("cAllActsSub"), { min: min })) + "</p>" + html +
+      (hidden > 0 ? '<p class="method">' + esc(fmt(T("cAllHidden"), { n: hidden, min: min })) + "</p>" : "") + "</div>";
+  }
+
   function groupSavings(G, min, n) {
     var rows = [];
     G.rows.forEach(function (row) { if (row.list.length >= min) rows.push({ name: row.name, list: row.list }); });
-    if (G.dirs.length) rows.push({ name: T("cLead"), list: G.dirs });
+    if (G.dirs.length >= min) rows.push({ name: T("cLead"), list: G.dirs });
     var data = rows.map(function (row) {
       var acts = []; row.list.forEach(function (r) { acts = acts.concat(r.acts); });
       return { name: row.name, n: row.list.length, s: savingsOf(acts) };
@@ -1761,20 +1890,47 @@
         '<div class="bar-line">' + saveBar(parts, d.s.hours, max || 1) + '<span class="val">' + esc(hr(d.s.total)) + "</span></div>" +
         '<div class="breakdown"><span>' + esc(T("helpAgent")) + " " + esc(hr(d.s.agent)) + "</span><span>" + esc(T("helpAssist")) + " " + esc(hr(d.s.assistant)) + "</span><span>" + esc(fmt(T("sOf"), { h: h1(d.s.hours) })) + "</span></div></div>";
     }).join("");
-    // Biggest savers: activity text only from groups that reach the minimum size.
-    var items = [];
-    G.eligible.forEach(function (e) { e.r.acts.forEach(function (x) { if (helpType(x) !== "human") items.push({ x: x, g: e.g, v: savedOf(x) }); }); });
-    items = mergeSame(items, function (m) { return helpType(m.x); });
-    items.sort(function (a, b) { return b.v[1] - a.v[1]; });
-    var top = items.slice(0, 8).map(function (m) {
-      return '<li><span class="a-n">' + esc(m.x.n) + '</span><span class="a-h">' + esc(fmt(T("sSaves"), { r: hr(m.v, true) })) + "</span>" +
-        '<span class="a-m">' + helpChip(m.x) + peopleTag(m) + (m.g ? "<span>" + esc(m.g) + "</span>" : "") + "</span></li>";
-    }).join("");
     return '<div class="card"><h3>' + esc(T("cSave")) + '</h3><p class="sub">' + esc(fmt(T("cSaveSub"), { min: min })) + "</p>" + helpLegend() +
-      (bars ? '<div class="bars">' + bars + "</div>" : '<p class="muted" style="font-size:0.9rem">' + esc(T("cNone")) + "</p>") +
-      '<h4 style="margin-top:1.6rem">' + esc(T("cSaveTop")) + '</h4><p class="sub">' + esc(fmt(T("cSaveTopSub"), { min: min })) + "</p>" +
-      (top ? '<ul class="alist">' + top + "</ul>" : '<p class="muted" style="font-size:0.9rem">' + esc(T("cNone")) + "</p>") +
-      '<p class="method">' + esc(T("sMethod")) + "</p></div>";
+      (bars ? '<div class="bars">' + bars + "</div>" : '<p class="muted" style="font-size:0.9rem">' + esc(T("cNone")) + "</p>") + "</div>";
+  }
+
+  function groupInvisible(G, min) {
+    var all = G.teams.concat(G.dirs), I = invisibleOf(all);
+    if (!I.n && !I.nRl) return "";
+    var rows = [];
+    G.rows.forEach(function (row) { if (row.list.length >= min) rows.push({ name: row.name, list: row.list }); });
+    if (G.dirs.length >= min) rows.push({ name: T("cLead"), list: G.dirs, lead: true });
+    var data = rows.map(function (row) { return { row: row, i: invisibleOf(row.list) }; }).filter(function (d) { return d.i.n || d.i.nRl; });
+    var max = 0; data.forEach(function (d) { max = Math.max(max, d.i.per); });
+    var bars = data.map(function (d) {
+      var w = max ? 100 * d.i.per / max : 0;
+      var sub = d.row.lead && d.i.n < d.row.list.length ? fmt(T("cInvAns"), { n: d.i.n, t: d.row.list.length }) : "";
+      return '<div class="bar-row"><div class="name">' + esc(d.row.name) + (sub ? "<small>" + esc(sub) + "</small>" : "") + "</div>" +
+        '<div class="bar-line"><div class="track"><div class="fill" style="width:' + w.toFixed(2) + '%;background:var(--c-hum)" data-tip="' +
+        esc(h1(d.i.per) + " " + T("cInvPer")) + '"></div><span style="width:' + (100 - w).toFixed(2) + '%"></span></div>' +
+        '<span class="val">' + h1(d.i.per) + " h</span></div>" +
+        '<div class="breakdown"><span>' + esc(T("cInvPer")) + "</span>" + (d.i.often != null ? "<span>" + esc(fmt(T("cInvRow"), { p: pct(d.i.often) })) + "</span>" : "") + "</div></div>";
+    }).join("");
+    // Free-text answers only from groups that reach the minimum size.
+    var quotes = [];
+    G.eligible.forEach(function (e) {
+      [e.r.kp, e.r.kd].forEach(function (q) { if (q && String(q).trim()) quotes.push({ q: String(q).trim(), g: e.g }); });
+    });
+    var dirsKw = G.dirs.filter(function (r) { return r.kw != null; });
+    var docTxt = dirsKw.length ? T("kwOpts").map(function (o, i) {
+      var c = dirsKw.filter(function (r) { return r.kw === i; }).length; return c ? o + " " + c : "";
+    }).filter(Boolean).join(" · ") : "";
+    return '<div class="card"><h3>' + esc(T("cInv")) + '</h3><p class="sub">' + esc(fmt(T("cInvSub"), { min: min })) + "</p>" +
+      '<div class="tiles" style="margin-top:0.4rem;margin-bottom:1.2rem">' +
+      '<div class="tile"><div class="v">' + h1(I.h) + '</div><div class="l">' + esc(T("cInvTot")) + "</div></div>" +
+      '<div class="tile"><div class="v">' + h1(I.per) + '</div><div class="l">' + esc(T("cInvPer")) + "</div></div>" +
+      (I.often != null ? '<div class="tile"><div class="v accent">' + pct(I.often) + '</div><div class="l">' + esc(T("cInvOften")) + "</div></div>" : "") + "</div>" +
+      (bars ? '<div class="bars">' + bars + "</div>" : "") +
+      (docTxt ? '<p class="method">' + esc(T("cInvDoc")) + " — " + esc(docTxt) + "</p>" : "") +
+      (quotes.length ? '<h4 style="margin-top:1.6rem">' + esc(T("cInvQuotes")) + '</h4><p class="sub">' + esc(fmt(T("cInvQuotesSub"), { min: min })) + "</p>" +
+        '<ul class="alist">' + quotes.slice(0, 10).map(function (m) {
+          return '<li><span class="a-n" style="font-weight:400">“' + esc(m.q) + '”</span><span></span>' + (m.g ? '<span class="a-m"><span>' + esc(m.g) + "</span></span>" : "") + "</li>";
+        }).join("") + "</ul>" : "") + "</div>";
   }
 
   function groupInvisible(G, min) {
@@ -1860,6 +2016,7 @@
     if (form === "t" && sess.roles && sess.roles.length) p.set("roles", sess.roles.join("|"));
     if (sess.min && sess.min !== 5) p.set("min", sess.min);
     if (sess.email && sess.email !== DEFAULT_TO) p.set("to", sess.email);
+    if (collectorId(sess.collect)) p.set("c", collectorId(sess.collect));
     p.set("lang", sess.lang || "en");
     p.set("form", form === "d" ? "direction" : "team");
     // Keep "|" readable: shorter links make smaller, easier-to-scan QR codes.
@@ -1891,6 +2048,10 @@
         '<p class="sub" style="margin:0.8rem 0 0">' + esc(T("shareDesc")) + "</p>" +
         sharePanel("t", T("shareTeam"), shareUrl("t")) +
         sharePanel("d", T("shareLead"), shareUrl("d"), true) +
+        '<div class="share-block"><h4>' + esc(T("fCollect")) + '</h4><p class="sub" style="margin:0 0 0.5rem">' + esc(T(SESSION.collect ? "collectOn" : "collectOff")) + " " + esc(T("collectNote")) + "</p>" +
+        '<div style="display:flex;gap:0.6rem;flex-wrap:wrap"><input type="text" id="s-col" style="flex:1;min-width:200px" placeholder="' + esc(T("fCollectPh")) + '" value="' + esc(collectorUrl(SESSION.collect)) + '">' +
+        (ART ? '<button class="btn ghost small" data-act="save-collect">' + esc(T("btnSaveCollect")) + "</button>" : "") + "</div>" +
+        '<p class="msg" id="col-msg" role="status"></p></div>' +
         '<div class="btn-row"><button class="btn" data-act="live">' + esc(T("btnLive")) + "</button>" +
         '<button class="btn ghost" data-act="answer" data-f="t">' + esc(T("btnAnswerT")) + "</button>" +
         '<button class="btn ghost" data-act="answer" data-f="d">' + esc(T("btnAnswerD")) + "</button></div></div>";
@@ -1910,6 +2071,7 @@
         '<div class="field"><label for="n-min">' + esc(T("fMin")) + '</label><input type="text" id="n-min" inputmode="numeric" value="5"></div>' +
         '<div class="field"><label for="n-to">' + esc(T("fTo")) + '</label><input type="text" id="n-to" inputmode="email" value="' + esc(DEFAULT_TO) + '"></div>' +
         '<div class="field"><label for="n-lang">' + esc(T("fLang")) + '</label><select id="n-lang">' + langOpts + "</select></div>" +
+        '<div class="field"><label for="n-col">' + esc(T("fCollect")) + '</label><input type="text" id="n-col" placeholder="' + esc(T("fCollectPh")) + '"></div>' +
         (ART ? '<div class="btn-row"><button class="btn" data-act="create" id="btn-create" disabled>' + esc(T("btnCreate")) + "</button></div>"
              : '<p class="sub" style="margin:0.4rem 0 0">' + esc(T("needArt")) + "</p>") +
         '<p class="msg" id="create-msg" role="status"></p></div>';
@@ -1929,7 +2091,7 @@
   // ============ public facilitator view (no artifact) ============
   function renderFacilitator() {
     var langOpts = '<option value="en"' + (lang === "en" ? " selected" : "") + '>English</option><option value="fr"' + (lang === "fr" ? " selected" : "") + ">Français</option>";
-    var pseudo = { org: P.org || "", roles: roles(), min: P.min, email: P.to, lang: lang };
+    var pseudo = { org: P.org || "", roles: roles(), min: P.min, email: P.to, lang: lang, collect: P.collect };
     return '<section class="screen">' +
       '<p class="eyebrow"><span class="mark">MR5</span> · ' + esc(T("fEyebrow")) + "</p>" +
       "<h1>" + esc(T("fTitle")) + "</h1>" +
@@ -1958,7 +2120,8 @@
       roles: $("f-roles").value.split("\n").map(function (s) { return s.trim(); }).filter(Boolean),
       min: Math.max(2, parseInt($("f-min").value, 10) || 5),
       email: $("f-to").value.trim() || DEFAULT_TO,
-      lang: $("f-lang").value
+      lang: $("f-lang").value,
+      collect: P.collect
     };
   }
   function updateFacilitatorLinks() {
@@ -2047,7 +2210,11 @@
         if (!stepValid(steps[state.step])) return;
         if (state.step < steps.length - 1) { state.step += 1; saveDraft(); go("survey"); break; }
         lastPayload = buildPayload();
-        if (mode === "standalone") { submitHTML = standaloneCodeHTML(lastPayload); state.done = true; saveDraft(); go("personal"); }
+        if (mode === "standalone") {
+          state.done = true; state.sent = false; saveDraft();
+          if (!sendToCollector(lastPayload)) submitHTML = standaloneCodeHTML(lastPayload);
+          go("personal");
+        }
         else if (mode === "respond") { submitToSession(lastPayload); go("personal"); }
         else { submitHTML = ""; go("personal"); }
         break;
@@ -2094,6 +2261,13 @@
         break;
       case "add-codes":
         addCodes(); break;
+      case "save-collect":
+        var cv = $("s-col").value.trim(), cid = collectorId(cv);
+        if (cv && !cid) { $("col-msg").textContent = T("collectBad"); break; }
+        var nsc = copyJSON(SESSION); nsc.collect = cid;
+        $("col-msg").textContent = "…";
+        publishSession(nsc).catch(function () { $("col-msg").textContent = T("saveErr"); });
+        break;
       case "close":
         if (!closeArmed) { closeArmed = true; t.textContent = T("btnCloseConfirm"); break; }
         var nc = copyJSON(SESSION); nc.closed = true;
@@ -2181,8 +2355,10 @@
       min: Math.max(2, parseInt($("n-min").value, 10) || 5),
       email: $("n-to").value.trim() || DEFAULT_TO,
       lang: $("n-lang").value === "fr" ? "fr" : "en",
+      collect: collectorId($("n-col").value),
       createdAt: Date.now(), responses: []
     };
+    if ($("n-col").value.trim() && !sess.collect) { $("create-msg").textContent = T("collectBad"); return; }
     $("create-msg").textContent = T("creating");
     publishSession(sess).catch(function () { $("create-msg").textContent = T("saveErr"); });
   }
@@ -2271,13 +2447,13 @@
   }
   function activitiesCsv(list) {
     var cols = ["respondent_id", "form", "role_group", "activity_no", "activity", "hours_per_week_bracket", "hours_per_week_estimate",
-      "same_way", "value", "error_consequence", "confidential", "wants_to_lighten", "proposed_category", "ai_help", "hours_saved_low", "hours_saved_high", "validated_category"];
+      "same_way", "value", "error_consequence", "confidential", "wants_to_lighten", "ai_view", "proposed_category", "ai_help", "hours_saved_low", "hours_saved_high", "validated_category"];
     var lines = [cols.join(",")];
     list.forEach(function (r) {
       r.acts.forEach(function (x, i) {
         lines.push([r.id, r.f === "t" ? "team" : "leadership", r.f === "d" ? T("cLead") : (r.role || T("prefNot")), i + 1, x.n,
           pick("hours", x.h), HOURS_MID[x.h], pick("same", x.s), pick("value", x.v), pick("err", x.e), pick("conf", x.c),
-          pick("lighten", x.w), T(CAT_LABEL[classify(x)]), T(HELP_LABEL[helpType(x)]), savedOf(x)[0], savedOf(x)[1], ""].map(csvCell).join(","));
+          pick("lighten", x.w), pick("aiOpts", x.a), T(CAT_LABEL[classify(x)]), T(HELP_LABEL[helpType(x)]), savedOf(x)[0], savedOf(x)[1], ""].map(csvCell).join(","));
       });
     });
     return lines.join("\n");
@@ -2410,7 +2586,7 @@
     }
   } else if (view !== "facilitator") {
     var dr = lsGet(draftKey());
-    if (dr && dr.done && dr.a) { state = dr; lastPayload = buildPayload(); submitHTML = standaloneCodeHTML(lastPayload); view = "personal"; }
+    if (dr && dr.done && dr.a) { state = dr; lastPayload = buildPayload(); submitHTML = dr.sent ? sentHTML(lastPayload) : standaloneCodeHTML(lastPayload); view = "personal"; }
   }
   codeMsg = ssGet("aia-code-msg") || "";
   ssDel("aia-code-msg");

@@ -23,14 +23,33 @@ link, so the page itself names no client.
 
 The artifact copy embeds `{"v":1,"session":null,"archive":[]}` in the
 `aia-data` block instead of `{"standalone":…}` and declares the `artifact` and
-`downloads` capabilities. There the facilitator creates a group session, shows
-the team and leadership QR codes (full-screen present mode), and opens the live
-group results: directions to discuss, where the time goes by role group,
-best candidates for AI, what stays human, reinvestment priorities and concerns
-(teams vs. leadership), training needs and readiness signals. Codes from the
-public link are added there; CSV exports and a PDF report are available; sessions
-close and move to the archive.
+`downloads` capabilities. There the facilitator creates a group session, shows the team and leadership QR
+codes (full-screen present mode), and opens the live group results. They lead with
+the share of the work described that AI agents, AI assistants and people could do,
+overall and by role group, then every activity listed under its category, the
+directions to discuss, the time AI could free, the invisible coordination work, and
+the conditions for success (where freed time should go, concerns, training,
+readiness). Codes are added there; CSV exports and a PDF report are available;
+sessions close and move to the archive.
 
-Team groups under the minimum size are pooled, and activity descriptions are
-only shown for groups that reach it. Categories follow the decision tree
-(section 6.3) and are proposals to validate.
+Each activity is placed by the respondent's own answer to "What could AI do with
+this activity?", except that work with serious consequences or where every case is
+different is not handed fully to an agent. Without that answer the criteria decide
+(serious consequences: human; done the same way each time: agent; otherwise:
+assistant). Confidential data is flagged "approved tools only". Groups under the
+minimum size are pooled, and activity descriptions are only shown for groups that
+reach it. All figures are proposals to validate.
+
+## Automatic collection (Google Sheet)
+
+Without it, respondents send their response code by email. With it, each finished
+questionnaire sends its code to a Google Sheet; the code stays on screen as a backup.
+
+1. In the MR5 Google account, create a Google Sheet (e.g. "AI Activity Diagnostic – responses").
+2. In the Sheet: **Extensions → Apps Script**. Replace the code with `collector/Code.gs`, then **Save**.
+3. **Deploy → New deployment → Select type: Web app**. Execute as: **Me**. Who has access: **Anyone**. **Deploy**, then authorize.
+4. Copy the **Web app URL** (`https://script.google.com/macros/s/…/exec`).
+5. In the facilitator console, paste it in **Automatic collection** (new session form or live session card) and save.
+   The links and QR codes then carry the collector; share those.
+6. To add answers to the results, copy the **Code** column of the "Responses" tab into **Add response codes**.
+   Codes already added are skipped, so pasting the whole column again is safe.
