@@ -1933,6 +1933,45 @@
         }).join("") + "</ul>" : "") + "</div>";
   }
 
+  function groupInvisible(G, min) {
+    var all = G.teams.concat(G.dirs), I = invisibleOf(all);
+    if (!I.n && !I.nRl) return "";
+    var rows = [];
+    G.rows.forEach(function (row) { if (row.list.length >= min) rows.push({ name: row.name, list: row.list }); });
+    if (G.dirs.length) rows.push({ name: T("cLead"), list: G.dirs, lead: true });
+    var data = rows.map(function (row) { return { row: row, i: invisibleOf(row.list) }; }).filter(function (d) { return d.i.n || d.i.nRl; });
+    var max = 0; data.forEach(function (d) { max = Math.max(max, d.i.per); });
+    var bars = data.map(function (d) {
+      var w = max ? 100 * d.i.per / max : 0;
+      var sub = d.row.lead && d.i.n < d.row.list.length ? fmt(T("cInvAns"), { n: d.i.n, t: d.row.list.length }) : "";
+      return '<div class="bar-row"><div class="name">' + esc(d.row.name) + (sub ? "<small>" + esc(sub) + "</small>" : "") + "</div>" +
+        '<div class="bar-line"><div class="track"><div class="fill" style="width:' + w.toFixed(2) + '%;background:var(--c-hum)" data-tip="' +
+        esc(h1(d.i.per) + " " + T("cInvPer")) + '"></div><span style="width:' + (100 - w).toFixed(2) + '%"></span></div>' +
+        '<span class="val">' + h1(d.i.per) + " h</span></div>" +
+        '<div class="breakdown"><span>' + esc(T("cInvPer")) + "</span>" + (d.i.often != null ? "<span>" + esc(fmt(T("cInvRow"), { p: pct(d.i.often) })) + "</span>" : "") + "</div></div>";
+    }).join("");
+    // Free-text answers only from groups that reach the minimum size.
+    var quotes = [];
+    G.eligible.forEach(function (e) {
+      [e.r.kp, e.r.kd].forEach(function (q) { if (q && String(q).trim()) quotes.push({ q: String(q).trim(), g: e.g }); });
+    });
+    var dirsKw = G.dirs.filter(function (r) { return r.kw != null; });
+    var docTxt = dirsKw.length ? T("kwOpts").map(function (o, i) {
+      var c = dirsKw.filter(function (r) { return r.kw === i; }).length; return c ? o + " " + c : "";
+    }).filter(Boolean).join(" · ") : "";
+    return '<div class="card"><h3>' + esc(T("cInv")) + '</h3><p class="sub">' + esc(fmt(T("cInvSub"), { min: min })) + "</p>" +
+      '<div class="tiles" style="margin-top:0.4rem;margin-bottom:1.2rem">' +
+      '<div class="tile"><div class="v">' + h1(I.h) + '</div><div class="l">' + esc(T("cInvTot")) + "</div></div>" +
+      '<div class="tile"><div class="v">' + h1(I.per) + '</div><div class="l">' + esc(T("cInvPer")) + "</div></div>" +
+      (I.often != null ? '<div class="tile"><div class="v accent">' + pct(I.often) + '</div><div class="l">' + esc(T("cInvOften")) + "</div></div>" : "") + "</div>" +
+      (bars ? '<div class="bars">' + bars + "</div>" : "") +
+      (docTxt ? '<p class="method">' + esc(T("cInvDoc")) + " — " + esc(docTxt) + "</p>" : "") +
+      (quotes.length ? '<h4 style="margin-top:1.6rem">' + esc(T("cInvQuotes")) + '</h4><p class="sub">' + esc(fmt(T("cInvQuotesSub"), { min: min })) + "</p>" +
+        '<ul class="alist">' + quotes.slice(0, 10).map(function (m) {
+          return '<li><span class="a-n" style="font-weight:400">“' + esc(m.q) + '”</span><span></span>' + (m.g ? '<span class="a-m"><span>' + esc(m.g) + "</span></span>" : "") + "</li>";
+        }).join("") + "</ul>" : "") + "</div>";
+  }
+
   function liveSession() { return LIVE_SRC || SESSION; }
 
   function renderGroup() {
