@@ -40,6 +40,13 @@ carried by its links, its answers and its results page, so each results page sho
 its own client's answers. (Sessions created before survey codes existed show only
 answers without one.)
 
+**Report by sector:** above the group results (console, results page and public
+facilitator view), **Report for** switches between the whole organization and one
+sector (role group). The whole report, PDF included, then covers that sector's team
+answers only. A sector needs at least the minimum group size to be chosen; leadership
+answers have no sector and stay in the whole-organization report. The sector ROI takes
+its own headcount and carries its share of the AI agent costs (by agent time freed).
+
 The live session card can change the role groups (that changes the team link and QR
 code; the old link keeps the old list). Past sessions keep a link to their results page
 and can be deleted from the console (two clicks); answers already in the Google Sheet

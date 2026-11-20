@@ -793,6 +793,11 @@
       gRespSplit: "{t} team · {d} leadership",
       cTime: "Where the time goes",
       cTimeSub: "Hours per week, by proposed category. Hours are bracket midpoints (estimates). Team groups under {min} people are pooled.",
+      secLabel: "Report for", secAll: "The whole organization (all sectors)", secFew: "fewer than {min} answers",
+      secNote: "A sector report needs at least {min} answers, to protect anonymity. The PDF follows this choice.",
+      secHead: "Sector report: {s} ({n}).", secLeadNote: "Team answers from this sector only; leadership answers are in the whole-organization report.",
+      rHeadS: "Number of people in this sector (extrapolation)",
+      rSecShare: "AI agent setup and running costs are shared between sectors in proportion to the agent time each frees: this sector carries {p}.",
       cAll: "All respondents", cPooled: "Pooled (groups under {min})", cLead: "Leadership", cHidden: "Hidden — fewer than {min} people",
       cCand: "Best candidates for AI",
       cCandSub: "Activities where AI could automate or assist and that people would like to lighten — most hours first. Shown only for groups of at least {min} people.",
@@ -1084,6 +1089,11 @@
       gRespSplit: "{t} équipes · {d} direction",
       cTime: "Où va le temps",
       cTimeSub: "Heures par semaine, par catégorie proposée. Les heures sont le milieu de chaque tranche (estimations). Les groupes de moins de {min} personnes sont regroupés.",
+      secLabel: "Rapport pour", secAll: "Toute l’organisation (tous les secteurs)", secFew: "moins de {min} réponses",
+      secNote: "Un rapport de secteur exige au moins {min} réponses, pour protéger l’anonymat. Le PDF suit ce choix.",
+      secHead: "Rapport de secteur : {s} ({n}).", secLeadNote: "Réponses des équipes de ce secteur seulement; les réponses de la direction sont dans le rapport de toute l’organisation.",
+      rHeadS: "Nombre de personnes dans ce secteur (extrapolation)",
+      rSecShare: "Les coûts de mise en place et d’exploitation des agents IA sont répartis entre les secteurs selon le temps libéré par les agents : ce secteur en porte {p}.",
       cAll: "Tous les répondants", cPooled: "Regroupés (groupes de moins de {min})", cLead: "Direction", cHidden: "Masqué — moins de {min} personnes",
       cCand: "Meilleurs candidats pour l’IA",
       cCandSub: "Activités que l’IA pourrait automatiser ou assister et que les gens aimeraient alléger — les plus longues d’abord. Affichées seulement pour les groupes d’au moins {min} personnes.",
@@ -1294,6 +1304,7 @@
   var LIVE_SRC = null;         // null = current session; otherwise an archived session
   var compiled = [];           // responses compiled from codes on the public facilitator view
   var closeArmed = false;
+  var SECTOR = ssGet("aia-sector") || "";   // report for one sector (its French role name); "" = whole organization
   var delArmed = -1;           // past session waiting for the second click on "Delete"
   var codeMsg = "";            // result of the last "add codes", shown again after the reload
   var ROI_IN = null;           // ROI assumptions; saved with the session in the artifact
@@ -1703,7 +1714,43 @@
     return { teams: teams, dirs: dirs, rows: rows, eligible: eligible };
   }
 
-  function renderGroupBody(responses, min) {
+  // Sectors (role groups) that answered, in the order set up for the survey.
+  function sectorList(responses, min) {
+    var cnt = {}, order = [];
+    responses.forEach(function (r) {
+      if (r.f !== "t" || !r.role) return;
+      if (!cnt[r.role]) { cnt[r.role] = 0; order.push(r.role); }
+      cnt[r.role]++;
+    });
+    var known = roles().map(function (l) { return roleParts(l)[0]; });
+    function rank(k) { var i = known.indexOf(k); return i < 0 ? known.length : i; }
+    order.sort(function (a, b) { return rank(a) - rank(b); });
+    return order.map(function (k) { return { key: k, name: roleName(k), n: cnt[k], ok: cnt[k] >= min }; });
+  }
+  // The report for the whole organization, or for one sector. A sector report, like every
+  // group figure, needs at least `min` answers; leadership answers have no sector.
+  function renderReport(responses, min) {
+    var list = sectorList(responses, min);
+    var cur = list.filter(function (x) { return x.key === SECTOR && x.ok; })[0];
+    if (!cur) SECTOR = "";
+    var picker = list.length ? '<div class="field no-pdf" style="margin-top:1.6rem;max-width:30rem"><label for="sector">' + esc(T("secLabel")) + "</label>" +
+      '<select id="sector"><option value="">' + esc(T("secAll")) + "</option>" +
+      list.map(function (x) {
+        return '<option value="' + esc(x.key) + '"' + (x.key === SECTOR ? " selected" : "") + (x.ok ? "" : " disabled") + ">" +
+          esc(x.name + " — " + ppl(x.n) + (x.ok ? "" : " · " + fmt(T("secFew"), { min: min }))) + "</option>";
+      }).join("") + '</select><p class="msg" style="margin-top:0.4rem">' + esc(fmt(T("secNote"), { min: min })) + "</p></div>" : "";
+    if (!cur) return picker + renderGroupBody(responses, min);
+    var sub = responses.filter(function (r) { return r.f === "t" && r.role === SECTOR; });
+    var all = [], mine = [];
+    responses.forEach(function (r) { all = all.concat(r.acts); });
+    sub.forEach(function (r) { mine = mine.concat(r.acts); });
+    var aAll = savingsOf(all).agent, aMine = savingsOf(mine).agent;
+    var share = aAll[0] + aAll[1] ? (aMine[0] + aMine[1]) / (aAll[0] + aAll[1]) : 0;
+    return picker + '<div class="status-banner"><strong>' + esc(fmt(T("secHead"), { s: cur.name, n: ppl(cur.n) })) + "</strong> " + esc(T("secLeadNote")) + "</div>" +
+      renderGroupBody(sub, min, { sector: SECTOR, agentShare: share });
+  }
+
+  function renderGroupBody(responses, min, opt) {
     var G = groupData(responses, min);
     var allActs = [];
     responses.forEach(function (r) { allActs = allActs.concat(r.acts); });
@@ -1794,7 +1841,7 @@
       }).join("") + "</div>" +
       groupOutlook(G, min, responses, SP, SV) +
       groupAllActivities({ agent: agents, assistant: assists, human: keep }, SP, allActs.length, min) +
-      groupROI(G, min, responses.length, SV, SP) +
+      groupROI(G, min, responses.length, SV, SP, opt) +
       '<div class="card"><h3>' + esc(T("cDirs")) + '</h3><p class="sub">' + esc(T("cDirsSub")) + '</p><div class="levers">' + dirs.join("") + "</div></div>" +
       groupSavings(G, min, responses.length) +
       groupInvisible(G, min) +
@@ -1828,7 +1875,8 @@
   }
   function whole(v) { return Math.round(v).toLocaleString(lang === "fr" ? "fr-CA" : "en-CA"); }
 
-  function groupROI(G, min, n, SV, SP) {
+  function groupROI(G, min, n, SV, SP, opt) {
+    var sector = opt && opt.sector, headKey = sector ? "head@" + sector : "head";
     var rows = [];
     G.rows.forEach(function (row) { if (row.list.length >= min) rows.push({ name: row.name, list: row.list }); });
     if (G.dirs.length >= min) rows.push({ name: T("cLead"), list: G.dirs });
@@ -1836,10 +1884,13 @@
       var acts = []; row.list.forEach(function (r) { acts = acts.concat(r.acts); });
       return { name: row.name, n: row.list.length, s: savingsOf(acts) };
     }) };
+    roiCtx.headKey = headKey;
+    if (sector) { roiCtx.rows = []; roiCtx.agentShare = opt.agentShare; }
     var I = roiInputs();
     var fields = ROI_FIELDS.map(function (f) {
-      return '<div class="field"><label for="roi-' + f[0] + '">' + esc(T(f[1])) + '</label><input type="text" inputmode="' + (f[0] === "cur" ? "text" : "decimal") +
-        '" id="roi-' + f[0] + '" data-roi="' + f[0] + '" value="' + esc(I[f[0]] == null ? "" : I[f[0]]) + '"' + (f[0] === "head" ? ' placeholder="' + esc(T("rHeadPh")) + " (" + n + ')"' : "") + "></div>";
+      var key = f[0] === "head" ? headKey : f[0];
+      return '<div class="field"><label for="roi-' + f[0] + '">' + esc(T(f[0] === "head" && sector ? "rHeadS" : f[1])) + '</label><input type="text" inputmode="' + (f[0] === "cur" ? "text" : "decimal") +
+        '" id="roi-' + f[0] + '" data-roi="' + key + '" value="' + esc(I[key] == null ? "" : I[key]) + '"' + (f[0] === "head" ? ' placeholder="' + esc(T("rHeadPh")) + " (" + n + ')"' : "") + "></div>";
     }).join("");
     var canSave = ART && SESSION && !LIVE_SRC && view === "group";
     return '<div class="card"><h3>' + esc(T("cRoi")) + '</h3><p class="sub">' + esc(T("cRoiSub")) + "</p>" +
@@ -1855,9 +1906,10 @@
     var I = roiInputs();
     var rate = num(I.rate), weeks = num(I.weeks) || 0, cap = num(I.capture);
     cap = cap == null ? 1 : Math.min(cap, 100) / 100;
-    var head = num(I.head) || C.n, scale = head / C.n;
+    var head = num(I[C.headKey || "head"]) || C.n, scale = head / C.n;
     function yearly(w) { return [w[0] * scale * weeks * cap, w[1] * scale * weeks * cap]; }
-    var setup = num(I.aSetup) || 0, monthly = num(I.aMonthly) || 0, lic = num(I.licence) || 0, train = num(I.training) || 0;
+    var fixed = C.agentShare == null ? 1 : C.agentShare;   // a sector carries its share of the AI agent costs
+    var setup = (num(I.aSetup) || 0) * fixed, monthly = (num(I.aMonthly) || 0) * fixed, lic = num(I.licence) || 0, train = num(I.training) || 0;
     var hA = yearly(C.SV.agent), hB = yearly(C.SV.assistant), hT = [hA[0] + hB[0], hA[1] + hB[1]];
     var mA = hA[0] + hA[1], mB = hB[0] + hB[1], shareA = mA + mB ? mA / (mA + mB) : 0.5;
     var cA = setup + monthly * 12 + train * head * shareA, cB = lic * 12 * head + train * head * (1 - shareA), cT = cA + cB;
@@ -1912,6 +1964,7 @@
     if (rate == null) notes.push(T("rNeedRate"));
     else if (!cT) notes.push(T("rNoCost"));
     return tiles + (notes.length ? '<div class="status-banner" style="margin-top:0.6rem">' + esc(notes.join(" ")) + "</div>" : "") + main + groups +
+      (C.agentShare != null ? '<p class="method">' + esc(fmt(T("rSecShare"), { p: pct(100 * C.agentShare) })) + "</p>" : "") +
       '<p class="method">' + esc(T("rMethod")) + "</p>";
   }
 
@@ -2075,7 +2128,7 @@
       "<h1>" + esc(T("gTitle")) + "</h1>" +
       '<p class="org-line"><strong>' + esc(s ? s.org : "") + '</strong><span class="sep">·</span>' + esc(dateStr(s && s.createdAt)) + "</p>" +
       '<p class="lede no-pdf" style="font-size:0.88rem;margin-top:0.4rem">' + esc(note) + "</p>" +
-      (responses.length ? renderGroupBody(responses, (s && s.min) || 5) : '<div class="status-banner">' + esc(T("gEmpty")) + "</div>") +
+      (responses.length ? renderReport(responses, (s && s.min) || 5) : '<div class="status-banner">' + esc(T("gEmpty")) + "</div>") +
       (isCurrent && ART ? adminHTML() : "") +
       '<div class="nav-row no-pdf" style="justify-content:flex-start;gap:0.8rem">' +
       '<button class="btn ghost" data-act="to-intro">' + esc(T("btnBackConsole")) + "</button>" +
@@ -2230,7 +2283,7 @@
       (compiled.length ? '<div id="report-root">' +
         '<p class="eyebrow" style="margin-top:2.4rem"><span class="mark">MR5</span> · ' + esc(T("gEyebrow")) + "</p>" +
         "<h1>" + esc(T("gTitle")) + '</h1><p class="org-line"><strong>' + esc(P.org || compiled[0].org || "") + '</strong><span class="sep">·</span>' + esc(dateStr()) + "</p>" +
-        renderGroupBody(compiled, P.min) + "</div>" +
+        renderReport(compiled, P.min) + "</div>" +
         '<div class="nav-row no-pdf" style="justify-content:flex-start"><button class="btn ghost" data-act="report">' + esc(T("btnReport")) + "</button></div>" : "") +
       "</section>";
   }
@@ -2266,7 +2319,7 @@
       (compiled.length
         ? '<div id="report-root"><p class="eyebrow" style="margin-top:2.4rem"><span class="mark">MR5</span> · ' + esc(T("gEyebrow")) + "</p>" +
           "<h1>" + esc(T("gTitle")) + '</h1><p class="org-line">' + (org ? "<strong>" + esc(org) + '</strong><span class="sep">·</span>' : "") + esc(dateStr()) + "</p>" +
-          renderGroupBody(compiled, P.min) + "</div>" +
+          renderReport(compiled, P.min) + "</div>" +
           '<div class="nav-row no-pdf" style="justify-content:flex-start;gap:0.8rem"><button class="btn ghost" data-act="report">' + esc(T("btnReport")) + "</button>" +
           '<button class="btn ghost small" data-act="csv-r">' + esc(T("btnCsvR")) + '</button><button class="btn ghost small" data-act="csv-a">' + esc(T("btnCsvA")) + "</button></div>"
         : (resLoaded ? '<div class="status-banner">' + esc(T("vNone")) + "</div>" : "")) +
@@ -2501,6 +2554,7 @@
       var out = $("roi-out"); if (out) out.innerHTML = roiOut();
       return;
     }
+    if (el.id === "sector") { SECTOR = el.value; ssSet("aia-sector", SECTOR); render(); return; }
     if (view === "facilitator") { if (el.closest("#f-links")) updateFacilitatorLinks(); return; }
     if (view === "intro") { syncCreate(); return; }
     if (view !== "survey") return;
@@ -2722,6 +2776,7 @@
         }
         if (total - start > 2) slices.push([start, total]);
         var org = view === "facilitator" || view === "results" ? P.org : (cfg().org || (liveSession() && liveSession().org) || "");
+        var secName = SECTOR && $("sector") ? roleName(SECTOR) : "";
         slices.forEach(function (sl, i) {
           var hgt = sl[1] - sl[0], c = document.createElement("canvas");
           c.width = canvas.width; c.height = hgt;
@@ -2731,12 +2786,12 @@
           if (i > 0) pdf.addPage();
           pdf.addImage(c.toDataURL("image/jpeg", 0.92), "JPEG", margin, margin, cw, hgt / k);
           pdf.setFontSize(8); pdf.setTextColor(138, 130, 122);
-          pdf.text("MR5 InnovAction · AI Activity Diagnostic · " + org, margin, ph - margin / 2 - 4);
+          pdf.text("MR5 InnovAction · AI Activity Diagnostic · " + org + (secName ? " · " + secName : ""), margin, ph - margin / 2 - 4);
           pdf.text((i + 1) + " / " + slices.length, pw - margin, ph - margin / 2 - 4, { align: "right" });
         });
-        pdf.setProperties({ title: org + " — AI Activity Diagnostic", author: "MR5 InnovAction" });
+        pdf.setProperties({ title: org + (secName ? " · " + secName : "") + " — AI Activity Diagnostic", author: "MR5 InnovAction" });
         var kind = "group-results";
-        return { pdf: pdf, filename: "ai-activities-" + kind + "-" + slug(org) + ".pdf" };
+        return { pdf: pdf, filename: "ai-activities-" + kind + "-" + slug(org) + (secName ? "-" + slug(secName) : "") + ".pdf" };
       });
     }).catch(function (e) { restore(); throw e; });
   }
