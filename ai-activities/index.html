@@ -135,6 +135,10 @@
   input:focus-visible, textarea:focus-visible, select:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; border-color: var(--accent); }
   input::placeholder, textarea::placeholder { color: var(--ink-3); opacity: 1; }
   .other-input { margin-top: 0.5rem; }
+  .sector-row { display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap; margin-bottom: 0.45rem; }
+  .sector-row .choices { flex: 1 1 14rem; }
+  .sector-row .choices label { width: 100%; }
+  .sector-row .hc-n { width: 10rem; flex: none; }
   .field { margin-bottom: 0.9rem; }
   .field label { display: block; font-size: 0.82rem; font-weight: 600; color: var(--ink-2); margin-bottom: 0.3rem; }
 
@@ -580,9 +584,9 @@
       eyebrowT: "AI activity diagnostic · Team questionnaire",
       eyebrowD: "AI activity diagnostic · Leadership questionnaire",
       titleT: "How do you spend your time at work?",
-      titleD: "Before the on-site diagnostic",
+      titleD: "Your work, your teams and AI",
       ledeT: "This takes about 15 minutes. We want to understand what you spend your time on, which tasks feel most useful and which you would like to lighten — to find where AI could take over repetitive work so you can spend more time on what matters: clients, higher-value work and the development of {org}.",
-      ledeD: "This takes about 15 minutes. It mostly gathers facts (teams, tools, data, rules) that may need a quick check. Questions about vision and direction will be discussed with you in the interview.",
+      ledeD: "This takes about 15 minutes. You describe your own main activities, the same way as your teams, then a few facts about your teams, tools, data and rules. Combined with your teams’ answers, it shows where AI could help across {org}.",
       pointsT: [
         "This is not an evaluation of your work or performance.",
         "It is anonymous: no name, no email address, no login.",
@@ -661,9 +665,10 @@
 
       sProfile: "Profile and scope",
       qName: "Name and title",
-      qScope: "Which roles, teams or functions report to you?",
-      qScopeHelp: "If you see fit, add the approximate number of people in each.",
-      qTop: "For each function you oversee, which 3 activities take up most of the team’s time?",
+      qScope: "Which sectors do you lead, and about how many people work in each?",
+      qScopeHelp: "Check each sector you lead and add an approximate number of people — it is used to estimate the return for each sector.",
+      scPeople: "number of people", scOther: "Other teams or functions not in the list",
+      sYouD: "Your work and AI",
       qExclude: "Are there any functions or activities to leave out of this exercise for now?",
       sAdoption: "Conditions for adoption",
       qTools: "Are AI tools already used at {org}?",
@@ -798,6 +803,7 @@
       secHead: "Sector report: {s} ({n}).", secLeadNote: "Team answers from this sector only; leadership answers are in the whole-organization report.",
       rHeadS: "Number of people in this sector (extrapolation)",
       rSecShare: "AI agent setup and running costs are shared between sectors in proportion to the agent time each frees: this sector carries {p}.",
+      cOutCovD: "Leadership: about {p} of their week.", rHeadFrom: "Directors’ answers: about {n} people.",
       cAll: "All respondents", cPooled: "Pooled (groups under {min})", cLead: "Leadership", cHidden: "Hidden — fewer than {min} people",
       cCand: "Best candidates for AI",
       cCandSub: "Activities where AI could automate or assist and that people would like to lighten — most hours first. Shown only for groups of at least {min} people.",
@@ -876,9 +882,9 @@
       eyebrowT: "Diagnostic IA des activités · Questionnaire Équipes",
       eyebrowD: "Diagnostic IA des activités · Questionnaire Direction",
       titleT: "À quoi consacrez-vous votre temps au travail?",
-      titleD: "Avant le diagnostic sur place",
+      titleD: "Votre travail, vos équipes et l’IA",
       ledeT: "Ce questionnaire prend environ 15 minutes. Nous voulons comprendre à quoi vous consacrez votre temps, quelles tâches vous semblent les plus utiles et lesquelles vous aimeriez alléger — afin de repérer où l’IA pourrait prendre en charge des tâches répétitives et vous laisser plus de temps pour ce qui compte : les clients, les tâches à valeur ajoutée et le développement de {org}.",
-      ledeD: "Ce questionnaire prend environ 15 minutes. Il rassemble surtout des faits (équipes, outils, données, règles) qui demandent parfois une vérification. Les questions de vision et d’orientation seront abordées avec vous en entrevue.",
+      ledeD: "Ce questionnaire prend environ 15 minutes. Vous décrivez vos propres activités principales, comme vos équipes, puis quelques faits sur vos équipes, vos outils, vos données et vos règles. Avec les réponses de vos équipes, il montre où l’IA pourrait aider dans l’ensemble de {org}.",
       pointsT: [
         "Il ne s’agit pas d’une évaluation de votre travail ni de votre performance.",
         "Le questionnaire est anonyme : aucun nom, aucune adresse courriel, aucune connexion.",
@@ -957,9 +963,10 @@
 
       sProfile: "Profil et périmètre",
       qName: "Nom et titre",
-      qScope: "Quelles fonctions, équipes ou quels rôles relèvent de vous?",
-      qScopeHelp: "Indiquez, si vous le jugez approprié, le nombre approximatif de personnes pour chacun.",
-      qTop: "Pour chaque fonction sous votre responsabilité, quelles sont les 3 activités qui consomment le plus de temps des équipes?",
+      qScope: "Quels secteurs dirigez-vous, et combien de personnes environ y travaillent?",
+      qScopeHelp: "Cochez chaque secteur que vous dirigez et indiquez un nombre approximatif de personnes — il sert à estimer le rendement de chaque secteur.",
+      scPeople: "nombre de personnes", scOther: "Autres équipes ou fonctions absentes de la liste",
+      sYouD: "Votre travail et l’IA",
       qExclude: "Y a-t-il des fonctions ou des activités à exclure de la démarche pour l’instant?",
       sAdoption: "Conditions d’adoption",
       qTools: "Des outils d’IA sont-ils déjà utilisés à {org}?",
@@ -1094,6 +1101,7 @@
       secHead: "Rapport de secteur : {s} ({n}).", secLeadNote: "Réponses des équipes de ce secteur seulement; les réponses de la direction sont dans le rapport de toute l’organisation.",
       rHeadS: "Nombre de personnes dans ce secteur (extrapolation)",
       rSecShare: "Les coûts de mise en place et d’exploitation des agents IA sont répartis entre les secteurs selon le temps libéré par les agents : ce secteur en porte {p}.",
+      cOutCovD: "Direction : environ {p} de leur semaine.", rHeadFrom: "Selon la direction : environ {n} personnes.",
       cAll: "Tous les répondants", cPooled: "Regroupés (groupes de moins de {min})", cLead: "Direction", cHidden: "Masqué — moins de {min} personnes",
       cCand: "Meilleurs candidats pour l’IA",
       cCandSub: "Activités que l’IA pourrait automatiser ou assister et que les gens aimeraient alléger — les plus longues d’abord. Affichées seulement pour les groupes d’au moins {min} personnes.",
@@ -1266,10 +1274,15 @@
     d: [
       { title: "sProfile", qs: [
         { k: "nm", type: "short", q: "qName", req: true },
-        { k: "sc", type: "long", q: "qScope", help: "qScopeHelp", req: true },
-        { k: "top", type: "long", q: "qTop", req: true },
+        { k: "hc", type: "sectors", q: "qScope", help: "qScopeHelp", req: true },
         { k: "ex", type: "long", q: "qExclude" },
         { k: "re", type: "many", q: "qReinvestD", o: "reinvest", max: 2, other: true, req: true }
+      ] },
+      { title: "sActs", sub: "sActsSubD", acts: { lo: 3, hi: 7 } },
+      { title: "sYouD", qs: [
+        { k: "cov", type: "one", q: "qCover", o: "cover", req: true, stack: true },
+        { k: "ai", type: "one", q: "qUsed", o: "used", req: true },
+        { k: "feel", type: "scale", q: "qFeel" }
       ] },
       { title: "sAdoption", qs: [
         { k: "tl", type: "one", q: "qTools", o: "tools", req: true },
@@ -1288,8 +1301,7 @@
         { k: "kd", type: "long", q: "qKd" },
         { k: "kw", type: "one", q: "qKw", o: "kwOpts" },
         { k: "kp", type: "long", q: "qKp" }
-      ] },
-      { title: "sActs", sub: "sActsSubD", acts: { lo: 3, hi: 5 } }
+      ] }
     ]
   };
 
@@ -1447,6 +1459,15 @@
       case "role":
         body = choiceGroup(q.k, roles().map(roleShow).concat([T("prefNot")]), v, false, { stack: true });
         break;
+      case "sectors":
+        var hv = v || {};
+        body = roles().map(function (l, i) {
+          var key = roleParts(l)[0], on = Object.prototype.hasOwnProperty.call(hv, key);
+          return '<div class="sector-row"><div class="choices"><input type="checkbox" id="hc-' + i + '" data-hc="' + i + '"' + (on ? " checked" : "") + '><label for="hc-' + i + '">' + esc(roleShow(l)) + "</label></div>" +
+            '<input type="text" inputmode="numeric" class="hc-n" data-hc-n="' + i + '" maxlength="5" aria-label="' + esc(roleShow(l) + " — " + T("scPeople")) + '" placeholder="' + esc(T("scPeople")) + '" value="' + esc(on && hv[key] != null ? hv[key] : "") + '"' + (on ? "" : " hidden") + "></div>";
+        }).join("") +
+          '<input type="text" class="other-input" data-k="sc" maxlength="300" placeholder="' + esc(T("scOther")) + '" aria-label="' + esc(T("scOther")) + '" value="' + esc(a.sc || "") + '">';
+        break;
       case "one":
         body = choiceGroup(q.k, T(q.o), v, false, { stack: q.stack });
         break;
@@ -1500,6 +1521,7 @@
       if (!q.req) return true;
       if (q.type === "agree") return Array.isArray(a[q.k]) && q.rows.every(function (_, i) { return a[q.k][i] != null; });
       if (q.type === "short" || q.type === "long") return filled((a[q.k] || "").trim());
+      if (q.type === "sectors") return Object.keys(a[q.k] || {}).length > 0 || filled((a.sc || "").trim());
       return filled(a[q.k]);
     });
   }
@@ -1563,6 +1585,7 @@
     }
     Object.keys(a).forEach(function (k) {
       if (k === "role" || k === "acts") return;
+      if (k === "hc") { if (Object.keys(a.hc || {}).length) out.hc = a.hc; return; }
       var v = a[k];
       if (typeof v === "string") v = v.trim();
       if (filled(v)) out[k] = v;
@@ -1729,7 +1752,22 @@
   }
   // The report for the whole organization, or for one sector. A sector report, like every
   // group figure, needs at least `min` answers; leadership answers have no sector.
+  // People per sector, as directors reported them (the largest figure when several name the
+  // same sector), and the organization total: those sectors plus the directors who answered.
+  function headcounts(responses) {
+    var by = {}, nd = 0, any = false;
+    responses.forEach(function (r) {
+      if (r.f !== "d") return;
+      nd++;
+      if (!r.hc || typeof r.hc !== "object") return;
+      Object.keys(r.hc).forEach(function (k) { var n = num(r.hc[k]); if (n) { any = true; by[k] = Math.max(by[k] || 0, n); } });
+    });
+    var total = 0;
+    Object.keys(by).forEach(function (k) { total += by[k]; });
+    return { by: by, total: any ? total + nd : null };
+  }
   function renderReport(responses, min) {
+    var HC = headcounts(responses);
     var list = sectorList(responses, min);
     var cur = list.filter(function (x) { return x.key === SECTOR && x.ok; })[0];
     if (!cur) SECTOR = "";
@@ -1739,7 +1777,7 @@
         return '<option value="' + esc(x.key) + '"' + (x.key === SECTOR ? " selected" : "") + (x.ok ? "" : " disabled") + ">" +
           esc(x.name + " — " + ppl(x.n) + (x.ok ? "" : " · " + fmt(T("secFew"), { min: min }))) + "</option>";
       }).join("") + '</select><p class="msg" style="margin-top:0.4rem">' + esc(fmt(T("secNote"), { min: min })) + "</p></div>" : "";
-    if (!cur) return picker + renderGroupBody(responses, min);
+    if (!cur) return picker + renderGroupBody(responses, min, { headSuggest: HC.total });
     var sub = responses.filter(function (r) { return r.f === "t" && r.role === SECTOR; });
     var all = [], mine = [];
     responses.forEach(function (r) { all = all.concat(r.acts); });
@@ -1747,7 +1785,7 @@
     var aAll = savingsOf(all).agent, aMine = savingsOf(mine).agent;
     var share = aAll[0] + aAll[1] ? (aMine[0] + aMine[1]) / (aAll[0] + aAll[1]) : 0;
     return picker + '<div class="status-banner"><strong>' + esc(fmt(T("secHead"), { s: cur.name, n: ppl(cur.n) })) + "</strong> " + esc(T("secLeadNote")) + "</div>" +
-      renderGroupBody(sub, min, { sector: SECTOR, agentShare: share });
+      renderGroupBody(sub, min, { sector: SECTOR, agentShare: share, headSuggest: HC.by[SECTOR] || null });
   }
 
   function renderGroupBody(responses, min, opt) {
@@ -1794,14 +1832,19 @@
     var feels = G.teams.map(function (r) { return r.feel; }).filter(function (x) { return x != null; });
     var feelAvg = feels.length ? feels.reduce(function (s, x) { return s + x; }, 0) / feels.length : null;
     var chT = avgAgree(G.teams, 2), chD = avgAgree(G.dirs, 1);
+    // Leadership asked these from the redesigned questionnaire on: count only those who answered.
+    var dAi = G.dirs.filter(function (r) { return r.ai != null; });
+    var usedWorkD = dAi.length ? 100 * dAi.filter(function (r) { return r.ai === 2 || r.ai === 3; }).length / dAi.length : null;
+    var feelsD = G.dirs.map(function (r) { return r.feel; }).filter(function (x) { return x != null; });
+    var feelAvgD = feelsD.length ? feelsD.reduce(function (s, x) { return s + x; }, 0) / feelsD.length : null;
     function rrow(label, a, b) {
       if (a == null && b == null) return "";
       return "<tr><td>" + esc(label) + "</td>" + (nt ? '<td class="num">' + (a == null ? "–" : a) + "</td>" : "") + (nd ? '<td class="num">' + (b == null ? "–" : b) + "</td>" : "") + "</tr>";
     }
     var rk = shareAgree(G.teams, 0), fi = shareAgree(G.teams, 1);
     var ready = '<table class="rt"><thead><tr><th></th>' + (nt ? '<th class="num">' + esc(T("cTeams")) + "</th>" : "") + (nd ? '<th class="num">' + esc(T("cDir")) + "</th>" : "") + "</tr></thead><tbody>" +
-      rrow(T("rUsedWork"), usedWork == null ? null : pct(usedWork), null) +
-      rrow(T("rFeel"), feelAvg == null ? null : h1(feelAvg), null) +
+      rrow(T("rUsedWork"), usedWork == null ? null : pct(usedWork), usedWorkD == null ? null : pct(usedWorkD)) +
+      rrow(T("rFeel"), feelAvg == null ? null : h1(feelAvg), feelAvgD == null ? null : h1(feelAvgD)) +
       rrow(T("rRekey"), rk == null ? null : pct(rk), null) +
       rrow(T("rFind"), fi == null ? null : pct(fi), null) +
       rrow(T("rChange"), chT == null ? null : h1(chT), chD == null ? null : h1(chD)) +
@@ -1885,12 +1928,16 @@
       return { name: row.name, n: row.list.length, s: savingsOf(acts) };
     }) };
     roiCtx.headKey = headKey;
+    var suggest = (opt && opt.headSuggest) || null;
+    roiCtx.suggest = suggest;
     if (sector) { roiCtx.rows = []; roiCtx.agentShare = opt.agentShare; }
     var I = roiInputs();
     var fields = ROI_FIELDS.map(function (f) {
-      var key = f[0] === "head" ? headKey : f[0];
+      var key = f[0] === "head" ? headKey : f[0], val = I[key] == null ? "" : I[key];
+      if (f[0] === "head" && val === "" && suggest) val = String(suggest);
       return '<div class="field"><label for="roi-' + f[0] + '">' + esc(T(f[0] === "head" && sector ? "rHeadS" : f[1])) + '</label><input type="text" inputmode="' + (f[0] === "cur" ? "text" : "decimal") +
-        '" id="roi-' + f[0] + '" data-roi="' + key + '" value="' + esc(I[key] == null ? "" : I[key]) + '"' + (f[0] === "head" ? ' placeholder="' + esc(T("rHeadPh")) + " (" + n + ')"' : "") + "></div>";
+        '" id="roi-' + f[0] + '" data-roi="' + key + '" value="' + esc(val) + '"' + (f[0] === "head" ? ' placeholder="' + esc(T("rHeadPh")) + " (" + n + ')"' : "") + ">" +
+        (f[0] === "head" && suggest ? '<small style="display:block;margin-top:0.25rem;font-size:0.76rem;color:var(--ink-3)">' + esc(fmt(T("rHeadFrom"), { n: suggest })) + "</small>" : "") + "</div>";
     }).join("");
     var canSave = ART && SESSION && !LIVE_SRC && view === "group";
     return '<div class="card"><h3>' + esc(T("cRoi")) + '</h3><p class="sub">' + esc(T("cRoiSub")) + "</p>" +
@@ -1906,7 +1953,7 @@
     var I = roiInputs();
     var rate = num(I.rate), weeks = num(I.weeks) || 0, cap = num(I.capture);
     cap = cap == null ? 1 : Math.min(cap, 100) / 100;
-    var head = num(I[C.headKey || "head"]) || C.n, scale = head / C.n;
+    var head = num(I[C.headKey || "head"]) || C.suggest || C.n, scale = head / C.n;
     function yearly(w) { return [w[0] * scale * weeks * cap, w[1] * scale * weeks * cap]; }
     var fixed = C.agentShare == null ? 1 : C.agentShare;   // a sector carries its share of the AI agent costs
     var setup = (num(I.aSetup) || 0) * fixed, monthly = (num(I.aMonthly) || 0) * fixed, lic = num(I.licence) || 0, train = num(I.training) || 0;
@@ -1983,6 +2030,8 @@
     var notes = [fmt(T("cOutHours"), { a: pct(SP.p.agent), b: pct(SP.p.assistant), c: pct(SP.p.human) })];
     if (SV.total[1] > 0) notes.push(fmt(T("cOutFree"), { r: hr(SV.total), pp: hr([SV.total[0] / responses.length, SV.total[1] / responses.length]) }));
     if (cov != null) notes.push(fmt(T("cOutCov"), { p: pct(cov) }));
+    var covsD = G.dirs.map(function (r) { return r.cov; }).filter(function (c) { return c != null; });
+    if (covsD.length) notes.push(fmt(T("cOutCovD"), { p: pct(covsD.reduce(function (t, c) { return t + [12.5, 37.5, 62.5, 87.5][c]; }, 0) / covsD.length) }));
     return '<div class="card live"><h3>' + esc(T("cOut")) + "</h3>" +
       '<p class="save-hero" style="font-size:clamp(1.2rem,3.2vw,1.6rem)">' + fmt(T("cOutP"), { n: ppl(responses.length), t: SP.n, a: pct(SP.c.agent), b: pct(SP.c.assistant), c: pct(SP.c.human) }) + "</p>" +
       '<p class="sub">' + esc(fmt(T("cOutSub"), { min: min })) + "</p>" + splitLegend() +
@@ -2157,7 +2206,8 @@
     sess = sess || SESSION;
     var p = new URLSearchParams();
     if (sess.org) p.set("org", sess.org);
-    if (form === "t" && sess.roles && sess.roles.length) p.set("roles", sess.roles.join("|"));
+    // Both questionnaires carry the role groups: teams pick one, directors check the ones they lead.
+    if (sess.roles && sess.roles.length) p.set("roles", sess.roles.join("|"));
     if (sess.min && sess.min !== 5) p.set("min", sess.min);
     if (sess.email && sess.email !== DEFAULT_TO) p.set("to", sess.email);
     if (sess.sid) p.set("s", sess.sid);
@@ -2559,7 +2609,15 @@
     if (view === "intro") { syncCreate(); return; }
     if (view !== "survey") return;
     var a = state.a, name = el.name || "";
-    if (el.hasAttribute("data-act-i")) {
+    if (el.hasAttribute("data-hc") || el.hasAttribute("data-hc-n")) {
+      var hi = el.getAttribute("data-hc") || el.getAttribute("data-hc-n"), hkey = roleParts(roles()[+hi])[0];
+      var hcv = Object.assign({}, a.hc || {}), hn = document.querySelector('[data-hc-n="' + hi + '"]');
+      var count = function (x) { var n = parseInt(String(x || "").replace(/[^\d]/g, ""), 10); return isFinite(n) ? n : ""; };
+      if (el.hasAttribute("data-hc-n")) hcv[hkey] = count(el.value);
+      else if (el.checked) { hcv[hkey] = count(hn && hn.value); if (hn) { hn.hidden = false; hn.focus(); } }
+      else { delete hcv[hkey]; if (hn) hn.hidden = true; }
+      a.hc = hcv;
+    } else if (el.hasAttribute("data-act-i")) {
       a.acts[+el.getAttribute("data-act-i")].n = el.value;
     } else if (el.hasAttribute("data-k")) {
       a[el.getAttribute("data-k")] = el.value;
@@ -2687,7 +2745,7 @@
     return v == null ? "" : opts[v];
   }
   function respondentsCsv(list) {
-    var cols = ["id", "form", "date", "lang", "org", "role_group", "name_title", "scope", "top_activities", "exclusions",
+    var cols = ["id", "form", "date", "lang", "org", "role_group", "name_title", "scope", "sectors_people", "top_activities", "exclusions",
       "coverage", "hand_over", "keep", "agree_rekey", "agree_find", "agree_teams_welcome_change", "agree_change_supported",
       "reinvest", "reinvest_other", "ai_used", "ai_feeling_1_5", "concerns", "concerns_other", "concerns_text",
       "training", "training_other", "ai_tools", "ai_tools_which", "data_indicators", "obligations", "written_rules",
@@ -2697,7 +2755,8 @@
     list.forEach(function (r) {
       var ag = r.ag || [], t = r.f === "t";
       var agv = function (i) { return ag[i] == null ? "" : T("agree")[ag[i]]; };
-      lines.push([r.id, t ? "team" : "leadership", r.d, r.l, r.org, t ? r.role : "", r.nm, r.sc, r.top, r.ex,
+      var hcTxt = r.hc && typeof r.hc === "object" ? Object.keys(r.hc).map(function (k) { return roleName(k) + (r.hc[k] === "" || r.hc[k] == null ? "" : ": " + r.hc[k]); }).join("; ") : "";
+      lines.push([r.id, t ? "team" : "leadership", r.d, r.l, r.org, t ? r.role : "", r.nm, r.sc, hcTxt, r.top, r.ex,
         pick("cover", r.cov), r.give, r.keep,
         t ? agv(0) : "", t ? agv(1) : "", t ? "" : agv(0), t ? agv(2) : agv(1),
         pick("reinvest", r.re), r.reo, pick("used", r.ai), r.feel, pick("concerns", r.co), r.coo, r.cq,
