@@ -11,6 +11,11 @@ few questions on day-to-day work and attitudes to AI. When they finish they see 
 thank-you screen (no results: those are for the facilitator) and their answers are
 sent, or they email a response code. No account, no backend.
 
+Directors answer the leadership questionnaire: name, the sectors they lead with about how
+many people in each, their own main activities (same cards as the teams), share of the week
+those cover, AI use and feeling, then facts about tools, data, rules and concerns, and the
+optional invisible-work step. Both links carry the role groups.
+
 ```
 …/ai-activities/?org=Organization&form=team&roles=Role A|Role B&s=<code>&lang=fr # anonymous team questionnaire
 …/ai-activities/?org=Organization&form=direction&lang=fr                       # leadership questionnaire
@@ -46,6 +51,8 @@ sector (role group). The whole report, PDF included, then covers that sector's t
 answers only. A sector needs at least the minimum group size to be chosen; leadership
 answers have no sector and stay in the whole-organization report. The sector ROI takes
 its own headcount and carries its share of the AI agent costs (by agent time freed).
+Headcounts reported by directors pre-fill the ROI (organization and each sector); they can
+be changed.
 
 The live session card can change the role groups (that changes the team link and QR
 code; the old link keeps the old list). Past sessions keep a link to their results page
